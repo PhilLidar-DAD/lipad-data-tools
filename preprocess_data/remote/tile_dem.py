@@ -5,14 +5,17 @@ import logging
 import math
 import os
 import osgeotools
+import random
+import string
 import sys
-import tempfile
 
-_version = "0.1.60"
+
+_version = "0.3.2"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _LOG_LEVEL = logging.DEBUG
 _CONS_LOG_LEVEL = logging.INFO
+_FILE_LOG_LEVEL = logging.DEBUG
 _TILE_SIZE = 1000
 _BUFFER = 50  # meters
 
@@ -34,6 +37,12 @@ def _setup_logging(args):
     ch.setFormatter(formatter)
     _logger.addHandler(ch)
 
+    # Setup file logging
+    fh = logging.FileHandler(args.logfile)
+    fh.setLevel(_FILE_LOG_LEVEL)
+    fh.setFormatter(formatter)
+    _logger.addHandler(fh)
+
 
 def _parse_arguments():
     # Parse arguments
@@ -53,6 +62,10 @@ tiles from input DEM.",
 projection is the same.")
     parser.add_argument("-o", "--output-dir", required=True,
                         help="Path to output directory.")
+    parser.add_argument("-tmp", "--temp-dir", required=True,
+                        help="Path to temporary working directory.")
+    parser.add_argument("-l", "--logfile", required=True,
+                        help="Filename of logfile")
     args = parser.parse_args()
     return args
 
@@ -90,8 +103,11 @@ if __name__ == '__main__':
     # Resample DEM to tile extents
     _logger.info("Resampling image...")
     # Get a temporary file for resampled raster
-    temp = tempfile.NamedTemporaryFile()
-    resampled_dem_path = temp.name
+    random_string = ''.join(random.choice(string.ascii_lowercase +
+                                          string.digits) for _ in range(16))
+    temp_dir = osgeotools.isexists(args.temp_dir)
+    resampled_dem_path = os.path.join(temp_dir,
+                                      "tile_dem_tmp_" + random_string)
     _logger.debug("resample_raster = %s", resampled_dem_path)
     osgeotools.resample_raster(dem, tile_extents, resampled_dem_path)
 
@@ -102,10 +118,10 @@ if __name__ == '__main__':
     _logger.info("Resampled DEM extents:\n%s", resampled_dem["extents"])
 
     # Compare rasters
-    #_logger.info("Comparing rasters...")
-    #avg, std = osgeotools.compare_rasters(dem, resampled_dem)
-    #_logger.info("Average difference: %s", avg)
-    #_logger.info("Standard deviation: %s", std)
+    _logger.info("Comparing rasters...")
+    avg, std = osgeotools.compare_rasters(dem, resampled_dem)
+    _logger.info("Average difference: %s", avg)
+    _logger.info("Standard deviation: %s", std)
 
     # Open raster band
     raster_band = osgeotools.open_raster_band(resampled_dem, 1, True)
@@ -117,7 +133,7 @@ if __name__ == '__main__':
     _logger.info("Generating tiles...")
     tile_counter = 0
     for tile_y in xrange(tile_extents["min_y"] + _TILE_SIZE,
-                         tile_extents["max_y"],
+                         tile_extents["max_y"] + _TILE_SIZE,
                          _TILE_SIZE):
         for tile_x in xrange(tile_extents["min_x"],
                              tile_extents["max_x"],
@@ -131,7 +147,7 @@ if __name__ == '__main__':
 
             # If tile has data
             if not tile_data is None:
-
+                ctr = 0
                 tile, ul_x, ul_y = tile_data
 
                 # Create new tile geotransform
@@ -144,16 +160,25 @@ if __name__ == '__main__':
                                               args.type.upper())
                 tile_path = os.path.join(output_dir, filename)
 
+                # Check if output filename is already exists
+                while os.path.exists(tile_path):
+                    print '\nWARNING:', tile_path, 'already exists'
+                    ctr += 1
+                    filename = filename.replace(
+                        '.tif', '_' + str(ctr) + '.tif')
+                    tile_path = os.path.join(output_dir, filename)
+
                 # Save new GeoTIFF
                 osgeotools.write_raster(tile_path, "GTiff", tile,
                                         osgeotools.gdalconst.GDT_Float32,
                                         tile_gt, dem, raster_band)
+                _logger.info(args.dem + ' --------- ' + filename + ' --------- ')
 
             tile_counter += 1
 
         # exit(1)
-
     _logger.info("Total no. of tiles: {0}".format(tile_counter))
 
     # Delete temporary resampled DEM
-    temp.close()
+    resampled_dem = None
+    os.remove(resampled_dem_path)
