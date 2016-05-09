@@ -4,7 +4,7 @@ import logging, traceback
 from fabric.api import *
 from fabric.contrib.console import confirm
 from fabric.tasks import execute
-from django.core.mail import send_mail
+from fabric.context_managers import settings
 import os
 
 COMMAND_DICT={  "TILE_DEM"      : "/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tile_dem.py",
@@ -16,6 +16,7 @@ COMMAND_DICT={  "TILE_DEM"      : "/home/AD/autotiler/lipad-data-tools/preproces
               }
 #PROJECTION_FILE="/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/WGS_84_UTM_zone_51N.prj"
 TILING_REMOTE_HOST="autotiler@palace.dream.upd.edu.ph"
+UPLOAD_REMOTE_HOST="autotiler@ceph-radosgw.prd.dream.upd.edu.ph"
 
 @hosts(TILING_REMOTE_HOST)
 def tile_dsm_remote(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir):
@@ -23,22 +24,15 @@ def tile_dsm_remote(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir):
     src_dir_arg = "-d {0}".format(geostorage_path_to_dsm_dir)
     out_dir_arg = "-o {0}".format(geostorage_path_to_output_dir)
     log_file_arg = "-l {0}".format(os.path.join(geostorage_path_to_output_dir, "remote.log"))
-    cli_call =  "{0} {1} {2} -t dsm {3} {4} {5}".format( COMMAND_DICT["TILE_DEM"],
+    cli_call =  "{0} {1} {2} {3} {4} {5}".format( COMMAND_DICT["TILE_DSM"],
                                          src_dir_arg,
                                          out_dir_arg,
                                          COMMAND_DICT["UTM_51N_PRJ"],
                                          COMMAND_DICT["TMP_DIR"],
                                          log_file_arg)
-    """
-    result = run(COMMAND_DICT["TILE_DEM"],
-                     src_dir_arg,
-                     out_dir_arg,
-                     "-t dsm",
-                     COMMAND_DICT["UTM_51N_PRJ"],
-                     COMMAND_DICT["TMP_DIR"],
-                     log_file_arg)
-    """
-    result = run(cli_call)
+    result = None
+    with settings(host_string=TILING_REMOTE_HOST):
+        result = run(cli_call)
     pprint(result.replace("\\r\\n","\n"))
     if result.failed:
         print "Failed"    
@@ -50,21 +44,18 @@ def tile_dtm_remote(geostorage_path_to_dtm_dir, geostorage_path_to_output_dir):
     src_dir_arg = "-d {0}".format(geostorage_path_to_dtm_dir)
     out_dir_arg = "-o {0}".format(geostorage_path_to_output_dir)
     log_file_arg = "-l {0}".format(os.path.join(geostorage_path_to_output_dir, "remote.log"))
-    print "[DEBUG]: {0} {1} {2} {3} {4} {5} -t dtm".format( COMMAND_DICT["TILE_DTM"],
+    cli_call =  "{0} {1} {2} {3} {4} {5}".format( COMMAND_DICT["TILE_DTM"],
                                          src_dir_arg,
                                          out_dir_arg,
                                          COMMAND_DICT["UTM_51N_PRJ"],
                                          COMMAND_DICT["TMP_DIR"],
                                          log_file_arg)
-    result = run(COMMAND_DICT["TILE_DTM"],
-                     src_dir_arg,
-                     out_dir_arg,
-                     "-t dtm",
-                     COMMAND_DICT["UTM_51N_PRJ"],
-                     COMMAND_DICT["TMP_DIR"],
-                     log_file_arg)
+    result = None
+    with settings(host_string=TILING_REMOTE_HOST):
+        result = run(cli_call)
     pprint(result)
     if result.failed:
         print ""    
 
 
+def upload_tiles(tiled_data_dir, metadata_log_dir):
