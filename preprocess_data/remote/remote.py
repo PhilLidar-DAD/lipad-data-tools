@@ -27,6 +27,12 @@ TILING_REMOTE_HOST="autotiler@palace.dream.upd.edu.ph"
 UPLOAD_REMOTE_HOST="autotiler@ceph-radosgw.prd.dream.upd.edu.ph"
 METADATA_LOG_DIR=os.path.join(get_cwd(),"dump")
 
+###
+###
+### TODO: Check Philgrid Data Coverage for duplicate data tiles
+###
+###
+
 @hosts(TILING_REMOTE_HOST)
 def tile_dsm_remote(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir):
     print "Tiling DSM on remote host [{0}] from [{1}] and output into [{2}]".format(TILING_REMOTE_HOST, geostorage_path_to_dsm_dir, geostorage_path_to_output_dir)
