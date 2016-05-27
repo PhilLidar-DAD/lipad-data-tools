@@ -1,13 +1,15 @@
 [scripts]
-tile_dem      = "/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/tile_dem.py"
-tile_dsm      = "/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/tile_dem.py -t dsm"
-tile_dtm      = "/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/tile_dem.py -t dtm"
-upload        = "python /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/upload/upload_tiles.py"
-rename_ortho  = "/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/rename_orthophoto.py"
-rename_las    = "/home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/rename_orthophoto.py"
+tile_dem      = /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/tile_dem.py
+tile_dsm      = /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/tile_dem.py -t dsm
+tile_dtm      = /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/tile_dem.py -t dtm
+upload        = /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/upload/upload_tiles.py
+rename_ortho  = /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/rename_orthophoto.py
+rename_laz    = /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/rename_laz.py
 [args]
-utm_51n_prj   = "-p /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj"
-tmp_dir       = "--temp-dir /tmp/remote/"
+utm_51n_prj   = -p /home/AD/autotiler/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj
+tmp_dir       = --temp-dir /tmp/remote/
 [hosts]
 tiling = autotiler@palace.dream.upd.edu.ph
 upload = autotiler@ceph-radosgw.prd.dream.upd.edu.ph
+[logs]
+dir = logs
