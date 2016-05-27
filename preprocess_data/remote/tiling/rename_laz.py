@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(description='Rename LAS/LAZ Files')
 parser.add_argument('-i','--input_directory')
 parser.add_argument('-o','--output_directory')
 #parser.add_argument('-t','--type')
+parser.add_argument("-tmp", "--temp-dir", required=True,
+                        help="Path to temporary working directory.")
 parser.add_argument("-ot", "--textfile")
 
 args = parser.parse_args()
@@ -41,13 +43,13 @@ for path, dirs, files in os.walk(inDir,topdown=False):
 				inLAS = os.path.join(path, las)
 
 				# Create temporary shapefile for LAZ's extent
-				fullCmd = ' '.join(['lasboundary -i', inLAS, '-o temp.shp'])
+				fullCmd = ' '.join(['lasboundary -i', inLAS, '-o {0}'.format(os.path.join(args.temp_dir,'temp_laz.shp'))])
 				print '\n', fullCmd
 
 				subprocess.call(fullCmd,shell=True)
 
 				# Open the temporary shapefile
-				inDS = driver.Open('temp.shp',0)
+				inDS = driver.Open(os.path.join(args.temp_dir,'temp_laz.shp'),0)
 				inLayer = inDS.GetLayer()
 				inFeat = inLayer.GetNextFeature()
 				inGeom = inFeat.GetGeometryRef()
@@ -94,7 +96,7 @@ for path, dirs, files in os.walk(inDir,topdown=False):
 			
 outTextfile.close()
 inDS.Destroy()
-driver.DeleteDataSource('temp.shp')
+driver.DeleteDataSource(os.path.join(args.temp_dir,'temp_laz.shp'))
 
 endTime = time.time()  # End timing
 print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime,2))), 'seconds'
