@@ -175,8 +175,7 @@ def rename_laz(geostorage_path_to_laz_dir, geostorage_path_to_output_dir):
                                          src_dir_arg,
                                          out_dir_arg,
                                          #COMMAND_DICT["UTM_51N_PRJ"],
-                                         COMMAND_DICT["TMP_DIR"],
-                                         log_file_arg)
+                                         COMMAND_DICT["TMP_DIR"])
     result = None
     with settings(host_string=TILING_REMOTE_HOST):
         result = run(cli_call)
