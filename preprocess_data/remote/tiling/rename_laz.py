@@ -9,6 +9,8 @@ import math
 import argparse
 import sys
 import logging
+from tile_dem import _floor, _ceil
+
 
 _version = "0.3.2"
 print os.path.basename(__file__) + ": v" + _version
@@ -22,8 +24,8 @@ parser.add_argument("-v", "--verbose", action="count")
 parser.add_argument('-i','--input_directory')
 parser.add_argument('-o','--output_directory')
 #parser.add_argument('-t','--type')
-parser.add_argument("-tmp", "--temp-dir", required=True,
-                        help="Path to temporary working directory.")
+#parser.add_argument("-tmp", "--temp-dir", required=True,
+#                        help="Path to temporary working directory.")
 parser.add_argument("-l", "--logfile", required=True,
                         help="Filename of logfile")
 
@@ -42,7 +44,7 @@ outDir = args.output_directory
 
 driver = ogr.GetDriverByName('ESRI Shapefile')
 
-typeFile = "LAZ"
+
 def _setup_logging(args):
     # Setup logging
     _logger.setLevel(_LOG_LEVEL)
@@ -71,66 +73,49 @@ _setup_logging(args)
 # Loop through the input directory
 for path, dirs, files in os.walk(inDir,topdown=False):
     for las in files:
-        if las.endswith(".laz"):
-            try:
-                ctr = 0
-                inLAS = os.path.join(path, las)
+        if las.endswith(".laz") or las.endswith(".las"):
+            typeFile = las.split(".")[-1].upper()
+            ctr = 0
+            laz_file_path = os.path.join(path, las)
 
-                # Create temporary shapefile for LAZ's extent
-                fullCmd = ' '.join(['lasboundary -i', inLAS, '-o {0}'.format(os.path.join(args.temp_dir,'temp_laz.shp'))])
-                print '\n', fullCmd
-
-                subprocess.call(fullCmd,shell=True)
-
-                # Open the temporary shapefile
-                inDS = driver.Open(os.path.join(args.temp_dir,'temp_laz.shp'),0)
-                inLayer = inDS.GetLayer()
-                inFeat = inLayer.GetNextFeature()
-                inGeom = inFeat.GetGeometryRef()
-                inCentroid = inGeom.Centroid()
-
-                inX = inCentroid.GetX()
-                inY = inCentroid.GetY()
+            # get LAZ bounding box/extents
+            p = subprocess.Popen(['./lasbb', '-get_bb', laz_file_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            out, err = p.communicate()
+            returncode = p.returncode
+            if returncode is 0:
+                tokens = out.split(" ")
+                minX = float(tokens[1])
+                minY = float(tokens[2])
+                maxX = float(tokens[3])
+                maxY = float(tokens[4])
                 
-                print 'Centroid X', inX
-                print 'Centroid Y', inY
+                bbox_center_x = (minX+(maxX-minX)/2) 
+                bbox_center_y = (minY+(maxY-minY)/2)
+                
+                _TILE_SIZE=1000
+                tile_x =  int(math.floor(bbox_center_x / float(_TILE_SIZE)))
+                tile_y =  int(math.floor(bbox_center_y / float(_TILE_SIZE))) + 1
 
-                if inX % 1000 > 0:
-                    flrMinX = int(math.floor(inX * 0.001)*1000) 
-                else:
-                    flrMinX = inX
-
-                if inY % 1000 > 0:
-                    flrMaxY = int(math.floor(inY * 0.001)*1000)+1000        
-                else:
-                    flrMaxY = inY
-
-                minX = str(int(round(flrMinX*0.001)))
-                maxY = str(int(round(flrMaxY*0.001)))
-
-                print 'min X', minX
-                print 'max Y', maxY
-
-                outFN = ''.join(['E',minX,'N',maxY,'_',typeFile,'.',typeFile.lower()])
+                #outFN = ''.join(['E',tile_x,'N',tile_y,'_',typeFile,'.',typeFile.lower()])
+                outFN = 'E{0}N{1}_{2}.{3}'.format(tile_x, tile_y, typeFile, typeFile.lower())
                 outPath = os.path.join(outDir,outFN)
 
                 # Check if output filename is already exists
                 while os.path.exists(outPath):
                     print '\nWARNING:', outPath, 'already exists!'
                     ctr += 1
-                    outFN = ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
+                    #outFN = ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
+                    outFN = 'E{0}N{1}_{2}_{3}.{4}'.format(tile_x, tile_y, typeFile, str(ctr), typeFile.lower())
                     outPath = os.path.join(outDir,outFN)
                 print os.path.join(path, las), outFN
                 
                 _logger.info(os.path.join(path, las)+' --------- '+outFN+'\n')
                 
                 print outPath, 'copied successfully'
-                shutil.copy(inLAS,outPath)
-            except:
-                _logger.error('Error while copying ' + inLAS + '\n')
+                shutil.copy(laz_file_path, outPath)
+            else:
+                _logger.error("Error reading extents of [{0}]. Trace from lasbb:\n{1}".format(laz_file_path, out))
+                
             
-inDS.Destroy()
-driver.DeleteDataSource(os.path.join(args.temp_dir,'temp_laz.shp'))
-
 endTime = time.time()  # End timing
 print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime,2))), 'seconds'
