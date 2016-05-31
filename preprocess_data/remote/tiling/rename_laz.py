@@ -2,6 +2,13 @@
 
 import subprocess, ogr, os, shutil, time, math, argparse, sys, logging
 
+def get_cwd():
+    cur_path = os.path.realpath(__file__)
+    if "?" in cur_path:
+        return cur_path.rpartition("?")[0].rpartition(os.path.sep)[0]+os.path.sep
+    else:
+        return cur_path.rpartition(os.path.sep)[0]+os.path.sep
+
 
 _version = "0.3.2"
 print os.path.basename(__file__) + ": v" + _version
@@ -70,7 +77,7 @@ for path, dirs, files in os.walk(inDir,topdown=False):
             laz_file_path = os.path.join(path, las)
 
             # get LAZ bounding box/extents
-            p = subprocess.Popen(['./lasbb', '-get_bb', laz_file_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = subprocess.Popen([os.path.join(get_cwd(),'lasbb'), '-get_bb', laz_file_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             out, err = p.communicate()
             returncode = p.returncode
             if returncode is 0:
