@@ -1,15 +1,6 @@
 #!/usr/bin/python2.7
 
-import subprocess
-import ogr
-import os
-import shutil
-import time
-import math
-import argparse
-import sys
-import logging
-from tile_dem import _floor, _ceil
+import subprocess, ogr, os, shutil, time, math, argparse, sys, logging
 
 
 _version = "0.3.2"
