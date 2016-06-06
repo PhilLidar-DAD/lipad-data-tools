@@ -12,6 +12,7 @@ _logger = logging.getLogger()
 _LOG_LEVEL = logging.DEBUG
 _CONS_LOG_LEVEL = logging.INFO
 _FILE_LOG_LEVEL = logging.DEBUG
+_TILE_SIZE = 1000
 
 def _parse_arguments():
     # Parse arguments
@@ -68,11 +69,11 @@ def _rename_file(filepath, newName):
 
 def _make_file_copy(filepath, target_dir, newname):
     try:
-        shutil.copy(filepath, "%s%s" % (target_dir, newname))
+        shutil.copy(filepath, os.path.join(target_dir, newname))
     except:
         _logger.error("failed to create a copy to target dir. check permissions?")
 
-    newcopy = "%s%s" % (target_dir,filepath)
+    newcopy = os.path.join(target_dir,filepath)
     if os.path.exists(newcopy):
         _logger.info("%s created" % newcopy)
 
@@ -80,8 +81,6 @@ def _make_file_copy(filepath, target_dir, newname):
 
 def _construct_new_filename(projection, orthophoto):
     #this is refactored main function
-    _TILE_SIZE = 1000
-
     extension = orthophoto[-3:]
 
     # Open orthophoto
