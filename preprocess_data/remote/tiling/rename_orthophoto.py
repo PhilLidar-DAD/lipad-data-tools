@@ -111,15 +111,14 @@ def rename_offset(orthophoto, outputdir):
 def batch_rename(topdir, outputdir, projection):
     #walk the directory
     for path,dirs,files in os.walk(topdir,topdown=False):
-        if path.endswith("Ortho"):
-            for f in files:
-                if f.endswith(".tif"):
-                    ortho = os.path.join(path,f)
-                    newname = rename_ortho(ortho, outputdir, projection)
-                    #copy offset | hack
-                    offset = ortho.replace('.tif', '.tfw')
-                    offset_name = newname.replace('.tif', '.tfw')
-                    _make_file_copy(offset, outputdir, offset_name)                  
+        for f in files:
+            if f.endswith(".tif"):
+                ortho = os.path.join(path,f)
+                newname = rename_ortho(ortho, outputdir, projection)
+                #copy offset | hack
+                offset = ortho.replace('.tif', '.tfw')
+                offset_name = newname.replace('.tif', '.tfw')
+                _make_file_copy(offset, outputdir, offset_name)                  
 
 if __name__ == '__main__':
     
