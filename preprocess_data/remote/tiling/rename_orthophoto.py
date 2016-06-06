@@ -85,7 +85,7 @@ def _construct_new_filename(projection, orthophoto):
 
     # Open orthophoto
     orthophoto = osgeotools.open_raster(orthophoto, projection)
-    _logger.info("Extents: "+orthophoto["extents"])
+    _logger.info("Extents: {0}".format(orthophoto["extents"]))
     ul_x = orthophoto["extents"]["min_x"]
     ul_y = orthophoto["extents"]["max_y"]
     _logger.info("upper left: {0},{1}".format(ul_x, ul_y))
