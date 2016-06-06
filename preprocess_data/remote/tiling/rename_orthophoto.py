@@ -128,7 +128,7 @@ def batch_rename(topdir, outputdir, projection):
                     offset_name = newname.replace('.tif', '.tfw')
                     _make_file_copy(offset, outputdir, offset_name)
                 except RuntimeError:
-                    _logger.error("Failed to read file [{0}] ".format(os.path.join(path,f)))
+                    _logger.error("Failed to read Orthophoto [{0}]. Did not create {1}.".format(os.path.join(path,f),newname))
 
 if __name__ == '__main__':
     
