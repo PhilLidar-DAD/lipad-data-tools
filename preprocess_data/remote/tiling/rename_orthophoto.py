@@ -75,7 +75,8 @@ def _make_file_copy(filepath, target_dir, newname):
         dup_ctr=0
         while os.path.exists(os.path.join(target_dir, tile_name)):
             dup_ctr+=1
-        tile_name = "{0}_{1}".format(tile_name,dup_ctr)
+        if dup_ctr > 0:
+            tile_name = "{0}_{1}".format(tile_name,dup_ctr)
         shutil.copy(filepath, os.path.join(target_dir, tile_name))
     except:
         _logger.error("failed to create a copy to target dir. check permissions?")
