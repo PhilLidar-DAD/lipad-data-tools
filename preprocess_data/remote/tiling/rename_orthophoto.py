@@ -45,6 +45,8 @@ def _setup_logging(args):
     if args.verbose and args.verbose >= 1:
         global _CONS_LOG_LEVEL
         _CONS_LOG_LEVEL = logging.DEBUG
+    else:
+        _CONS_LOG_LEVEL = logging.INFO
 
     # Setup console logging
     ch = logging.StreamHandler(sys.stdout)
@@ -75,7 +77,7 @@ def _make_file_copy(filepath, target_dir, newname):
 
     newcopy = os.path.join(target_dir,filepath)
     if os.path.exists(newcopy):
-        _logger.info("%s created" % newcopy)
+        _logger.debug("%s created" % newcopy)
 
     return newcopy
 
@@ -85,10 +87,10 @@ def _construct_new_filename(projection, orthophoto):
 
     # Open orthophoto
     orthophoto = osgeotools.open_raster(orthophoto, projection)
-    _logger.info("Extents: {0}".format(orthophoto["extents"]))
+    _logger.debug("Extents: {0}".format(orthophoto["extents"]))
     ul_x = orthophoto["extents"]["min_x"]
     ul_y = orthophoto["extents"]["max_y"]
-    _logger.info("upper left: {0},{1}".format(ul_x, ul_y))
+    _logger.debug("upper left: {0},{1}".format(ul_x, ul_y))
     # Construct filename
     
     filename = "E%dN%d_ORTHO.%s" % (ul_x / _TILE_SIZE,
@@ -121,7 +123,7 @@ def batch_rename(topdir, outputdir, projection):
                     offset_name = newname.replace('.tif', '.tfw')
                     _make_file_copy(offset, outputdir, offset_name)
                 except RuntimeError:
-                    _logger.error("Failed to read file [{0}] ".format(newname))
+                    _logger.error("Failed to read file [{0}] ".format(os.path.join(path,f)))
 
 if __name__ == '__main__':
     
