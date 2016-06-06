@@ -114,11 +114,14 @@ def batch_rename(topdir, outputdir, projection):
         for f in files:
             if f.endswith(".tif"):
                 ortho = os.path.join(path,f)
-                newname = rename_ortho(ortho, outputdir, projection)
-                #copy offset | hack
-                offset = ortho.replace('.tif', '.tfw')
-                offset_name = newname.replace('.tif', '.tfw')
-                _make_file_copy(offset, outputdir, offset_name)                  
+                try:
+                    newname = rename_ortho(ortho, outputdir, projection)
+                    #copy offset | hack
+                    offset = ortho.replace('.tif', '.tfw')
+                    offset_name = newname.replace('.tif', '.tfw')
+                    _make_file_copy(offset, outputdir, offset_name)
+                except RuntimeError:
+                    _logger.error("Failed to read file [{0}] ".format(newname))
 
 if __name__ == '__main__':
     
