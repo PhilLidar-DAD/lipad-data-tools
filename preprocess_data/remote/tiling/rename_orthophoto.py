@@ -4,10 +4,14 @@ import osgeotools
 import argparse
 import os, shutil
 import logging
+import sys
 
-_version = "0.1.1"
+_version = "0.2.0"
 print os.path.basename(__file__) + ": v" + _version
-
+_logger = logging.getLogger()
+_LOG_LEVEL = logging.DEBUG
+_CONS_LOG_LEVEL = logging.INFO
+_FILE_LOG_LEVEL = logging.DEBUG
 
 def _parse_arguments():
     # Parse arguments
@@ -25,28 +29,52 @@ projection is the same.")
                         help="Path to output directory.")
     parser.add_argument("-d", "--directory", required=False,
             help="Path to input director for recursive operation")
-    
+    parser.add_argument("-l", "--logfile", required=True,
+                        help="Filename of logfile")
     args = parser.parse_args()
     return args
 
+def _setup_logging(args):
+    # Setup logging
+    _logger.setLevel(_LOG_LEVEL)
+    formatter = logging.Formatter("[%(asctime)s] %(filename)s \
+(%(levelname)s,%(lineno)d) : %(message)s")
+
+    # Check verbosity for console
+    if args.verbose and args.verbose >= 1:
+        global _CONS_LOG_LEVEL
+        _CONS_LOG_LEVEL = logging.DEBUG
+
+    # Setup console logging
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(_CONS_LOG_LEVEL)
+    ch.setFormatter(formatter)
+    _logger.addHandler(ch)
+
+    # Setup file logging
+    fh = logging.FileHandler(args.logfile)
+    fh.setLevel(_FILE_LOG_LEVEL)
+    fh.setFormatter(formatter)
+    _logger.addHandler(fh)
+    
 def _rename_file(filepath, newName):
     dirName = os.path.dirname(filepath)
     fileName = os.path.basename(filepath)
     try:
-        print "renaming %s at %s" % (fileName, dirName)
+        _logger.info("renaming %s at %s" % (fileName, dirName))
         os.rename(fileName, newName)
     except:
-        print "failed to rename file %s. Check file ownership settings, perhaps?" % fileName
+        _logger.error("failed to rename file %s. Check file ownership settings, perhaps?" % fileName)
 
 def _make_file_copy(filepath, target_dir, newname):
     try:
         shutil.copy(filepath, "%s%s" % (target_dir, newname))
     except:
-        print "failed to create a copy to target dir. check permissions?"
+        _logger.error("failed to create a copy to target dir. check permissions?")
 
     newcopy = "%s%s" % (target_dir,filepath)
     if os.path.exists(newcopy):
-        print "%s created" % newcopy
+        _logger.info("%s created" % newcopy)
 
     return newcopy
 
@@ -58,10 +86,10 @@ def _construct_new_filename(projection, orthophoto):
 
     # Open orthophoto
     orthophoto = osgeotools.open_raster(orthophoto, projection)
-    print orthophoto["extents"]
+    _logger.info("Extents: "+orthophoto["extents"])
     ul_x = orthophoto["extents"]["min_x"]
     ul_y = orthophoto["extents"]["max_y"]
-    print "upper left:", ul_x, ul_y
+    _logger.info("upper left: {0},{1}".format(ul_x, ul_y))
     # Construct filename
     
     filename = "E%dN%d_ORTHO.%s" % (ul_x / _TILE_SIZE,
@@ -74,7 +102,7 @@ def rename_ortho(orthophoto,outputdir,projection):
 
     newname = _construct_new_filename(projection, orthophoto)
     newpath = _make_file_copy(orthophoto, outputdir,newname)
-    print "%s created at output folder" % newname
+    _logger.info("%s created at output folder" % newname)
     return newname
     
 def rename_offset(orthophoto, outputdir):
@@ -95,22 +123,20 @@ def batch_rename(topdir, outputdir, projection):
                     _make_file_copy(offset, outputdir, offset_name)                  
 
 if __name__ == '__main__':
-    #TODO: output text to logger
-    logging.basicConfig()
-
+    
     # Parse arguments
     args = _parse_arguments()
-
+    _setup_logging(args)
     
 
     #newpath = _make_file_copy(args.orthophoto, args.outputdir)
     if args.orthophoto:
         filename = _construct_new_filename(args.prj_file, args.orthophoto)
         newpath = _make_file_copy(args.orthophoto, args.outputdir, filename)
-        print "new filename:", filename
+        _logger.info("new filename:" + filename)
 
     if args.directory:
-        print "batch processing"
+        _logger.info("batch processing")
     batch_rename(args.directory, args.outputdir, args.prj_file)
 
 
