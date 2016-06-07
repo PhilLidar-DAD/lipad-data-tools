@@ -47,9 +47,9 @@ def find_fmc_dtms(toplevel_dir, output_log_file, prj_file):
                                         _ceil(dem["extents"]["max_x"]),
                                         _ceil(dem["extents"]["max_y"])]
                         time_created = datetime.fromtimestamp(os.path.getctime(dem_dir)).strftime("%Y/%m/%d")
-                        log_fh.write("{0}, {1}, {2}, None".format(time_created, dem_dir, tile_extents))
+                        log_fh.write("{0}, {1}, {2}, None\n".format(time_created, dem_dir, tile_extents))
                     except Exception as e:
-                        log_fh.write("{0}, {1} ERROR, {2}".format(time_created, dem_dir, e))
+                        log_fh.write("{0}, {1} ERROR, {2}\n".format(time_created, dem_dir, e))
 
 if __name__ == '__main__':
     args = _parse_arguments()
