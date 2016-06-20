@@ -49,12 +49,12 @@ class BulkUpload:
         self.resume_dict = None
         
         # Setup log files
-        self.header_line = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,GEO_TYPE,FILE_HASH GRID_REF\n"
-        self.footer_line = "===END===\n"
+        self.header_line = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH,GRID_REF"
+        self.footer_line = "===END==="
         
         self.setup_logs()
         self.data_tiles_dir = data_tiles_dir
-        self.setup_metadata_log(self.data_tiles_dir)
+        self.setup_metadata_log()
             
     def activate_venv(self):
         #Try activating the virtualenv, error out if it cannot be activated
@@ -140,7 +140,7 @@ class BulkUpload:
                                                 container_name=self.ceph_ogw['container'])
         #Connect to Ceph Storage
         self.ceph_sc.connect()
-        print "Connected to Ceph OGW at URI [{0}]".format(self.CEPH_OGW['url'])
+        print "Connected to Ceph OGW at URI [{0}]".format(self.ceph_ogw['url'])
 
         # Parse list of allowed file extensions from config.ini
         allowed_files_exts = self.config.get("file_types", "allowed").replace(' ', '').split(',')
@@ -160,28 +160,35 @@ class BulkUpload:
                         grid_ref = filename_tokens[0].rsplit("_")[0]
                         file_path = join(path, name)
                         
-                        # Upload_file(file_path, grid_ref)
-                        obj_dict = self.ceph_sc.upload_file_from_path(file_path)
-                        obj_dict['grid_ref'] = grid_ref
-                        #uploaded_objects.append(obj_dict)
-                        print "Uploaded file [{0}]".format(join(path, name))
-                        
-                        #Debug obj_dict
-                        obj_dict = dict()
-                        obj_dict['name'] = name
-                        obj_dict['last_modified'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #2016-03-23 14:59:18
-                        obj_dict['bytes'] = os.path.getsize(file_path)
-                        obj_dict['content_type'] = "#DEBUGTYPE"
-                        obj_dict['hash'] = "#DEBUGHASH"
-                        obj_dict['grid_ref'] = grid_ref
-                        
-                        # Write metadata for file into dumpfile in CSV format
-                        metadata_csv="{0},{1},{2},{3},{4},{5}\n".format(obj_dict['name'],
-                                                                        obj_dict['last_modified'],
-                                                                        obj_dict['bytes'],
-                                                                        obj_dict['content_type'],
-                                                                        obj_dict['hash'],
-                                                                        obj_dict['grid_ref'])
+                        try:
+                            # Upload_file(file_path, grid_ref)
+                            obj_dict = self.ceph_sc.upload_file_from_path(file_path)
+                            obj_dict['grid_ref'] = grid_ref
+                            #uploaded_objects.append(obj_dict)
+                            print "Uploaded file [{0}]".format(join(path, name))
+                            
+                            # Write metadata for file into dumpfile in CSV format
+                            metadata_csv="{0},{1},{2},{3},{4},{5}".format(obj_dict['name'],
+                                                                            obj_dict['last_modified'],
+                                                                            obj_dict['bytes'],
+                                                                            obj_dict['content_type'],
+                                                                            obj_dict['hash'],
+                                                                            obj_dict['grid_ref'])
+                        except:
+                            #DEBUG
+                            obj_dict = dict()
+                            obj_dict['name'] = name
+                            obj_dict['last_modified'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #2016-03-23 14:59:18
+                            obj_dict['bytes'] = os.path.getsize(file_path)
+                            obj_dict['content_type'] = "#DEBUGTYPE"
+                            obj_dict['hash'] = "#DEBUGHASH"
+                            obj_dict['grid_ref'] = grid_ref
+                            metadata_csv="{0},{1},{2},{3},{4},{5}".format(obj_dict['name'],
+                                                                            obj_dict['last_modified'],
+                                                                            obj_dict['bytes'],
+                                                                            obj_dict['content_type'],
+                                                                            obj_dict['hash'],
+                                                                            obj_dict['grid_ref'])
                         self.metadata_logger.info(metadata_csv)
                         
         
@@ -212,9 +219,9 @@ if __name__ == "__main__":
     else:
         raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
 
-    bupload = BulkUpload()
+    bupload = BulkUpload(args.dir)
     # No resume log specified
     if args.resume is not None:
         bupload.build_resume_dict(args.resume)
     
-    bupload.upload_data_tiles(data_tiles_dir)
+    bupload.upload_data_tiles()
