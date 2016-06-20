@@ -155,7 +155,7 @@ if __name__ == '__main__':
                 tile_gt[0], tile_gt[3] = ul_x, ul_y
 
                 # Construct filename
-                filename = "E%sN%s_%s.tif" % (tile_x / _TILE_SIZE,
+                filename = "E%sN%s_%s_PL1.tif" % (tile_x / _TILE_SIZE,
                                               tile_y / _TILE_SIZE,
                                               args.type.upper())
                 tile_path = os.path.join(output_dir, filename)
@@ -165,7 +165,7 @@ if __name__ == '__main__':
                     print '\nWARNING:', tile_path, 'already exists'
                     ctr += 1
                     filename = filename.replace(
-                        '.tif', '_' + str(ctr) + '.tif')
+                        '.tif', '_' + str(ctr) + '_PL1'+'.tif')
                     tile_path = os.path.join(output_dir, filename)
 
                 # Save new GeoTIFF
