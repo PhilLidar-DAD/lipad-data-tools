@@ -127,8 +127,7 @@ class BulkUpload:
             for csv_line in resume_log:
                 if not csv_line == self.header_line:
                     metadata_list = csv_line.split(csv_delimiter) # Write each line to new metadata log as well
-                    self.resume_dict[metadata_list[0]]=csv_line
-                    self.metadata_logger.info(csv_line)
+                    self.resume_dict[metadata_list[0]]=csv_line.rstrip()
                     
         print "Loaded [{0}] objects from previous metadata log file".format(len(self.resume_dict))
         
@@ -151,7 +150,11 @@ class BulkUpload:
         # Begin uploading data tiles
         for path, subdirs, files in walk(self.data_tiles_dir):
             for name in files:
-                if (self.resume_dict is None) or (self.resume_dict is not None and name not in self.resume_dict):
+                if (self.resume_dict is not None and name in self.resume_dict):
+                    print "Skipping previously uploaded file [{0}]".format(join(path, name))
+                    self.metadata_logger.info(self.resume_dict[name])
+                else:
+                #if (self.resume_dict is None) or (self.resume_dict is not None and name not in self.resume_dict):
                     # Upload each file
                     filename_tokens = name.rsplit(".")
                     
