@@ -201,6 +201,7 @@ class BulkUpload:
         # Rename completed log from .inc into .log
         new_metadata_log_file_path = ".".join(self.metadata_log_file_path.split('.')[:-1]) + ".log"
         os.rename(self.metadata_log_file_path, new_metadata_log_file_path)
+        print "Ceph metadata logged at [{0}]".format(new_metadata_log_file_path)
         
 
 if __name__ == "__main__": 
