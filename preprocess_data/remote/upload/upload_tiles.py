@@ -29,7 +29,7 @@ class BulkUpload:
         
         # Init Ceph OGW settings 
         self.ceph_ogw = dict()
-        self.ceph_client = None
+        self.ceph_sc = None
         options = self.config.options("ceph")
         for option in options:
             try:
@@ -134,12 +134,12 @@ class BulkUpload:
         
     def upload_data_tiles(self):
         # Connect to Ceph
-        self.ceph_client = CephStorageClient(   self.ceph_ogw['user'],
+        self.ceph_sc = CephStorageClient(   self.ceph_ogw['user'],
                                                 self.ceph_ogw['key'],
                                                 self.ceph_ogw['url'],
                                                 container_name=self.ceph_ogw['container'])
         #Connect to Ceph Storage
-        self.ceph_client.connect()
+        self.ceph_sc.connect()
         print "Connected to Ceph OGW at URI [{0}]".format(self.CEPH_OGW['url'])
 
         # Parse list of allowed file extensions from config.ini
@@ -160,13 +160,11 @@ class BulkUpload:
                         grid_ref = filename_tokens[0].rsplit("_")[0]
                         file_path = join(path, name)
                         
-                        """    # Commented out for testing
                         # Upload_file(file_path, grid_ref)
-                        obj_dict = self.ceph_client.upload_file_from_path(file_path)
+                        obj_dict = self.ceph_sc.upload_file_from_path(file_path)
                         obj_dict['grid_ref'] = grid_ref
                         #uploaded_objects.append(obj_dict)
                         print "Uploaded file [{0}]".format(join(path, name))
-                        """
                         
                         #Debug obj_dict
                         obj_dict = dict()
