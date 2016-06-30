@@ -64,6 +64,8 @@ projection is the same.")
                         help="Path to output directory.")
     parser.add_argument("-tmp", "--temp-dir", required=True,
                         help="Path to temporary working directory.")
+    parser.add_argument("-rbid", "--rbid", required=True,
+                        help="River basin ID for this DEM.")
     parser.add_argument("-l", "--logfile", required=True,
                         help="Filename of logfile")
     args = parser.parse_args()
@@ -155,9 +157,10 @@ if __name__ == '__main__':
                 tile_gt[0], tile_gt[3] = ul_x, ul_y
 
                 # Construct filename
-                filename = "E%sN%s_%s.tif" % (tile_x / _TILE_SIZE,
+                filename = "E%sN%s_%s_%s.tif" % (tile_x / _TILE_SIZE,
                                               tile_y / _TILE_SIZE,
-                                              args.type.upper())
+                                              args.type.upper(),
+                                              args.rbid.upper())
                 tile_path = os.path.join(output_dir, filename)
 
                 # Check if output filename is already exists
