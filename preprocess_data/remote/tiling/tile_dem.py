@@ -168,7 +168,7 @@ if __name__ == '__main__':
                     print '\nWARNING:', tile_path, 'already exists'
                     ctr += 1
                     filename = filename.replace(
-                        '.tif', '_' + str(ctr) + '.tif')
+                        '.tif', '_' + str(ctr) + '_PL1'+'.tif')
                     tile_path = os.path.join(output_dir, filename)
 
                 # Save new GeoTIFF
