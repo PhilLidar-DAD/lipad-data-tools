@@ -30,6 +30,8 @@ projection is the same.")
                         help="Path to output directory.")
     parser.add_argument("-d", "--directory", required=False,
             help="Path to input director for recursive operation")
+    parser.add_argument("-rbid", "--rbid", required=True,
+                        help="River basin ID for this DEM.")
     parser.add_argument("-l", "--logfile", required=True,
                         help="Filename of logfile")
     args = parser.parse_args()
@@ -99,8 +101,10 @@ def _construct_new_filename(projection, orthophoto):
     _logger.debug("upper left: {0},{1}".format(ul_x, ul_y))
     # Construct filename
     
-    filename = "E%dN%d_ORTHO.%s" % (ul_x / _TILE_SIZE,
-                                     ul_y / _TILE_SIZE, extension)
+    filename = "E%dN%d_ORTHO_%s.%s" % (ul_x / _TILE_SIZE,
+                                     ul_y / _TILE_SIZE, 
+                                     args.rbid.upper(), 
+                                     extension)
 
     return filename
 
