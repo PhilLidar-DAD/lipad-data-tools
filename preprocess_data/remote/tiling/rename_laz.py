@@ -24,6 +24,8 @@ parser.add_argument('-o','--output_directory')
 #parser.add_argument('-t','--type')
 #parser.add_argument("-tmp", "--temp-dir", required=True,
 #                        help="Path to temporary working directory.")
+parser.add_argument("-rbid", "--rbid", required=True,
+                        help="River basin ID for this DEM.")
 parser.add_argument("-l", "--logfile", required=True,
                         help="Filename of logfile")
 
@@ -95,7 +97,7 @@ for path, dirs, files in os.walk(inDir,topdown=False):
                 tile_y =  int(math.floor(bbox_center_y / float(_TILE_SIZE))) + 1
 
                 #outFN = ''.join(['E',tile_x,'N',tile_y,'_',typeFile,'.',typeFile.lower()])
-                outFN = 'E{0}N{1}_{2}.{3}'.format(tile_x, tile_y, typeFile, typeFile.lower())
+                outFN = 'E{0}N{1}_{2}_{3}.{4}'.format(tile_x, tile_y, typeFile, args.rbid.upper(), typeFile.lower())
                 outPath = os.path.join(outDir,outFN)
 
                 # Check if output filename is already exists
