@@ -38,15 +38,19 @@ if __name__ == "__main__":
     data_tiles_dir = None
     if isdir(args.dir):
         data_tiles_dir = args.dir
-        print("Uploading files from [{0}].".format(args.dir))
+        print("Suffixing files from [{0}].".format(args.dir))
     else:
         raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
     
-    for path, subdirs, files in walk(self.data_tiles_dir):
+    for path, subdirs, files in walk(data_tiles_dir):
         for filename in files:
             name_tokens = filename.split(".")
             if name_tokens[-1] == "tif":
-                new_name = os.path.join(name_tokens[:-1], suffix, ".", name_tokens[:-1])
-                print "{0} >>> {1}".format(filename, new_name)
-                #os.rename(root + os.sep + filename, root + os.sep + new_name)
+                tile_name, file_ext = filename.split(".")
+                name_tokens = tile_name.split("_")
+                #print "_".join(name_tokens[:2])
+                new_name = ".".join([ "_".join(name_tokens[:2] + [suffix,] + name_tokens[2:]), file_ext ])
+                print "{0} >>> {1}".format(path + os.sep + filename, path + os.sep + new_name)
+                os.rename(path + os.sep + filename, path + os.sep + new_name)
+
     
