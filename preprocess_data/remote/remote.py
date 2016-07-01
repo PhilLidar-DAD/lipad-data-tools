@@ -43,7 +43,7 @@ UPLOAD_REMOTE_HOST=config.get('hosts', 'upload')
 """
 
 @hosts(TILING_REMOTE_HOST)
-def tile_dsm(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir):
+def tile_dsm(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir, rbid):
     print "Tiling DSM on remote host [{0}] from [{1}] and output into [{2}]".format(TILING_REMOTE_HOST, geostorage_path_to_dsm_dir, geostorage_path_to_output_dir)
     
     top_dir = os.path.dirname(geostorage_path_to_output_dir)
@@ -60,6 +60,7 @@ def tile_dsm(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir):
 
     src_dir_arg = "-d {0}".format(geostorage_path_to_dsm_dir)
     out_dir_arg = "-o {0}".format(geostorage_path_to_output_dir)
+    rbid_arg = "-rbid {0}".format(rbid)
     log_file_arg = "-l {0}".format(os.path.join(geostorage_path_to_output_dir, "remote.log"))
     cli_call =  "{0} {1} {2} {3} {4} {5}".format( COMMAND_DICT["TILE_DSM"],
                                          src_dir_arg,
@@ -81,7 +82,7 @@ def tile_dsm(geostorage_path_to_dsm_dir, geostorage_path_to_output_dir):
 
 
 @hosts(TILING_REMOTE_HOST)
-def tile_dtm(geostorage_path_to_dtm_dir, geostorage_path_to_output_dir):
+def tile_dtm(geostorage_path_to_dtm_dir, geostorage_path_to_output_dir, rbid):
     print "Tiling DTM on remote host [{0}] from [{1}] and output into [{2}]".format(TILING_REMOTE_HOST, geostorage_path_to_dtm_dir, geostorage_path_to_output_dir)
     
     top_dir = os.path.dirname(geostorage_path_to_output_dir)
@@ -98,6 +99,7 @@ def tile_dtm(geostorage_path_to_dtm_dir, geostorage_path_to_output_dir):
 
     src_dir_arg = "-d {0}".format(geostorage_path_to_dtm_dir)
     out_dir_arg = "-o {0}".format(geostorage_path_to_output_dir)
+    rbid_arg = "-rbid {0}".format(rbid)
     log_file_arg = "-l {0}".format(os.path.join(geostorage_path_to_output_dir, "remote.log"))
     cli_call =  "{0} {1} {2} {3} {4} {5}".format( COMMAND_DICT["TILE_DTM"],
                                          src_dir_arg,
@@ -117,7 +119,7 @@ def tile_dtm(geostorage_path_to_dtm_dir, geostorage_path_to_output_dir):
         raise RemoteScriptFailedException("Failed to run: {0}".format(cli_call))
 
 @hosts(TILING_REMOTE_HOST)
-def rename_ortho(geostorage_path_to_ortho_dir, geostorage_path_to_output_dir):
+def rename_ortho(geostorage_path_to_ortho_dir, geostorage_path_to_output_dir, rbid):
     print "Renaming orthophoto on remote host [{0}] from [{1}] and output into [{2}]".format(TILING_REMOTE_HOST, geostorage_path_to_ortho_dir, geostorage_path_to_output_dir)
     
     top_dir = os.path.dirname(geostorage_path_to_output_dir)
@@ -134,6 +136,7 @@ def rename_ortho(geostorage_path_to_ortho_dir, geostorage_path_to_output_dir):
 
     src_dir_arg = "-d {0}".format(geostorage_path_to_ortho_dir)
     out_dir_arg = "-op {0}".format(geostorage_path_to_output_dir)
+    rbid_arg = "-rbid {0}".format(rbid)
     log_file_arg = "-l {0}".format(os.path.join(geostorage_path_to_output_dir, "remote.log"))
     cli_call =  "{0} {1} {2} {3} {4}".format( COMMAND_DICT["RENAME_ORTHO"],
                                          src_dir_arg,
@@ -153,7 +156,7 @@ def rename_ortho(geostorage_path_to_ortho_dir, geostorage_path_to_output_dir):
         raise RemoteScriptFailedException("Failed to run: {0}".format(cli_call))
 
 @hosts(TILING_REMOTE_HOST)
-def rename_laz(geostorage_path_to_laz_dir, geostorage_path_to_output_dir):
+def rename_laz(geostorage_path_to_laz_dir, geostorage_path_to_output_dir, rbid):
     print "Renaming LAZ on remote host [{0}] from [{1}] and output into [{2}]".format(TILING_REMOTE_HOST, geostorage_path_to_laz_dir, geostorage_path_to_output_dir)
     
     top_dir = os.path.dirname(geostorage_path_to_output_dir)
@@ -170,6 +173,7 @@ def rename_laz(geostorage_path_to_laz_dir, geostorage_path_to_output_dir):
 
     src_dir_arg = "-i {0}".format(geostorage_path_to_laz_dir)
     out_dir_arg = "-o {0}".format(geostorage_path_to_output_dir)
+    rbid_arg = "-rbid {0}".format(rbid)
     log_file_arg = "-l {0}".format(os.path.join(geostorage_path_to_output_dir, "remote.log"))
     cli_call =  "{0} {1} {2} {3}".format( COMMAND_DICT["RENAME_LAZ"],
                                          src_dir_arg,
