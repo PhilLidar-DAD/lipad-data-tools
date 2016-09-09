@@ -1,0 +1,215 @@
+osgeotools.pyc: v0.3.1
+utils.py: v0.1.16
+usetime: mtime
+[2016-09-09 21:41:29,258] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/USC/LIBERTAD/v_libertad/hdr.adf: 2016-08-02 18:32:58.348430
+[2016-09-09 21:41:29,262] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/USC/LIBERTAD/v_libertad.
+[2016-09-09 21:41:29,263] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,273] utils.py (WARNING,138) : 2016/08/02,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/USC/LIBERTAD/v_libertad,NEW,LIBERTAD,186488,521000,1104000,530000,1118000
+[2016-09-09 21:41:29,316] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/USC/BAYAWAN_SICOPONG/bywn_scpng/hdr.adf: 2016-06-28 20:40:02.063915
+[2016-09-09 21:41:29,320] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/USC/BAYAWAN_SICOPONG/bywn_scpng.
+[2016-09-09 21:41:29,320] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,328] utils.py (WARNING,138) : 2016/06/28,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/USC/BAYAWAN_SICOPONG/bywn_scpng,NEW,BAYAWAN_SICOPONG,1146788,467000,1028000,498000,1050000
+[2016-09-09 21:41:29,353] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Calauag/cal_bty1m/hdr.adf: 2016-08-22 11:11:27.765249
+[2016-09-09 21:41:29,356] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Calauag/cal_bty1m.
+[2016-09-09 21:41:29,356] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,364] utils.py (WARNING,138) : 2016/08/22,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Calauag/cal_bty1m,NEW,Calauag,524195,423000,1530000,435000,1546000
+[2016-09-09 21:41:29,379] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/vinas_bty/hdr.adf: 2016-09-05 18:40:20.863319
+[2016-09-09 21:41:29,382] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/vinas_bty.
+[2016-09-09 21:41:29,382] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,390] utils.py (WARNING,138) : 2016/09/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/vinas_bty,NEW,Vinas,1058458,426000,1539000,443000,1558000
+[2016-09-09 21:41:29,398] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/Vinas/version5/hs_vinas_bty/hdr.adf: 2016-08-26 05:57:26.440239
+[2016-09-09 21:41:29,401] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/Vinas/version5/hs_vinas_bty.
+[2016-09-09 21:41:29,402] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,409] utils.py (WARNING,138) : 2016/08/26,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/Vinas/version5/hs_vinas_bty,NEW,Vinas,281255,426000,1539000,443000,1558000
+[2016-09-09 21:41:29,412] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/Vinas/version5/vinas_bty/hdr.adf: 2016-08-26 05:53:18.971877
+[2016-09-09 21:41:29,415] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/Vinas/version5/vinas_bty.
+[2016-09-09 21:41:29,416] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,423] utils.py (WARNING,138) : 2016/08/26,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Vinas/Vinas/version5/vinas_bty,NEW,Vinas,1058458,426000,1539000,443000,1558000
+[2016-09-09 21:41:29,426] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Labo/labo_bathy/hdr.adf: 2016-07-14 16:53:11.527841
+[2016-09-09 21:41:29,429] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Labo/labo_bathy.
+[2016-09-09 21:41:29,429] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,437] utils.py (WARNING,138) : 2016/07/14,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Labo/labo_bathy,NEW,Labo,1095159,461000,1554000,496000,1580000
+[2016-09-09 21:41:29,443] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Yabahaan/ybh_bty1m/hdr.adf: 2016-09-05 16:01:31.485454
+[2016-09-09 21:41:29,446] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Yabahaan/ybh_bty1m.
+[2016-09-09 21:41:29,447] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,454] utils.py (WARNING,138) : 2016/09/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Yabahaan/ybh_bty1m,NEW,Yabahaan,183760,460000,1458000,466000,1469000
+[2016-09-09 21:41:29,461] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Silongin/slgn_bty1m/hdr.adf: 2016-09-08 17:43:24.133101
+[2016-09-09 21:41:29,464] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Silongin/slgn_bty1m.
+[2016-09-09 21:41:29,464] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,471] utils.py (WARNING,138) : 2016/09/08,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Silongin/slgn_bty1m,NEW,Silongin,189376,445000,1467000,455000,1475000
+[2016-09-09 21:41:29,474] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Silongin/slgn_s/hdr.adf: 2016-09-08 17:45:20.137975
+[2016-09-09 21:41:29,477] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Silongin/slgn_s.
+[2016-09-09 21:41:29,478] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,485] utils.py (WARNING,138) : 2016/09/08,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Silongin/slgn_s,NEW,Silongin,58614,445000,1467000,455000,1475000
+[2016-09-09 21:41:29,499] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Catanauan/hs_v_ctn_bty/hdr.adf: 2016-08-30 16:07:22.310613
+[2016-09-09 21:41:29,502] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Catanauan/hs_v_ctn_bty.
+[2016-09-09 21:41:29,502] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,509] utils.py (WARNING,138) : 2016/08/30,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Catanauan/hs_v_ctn_bty,NEW,Catanauan,224937,420000,1499000,435000,1519000
+[2016-09-09 21:41:29,514] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Catanauan/v_ctn_bty/hdr.adf: 2016-08-30 16:04:30.781358
+[2016-09-09 21:41:29,517] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Catanauan/v_ctn_bty.
+[2016-09-09 21:41:29,517] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,524] utils.py (WARNING,138) : 2016/08/30,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Catanauan/v_ctn_bty,NEW,Catanauan,745675,420000,1499000,435000,1519000
+[2016-09-09 21:41:29,538] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Bigol/vigo_bathy1m/hdr.adf: 2016-07-26 13:19:35.537489
+[2016-09-09 21:41:29,541] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Bigol/vigo_bathy1m.
+[2016-09-09 21:41:29,542] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,548] utils.py (WARNING,138) : 2016/07/26,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MIT/Bigol/vigo_bathy1m,NEW,Bigol,36,447000,1486000,462000,1496000
+[2016-09-09 21:41:29,637] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/_OTHERS/CAGAYAN_LOWERPART/Cagayan_LowerPart/cgy_lowerprt/hdr.adf: 2016-08-26 17:05:27.658936
+[2016-09-09 21:41:29,640] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/_OTHERS/CAGAYAN_LOWERPART/Cagayan_LowerPart/cgy_lowerprt.
+[2016-09-09 21:41:29,640] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:29,649] utils.py (WARNING,138) : 2016/08/26,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/_OTHERS/CAGAYAN_LOWERPART/Cagayan_LowerPart/cgy_lowerprt,NEW,CAGAYAN_LOWERPART,12977137,325000,1797000,401000,1891000
+[2016-09-09 21:41:30,621] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Iwahig/h_iwahig/hdr.adf: 2016-07-05 20:25:11.000148
+[2016-09-09 21:41:30,624] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Iwahig/h_iwahig.
+[2016-09-09 21:41:30,625] utils.py (INFO,140) : Error opening dem!
+[2016-09-09 21:41:30,633] utils.py (WARNING,143) : 2016/07/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Iwahig/h_iwahig,ERROR,Iwahig,85031
+[2016-09-09 21:41:30,635] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Iwahig/v_iwahig/hdr.adf: 2016-07-05 20:25:13.411151
+[2016-09-09 21:41:30,638] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Iwahig/v_iwahig.
+[2016-09-09 21:41:30,638] utils.py (INFO,140) : Error opening dem!
+[2016-09-09 21:41:30,646] utils.py (WARNING,143) : 2016/07/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Iwahig/v_iwahig,ERROR,Iwahig,298294
+[2016-09-09 21:41:30,661] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Eraan/eraan_bty/hdr.adf: 2016-07-19 15:08:38
+[2016-09-09 21:41:30,664] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Eraan/eraan_bty.
+[2016-09-09 21:41:30,664] utils.py (INFO,140) : Error opening dem!
+[2016-09-09 21:41:30,671] utils.py (WARNING,143) : 2016/07/19,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Eraan/eraan_bty,ERROR,Eraan,452042
+[2016-09-09 21:41:30,685] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Inagauan/inagauan_1m/hdr.adf: 2016-07-01 17:31:47.255452
+[2016-09-09 21:41:30,688] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Inagauan/inagauan_1m.
+[2016-09-09 21:41:30,689] utils.py (INFO,140) : Error opening dem!
+[2016-09-09 21:41:30,696] utils.py (WARNING,143) : 2016/07/01,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPLB/Inagauan/inagauan_1m,ERROR,Inagauan,247570
+[2016-09-09 21:41:30,717] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Buaya/buaya_bathy/hdr.adf: 2016-08-23 17:25:15.279416
+[2016-09-09 21:41:30,720] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Buaya/buaya_bathy.
+[2016-09-09 21:41:30,720] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,728] utils.py (WARNING,138) : 2016/08/23,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Buaya/buaya_bathy,NEW,Buaya,722200,221000,1886000,246000,1903000
+[2016-09-09 21:41:30,736] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Silay/dtm_silay/hdr.adf: 2016-08-23 17:09:28.631245
+[2016-09-09 21:41:30,739] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Silay/dtm_silay.
+[2016-09-09 21:41:30,740] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,747] utils.py (WARNING,138) : 2016/08/23,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Silay/dtm_silay,NEW,Silay,1427219,223000,1905000,244000,1935000
+[2016-09-09 21:41:30,764] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Amburayan/amburayan_dtm/hdr.adf: 2016-09-06 14:39:48.448968
+[2016-09-09 21:41:30,767] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Amburayan/amburayan_dtm.
+[2016-09-09 21:41:30,767] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,775] utils.py (WARNING,138) : 2016/09/06,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Amburayan/amburayan_dtm,NEW,Amburayan,1121947,222000,1858000,241000,1881000
+[2016-09-09 21:41:30,783] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Amburayan/hs_amb/hdr.adf: 2016-09-06 15:48:42.273309
+[2016-09-09 21:41:30,786] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Amburayan/hs_amb.
+[2016-09-09 21:41:30,786] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,794] utils.py (WARNING,138) : 2016/09/06,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Amburayan/hs_amb,NEW,Amburayan,342401,222000,1858000,241000,1881000
+[2016-09-09 21:41:30,806] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Tineg_Ikmin/tineg_ikmin/hdr.adf: 2016-09-06 15:15:43.756477
+[2016-09-09 21:41:30,809] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Tineg_Ikmin/tineg_ikmin.
+[2016-09-09 21:41:30,810] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,817] utils.py (WARNING,138) : 2016/09/06,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Tineg_Ikmin/tineg_ikmin,NEW,Tineg_Ikmin,1921818,230000,1935000,266000,1963000
+[2016-09-09 21:41:30,820] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Tineg_Ikmin/hs/hdr.adf: 2016-09-06 15:58:56.280703
+[2016-09-09 21:41:30,822] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Tineg_Ikmin/hs.
+[2016-09-09 21:41:30,823] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,829] utils.py (WARNING,138) : 2016/09/06,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPB/Tineg_Ikmin/hs,NEW,Tineg_Ikmin,547898,230000,1935000,266000,1963000
+[2016-09-09 21:41:30,846] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/SIBUGUEY_BATHY_1m/sib_bathy_1m/hdr.adf: 2016-08-03 19:04:24.574584
+[2016-09-09 21:41:30,849] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/SIBUGUEY_BATHY_1m/sib_bathy_1m.
+[2016-09-09 21:41:30,849] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,857] utils.py (WARNING,138) : 2016/08/03,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/SIBUGUEY_BATHY_1m/sib_bathy_1m,NEW,SIBUGUEY_BATHY_1m,135466,476000,852000,483000,861000
+[2016-09-09 21:41:30,863] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/Vitali_Tigbao_Bathy_1m_v2/vit_tig_bathy/hdr.adf: 2016-07-19 11:27:15.938207
+[2016-09-09 21:41:30,866] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/Vitali_Tigbao_Bathy_1m_v2/vit_tig_bathy.
+[2016-09-09 21:41:30,867] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,874] utils.py (WARNING,138) : 2016/07/19,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/Vitali_Tigbao_Bathy_1m_v2/vit_tig_bathy,NEW,Vitali_Tigbao_Bathy_1m_v2,857896,415000,806000,434000,827000
+[2016-09-09 21:41:30,879] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/TUPILAC_BATHY_1m/tup_bathy_1m/hdr.adf: 2016-08-22 14:41:26.803529
+[2016-09-09 21:41:30,882] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/TUPILAC_BATHY_1m/tup_bathy_1m.
+[2016-09-09 21:41:30,882] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,889] utils.py (WARNING,138) : 2016/08/22,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/TUPILAC_BATHY_1m/tup_bathy_1m,NEW,TUPILAC_BATHY_1m,308598,430000,839000,445000,849000
+[2016-09-09 21:41:30,900] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/KABASALAN_1m/kab_bathy/hdr.adf: 2016-07-29 11:14:51.049329
+[2016-09-09 21:41:30,903] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/KABASALAN_1m/kab_bathy.
+[2016-09-09 21:41:30,903] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,910] utils.py (WARNING,138) : 2016/07/29,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADZU/KABASALAN_1m/kab_bathy,NEW,KABASALAN_1m,555216,464000,855000,480000,871000
+[2016-09-09 21:41:30,952] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Pandan/pandan_bathy/hdr.adf: 2016-08-09 14:27:57.010521
+[2016-09-09 21:41:30,955] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Pandan/pandan_bathy.
+[2016-09-09 21:41:30,956] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,963] utils.py (WARNING,138) : 2016/08/09,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Pandan/pandan_bathy,NEW,Pandan,109710,715000,1147000,722000,1155000
+[2016-09-09 21:41:30,977] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Sangputan/sangputan/hdr.adf: 2016-08-16 09:28:09.780121
+[2016-09-09 21:41:30,980] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Sangputan/sangputan.
+[2016-09-09 21:41:30,980] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:30,988] utils.py (WARNING,138) : 2016/08/16,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Sangputan/sangputan,NEW,Sangputan,1246541,688000,1232000,711000,1261000
+[2016-09-09 21:41:30,995] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Basey/basey_bathy/hdr.adf: 2016-08-16 21:21:26.465604
+[2016-09-09 21:41:30,998] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Basey/basey_bathy.
+[2016-09-09 21:41:30,998] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,006] utils.py (WARNING,138) : 2016/08/16,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Basey/basey_bathy,NEW,Basey,954484,718000,1245000,739000,1262000
+[2016-09-09 21:41:31,017] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Bisay/bisay_bathy/hdr.adf: 2016-08-02 20:08:52.827700
+[2016-09-09 21:41:31,020] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Bisay/bisay_bathy.
+[2016-09-09 21:41:31,021] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,028] utils.py (WARNING,138) : 2016/08/02,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/VSU/Bisay/bisay_bathy,NEW,Bisay,212841,735000,1143000,745000,1154000
+[2016-09-09 21:41:31,054] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Panganiban/panbathy/hdr.adf: 2016-07-05 14:43:45.139928
+[2016-09-09 21:41:31,057] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Panganiban/panbathy.
+[2016-09-09 21:41:31,058] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,065] utils.py (WARNING,138) : 2016/07/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Panganiban/panbathy,NEW,Panganiban,115689,636000,1533000,643000,1541000
+[2016-09-09 21:41:31,077] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Ragay/ragay_bathy/hdr.adf: 2016-08-23 13:57:53.874878
+[2016-09-09 21:41:31,080] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Ragay/ragay_bathy.
+[2016-09-09 21:41:31,080] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,088] utils.py (WARNING,138) : 2016/08/23,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Ragay/ragay_bathy,NEW,Ragay,425242,470000,1522000,486000,1533000
+[2016-09-09 21:41:31,101] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Guinale/guinale_bty/hdr.adf: 2016-09-05 15:46:08.006106
+[2016-09-09 21:41:31,104] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Guinale/guinale_bty.
+[2016-09-09 21:41:31,105] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,112] utils.py (WARNING,138) : 2016/09/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/ADNU/Guinale/guinale_bty,NEW,Guinale,341303,568000,1473000,581000,1487000
+[2016-09-09 21:41:31,155] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Bislig/BISLIG_V2/bis_bty/hdr.adf: 2016-08-08 14:44:05.221267
+[2016-09-09 21:41:31,158] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Bislig/BISLIG_V2/bis_bty.
+[2016-09-09 21:41:31,158] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,166] utils.py (WARNING,138) : 2016/08/08,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Bislig/BISLIG_V2/bis_bty,NEW,Bislig,451552,856000,901000,870000,914000
+[2016-09-09 21:41:31,169] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Bislig/BISLIG_V2/hf_bis_bty/hdr.adf: 2016-08-08 14:45:56.628640
+[2016-09-09 21:41:31,171] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Bislig/BISLIG_V2/hf_bis_bty.
+[2016-09-09 21:41:31,171] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,179] utils.py (WARNING,138) : 2016/08/08,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Bislig/BISLIG_V2/hf_bis_bty,NEW,Bislig,137524,856000,901000,870000,914000
+[2016-09-09 21:41:31,187] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hinatuan/hin_bathy_1m/hdr.adf: 2016-07-22 09:29:38.331130
+[2016-09-09 21:41:31,190] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hinatuan/hin_bathy_1m.
+[2016-09-09 21:41:31,190] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,197] utils.py (WARNING,138) : 2016/07/22,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hinatuan/hin_bathy_1m,NEW,Hinatuan,3756747,826000,919000,876000,971000
+[2016-09-09 21:41:31,200] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Tandag/tandag_bty/hdr.adf: 2016-07-12 19:50:48.017405
+[2016-09-09 21:41:31,203] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Tandag/tandag_bty.
+[2016-09-09 21:41:31,204] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,211] utils.py (WARNING,138) : 2016/07/12,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Tandag/tandag_bty,NEW,Tandag,241485,843000,998000,854000,1007000
+[2016-09-09 21:41:31,216] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hubo_Otieza/hub_bty/hdr.adf: 2016-08-03 16:37:19.068530
+[2016-09-09 21:41:31,219] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hubo_Otieza/hub_bty.
+[2016-09-09 21:41:31,219] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,227] utils.py (WARNING,138) : 2016/08/03,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hubo_Otieza/hub_bty,NEW,Hubo_Otieza,264567,849000,962000,860000,972000
+[2016-09-09 21:41:31,231] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hubo_Otieza/hf_hub_bty/hdr.adf: 2016-08-03 16:38:19.028960
+[2016-09-09 21:41:31,234] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hubo_Otieza/hf_hub_bty.
+[2016-09-09 21:41:31,234] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,241] utils.py (WARNING,138) : 2016/08/03,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CSU/Hubo_Otieza/hf_hub_bty,NEW,Hubo_Otieza,71743,849000,962000,860000,972000
+[2016-09-09 21:41:31,247] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Bitanagan/bitanagan_1m/hdr.adf: 2016-08-16 10:51:26.004297
+[2016-09-09 21:41:31,250] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Bitanagan/bitanagan_1m.
+[2016-09-09 21:41:31,251] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,257] utils.py (WARNING,138) : 2016/08/16,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Bitanagan/bitanagan_1m,NEW,Bitanagan,184634,857000,765000,868000,778000
+[2016-09-09 21:41:31,266] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Kingking/kingking_1m/hdr.adf: 2016-08-12 10:28:30
+[2016-09-09 21:41:31,268] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Kingking/kingking_1m.
+[2016-09-09 21:41:31,269] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,276] utils.py (WARNING,138) : 2016/08/12,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Kingking/kingking_1m,NEW,Kingking,186382,816000,786000,827000,796000
+[2016-09-09 21:41:31,278] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Bugnan_Mayo/bugnanmayo_1m/hdr.adf: 2016-08-10 13:45:06.015504
+[2016-09-09 21:41:31,281] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Bugnan_Mayo/bugnanmayo_1m.
+[2016-09-09 21:41:31,281] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,288] utils.py (WARNING,138) : 2016/08/10,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Bugnan_Mayo/bugnanmayo_1m,NEW,Bugnan_Mayo,148083,860000,770000,870000,781000
+[2016-09-09 21:41:31,292] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Casauman/casauman_1m/hdr.adf: 2016-09-08 11:42:21.762283
+[2016-09-09 21:41:31,295] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Casauman/casauman_1m.
+[2016-09-09 21:41:31,296] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,302] utils.py (WARNING,138) : 2016/09/08,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Casauman/casauman_1m,NEW,Casauman,105607,882000,791000,891000,796000
+[2016-09-09 21:41:31,305] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Quinonoan/quinonoan_1m/hdr.adf: 2016-09-05 18:08:01.441607
+[2016-09-09 21:41:31,308] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Quinonoan/quinonoan_1m.
+[2016-09-09 21:41:31,309] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,316] utils.py (WARNING,138) : 2016/09/05,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Quinonoan/quinonoan_1m,NEW,Quinonoan,156821,875000,783000,886000,792000
+[2016-09-09 21:41:31,321] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Sumlog/sumlog_1m/hdr.adf: 2016-08-26 10:37:40.413072
+[2016-09-09 21:41:31,324] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Sumlog/sumlog_1m.
+[2016-09-09 21:41:31,324] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,330] utils.py (WARNING,138) : 2016/08/26,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPM/Sumlog/sumlog_1m,NEW,Sumlog,508307,830000,756000,846000,774000
+[2016-09-09 21:41:31,365] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CMU/LunMasla/lunmasla/hdr.adf: 2016-08-23 11:07:29.883466
+[2016-09-09 21:41:31,367] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CMU/LunMasla/lunmasla.
+[2016-09-09 21:41:31,368] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,375] utils.py (WARNING,138) : 2016/08/23,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CMU/LunMasla/lunmasla,NEW,LunMasla,173797,751000,663000,760000,672000
+[2016-09-09 21:41:31,389] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CMU/Silway/silway/hdr.adf: 2016-07-12 15:46:46.300929
+[2016-09-09 21:41:31,391] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CMU/Silway/silway.
+[2016-09-09 21:41:31,392] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,399] utils.py (WARNING,138) : 2016/07/12,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/CMU/Silway/silway,NEW,Silway,170302,734000,673000,742000,682000
+[2016-09-09 21:41:31,407] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPC/Aklan_Bathy/aklan/hdr.adf: 2016-08-30 16:49:51.021045
+[2016-09-09 21:41:31,409] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPC/Aklan_Bathy/aklan.
+[2016-09-09 21:41:31,410] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,417] utils.py (WARNING,138) : 2016/08/30,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPC/Aklan_Bathy/aklan,NEW,Aklan_Bathy,1291914,417000,1274000,437000,1299000
+[2016-09-09 21:41:31,434] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPC/Balantian_Bathy/balantian/hdr.adf: 2016-08-10 09:58:26.980154
+[2016-09-09 21:41:31,437] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPC/Balantian_Bathy/balantian.
+[2016-09-09 21:41:31,438] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,445] utils.py (WARNING,138) : 2016/08/10,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/UPC/Balantian_Bathy/balantian,NEW,Balantian_Bathy,843510,502000,1255000,520000,1276000
+[2016-09-09 21:41:31,481] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MSU_IIT/Molave/molave_bty/hdr.adf: 2016-07-19 11:41:10.058922
+[2016-09-09 21:41:31,484] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MSU_IIT/Molave/molave_bty.
+[2016-09-09 21:41:31,485] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,493] utils.py (WARNING,138) : 2016/07/19,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MSU_IIT/Molave/molave_bty,NEW,Molave,378066,547000,884000,566000,901000
+[2016-09-09 21:41:31,510] utils.py (INFO,122) : Found! /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MSU_IIT/Dipolog/New folder/dip_bathy/hdr.adf: 2016-08-11 16:25:20.342419
+[2016-09-09 21:41:31,512] osgeotools.py (INFO,86) : Opened raster dataset: /mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MSU_IIT/Dipolog/New folder/dip_bathy.
+[2016-09-09 21:41:31,513] osgeotools.py (INFO,140) : Projection from /home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj matches raster dataset.
+[2016-09-09 21:41:31,520] utils.py (WARNING,138) : 2016/08/11,/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/MSU_IIT/Dipolog/New folder/dip_bathy,NEW,Dipolog,2496202,528000,928000,565000,967000
