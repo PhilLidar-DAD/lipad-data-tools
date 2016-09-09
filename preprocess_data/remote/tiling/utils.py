@@ -11,18 +11,18 @@ import logging
 import sys
 
 
-_TILE_SIZE = 1000
-_version = "0.1.16"
+_version = "0.1.17"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _LOG_LEVEL = logging.DEBUG
 _FILE_LOG_LEVEL = logging.WARNING
 _CONS_LOG_LEVEL = logging.INFO
+_TILE_SIZE = 1000
 toplevel_dir = "/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/"
 output_log_file = "/home/autotiler@ad.dream.upd.edu.ph/fmc_dtms_20160909.log"
 prj_file = "/home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj"
 # from_date = "2016/06/28"
-from_date = datetime(2016, 6, 28)
+from_date = datetime(2016, 6, 1)
 usetime = 'mtime'
 # usetime = 'ctime'
 print 'usetime:', usetime
@@ -37,7 +37,7 @@ def _ceil(x):
 
 
 def get_dir_size(dir_path='.'):
-    cli_cmd = 'du -s "' + dir_path + '"'
+    cli_cmd = 'du -B1 "' + dir_path + '"'
     # p = subprocess.Popen(cli_cmd.split(
     #     ' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # out, err = p.communicate()
