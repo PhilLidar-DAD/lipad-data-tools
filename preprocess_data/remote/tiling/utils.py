@@ -11,7 +11,7 @@ import logging
 import sys
 
 
-_version = "0.1.17"
+_version = "0.1.18"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _LOG_LEVEL = logging.DEBUG
@@ -19,7 +19,7 @@ _FILE_LOG_LEVEL = logging.WARNING
 _CONS_LOG_LEVEL = logging.INFO
 _TILE_SIZE = 1000
 toplevel_dir = "/mnt/pmsat-nas_geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC/"
-output_log_file = "/home/autotiler@ad.dream.upd.edu.ph/fmc_dtms_20160909.log"
+output_log_file = "/home/autotiler@ad.dream.upd.edu.ph/fmc_dtms.log"
 prj_file = "/home/autotiler@ad.dream.upd.edu.ph/lipad-data-tools/preprocess_data/remote/tiling/WGS_84_UTM_zone_51N.prj"
 # from_date = "2016/06/28"
 from_date = datetime(2016, 6, 1)
@@ -112,13 +112,15 @@ def get_dir_size(dir_path='.'):
 # print "[{0}] -  {1}, None\n".format(time_created, os.path.join(dem_dir))
 
 
-def find_fmc_dtms(toplevel_dir, prj_file, usetime, from_date):
+def find_fmc_dtms(toplevel_dir, prj_file, usetime, from_date=None):
     for root, dirs, files in os.walk(toplevel_dir):
         for f in files:
             f_path = os.path.join(root, f)
             lastdate = datetime.fromtimestamp(
                 eval('os.path.get' + usetime + '(f_path)'))
-            if f == 'hdr.adf' and lastdate >= from_date:
+            if (f == 'hdr.adf' and
+                (from_date is None or
+                    (from_date and lastdate >= from_date))):
                 _logger.info('Found! %s: %s', f_path, lastdate)
 
                 # Open DEM
@@ -173,4 +175,5 @@ if __name__ == '__main__':
 (%(levelname)s,%(lineno)d) : %(message)s"))
     _logger.addHandler(ch)
 
-    find_fmc_dtms(toplevel_dir, prj_file, usetime, from_date)
+    # find_fmc_dtms(toplevel_dir, prj_file, usetime, from_date)
+    find_fmc_dtms(toplevel_dir, prj_file, usetime)
