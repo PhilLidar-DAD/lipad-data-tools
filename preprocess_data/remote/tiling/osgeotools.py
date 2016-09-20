@@ -2,6 +2,7 @@ import logging
 import numpy
 import os
 import random
+import string
 import sys
 
 
@@ -10,13 +11,17 @@ try:
 except:
     sys.exit('ERROR: cannot find GDAL/OGR modules')
 
-_version = "0.3.1"
+_version = "0.4.3"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _BUFFER = 50  # meters
 
 # Enable GDAL/OGR exceptions
 gdal.UseExceptions()
+
+
+class ProjectionDoesNotMatchError(Exception):
+    pass
 
 
 def pixel2world(gt, col_id, row_id):
@@ -38,12 +43,12 @@ def _image2array(i):
 
 
 def isexists(path):
-    normpath = os.path.normpath(path)
+    abspath = os.path.abspath(path)
     # Check if path exists
-    if not os.path.exists(normpath):
+    if not os.path.exists(abspath):
         _logger.error("%s path does not exist! Exiting.", path)
         exit(1)
-    return normpath
+    return abspath
 
 
 def _open_ogr_driver(driver_name):
@@ -135,8 +140,8 @@ def _check_projection(prj_file, raster_dataset):
         # Exiting.",
         #                       prj_file)
         #         exit(5)
-        raise Exception('Projection from ' + prj_file +
-                        ' does not match raster dataset!')
+        raise ProjectionDoesNotMatchError('Projection from ' + prj_file +
+                                          ' does not match raster dataset!')
     _logger.info("Projection from %s matches raster dataset.", prj_file)
     return prj
 
@@ -310,3 +315,11 @@ def compare_rasters(src_raster, dst_raster):
     avg = numpy.average(samples)
     std = numpy.std(samples)
     return avg, std
+
+
+def get_tempfile(temp_dir):
+    # Get a temporary file for resampled raster
+    random_string = ''.join(random.choice(string.ascii_lowercase +
+                                          string.digits) for _ in range(16))
+    temp_dir = isexists(temp_dir)
+    return os.path.join(temp_dir, "tile_dem_tmp_" + random_string)
