@@ -3,6 +3,10 @@ import osgeotools
 import math
 import argparse
 from datetime import datetime
+from osgeo import ogr
+import fiona
+from shapely.geometry.geo import mapping
+from shapely.geometry.polygon import Polygon
 _TILE_SIZE = 1000
 
 _version = "0.1.0"
@@ -69,9 +73,41 @@ def test_find_fmc_dtm(toplevel_dir, from_date):
                 if time_created > from_dt:
                     print "[{0}] -  {1}, None\n".format(time_created, os.path.join(dem_dir))
 
+def open_postgis_layer(layer_name, postgis_host, postgis_dbname, postgis_user, postgis_password, ):
+    source = ogr.Open(("PG:host={0} dbname={1} user={2} password={3}".format(postgis_host,postgis_dbname,postgis_user,postgis_password)))
+    pass
+
+def create_box(min_x, min_y, max_x, max_y):
+    return Polygon([(min_x, max_y), (min_x, min_y), (max_x, min_y), (max_x, max_y)])
+    
+def add_dtm_bboxes_from_csv(dtm_csv_file, dtm_shape_file):
+    with fiona.open(dtm_shape_file, 'a') as dtm_shp:
+        with open(dtm_csv_file, 'r') as dtm_csv:
+            feature_count = len(dtm_shp)
+            for line in dtm_csv:
+                tokens = line.split(',')
+                uploaded = tokens[2].strip(' \t\n\r')
+                if uploaded == 'NEW':
+                    rb_name = tokens[3].strip(' \t\n\r')
+                    min_x = int(tokens[5].strip(' \t\n\r'))
+                    min_y = int(tokens[6].strip(' \t\n\r'))
+                    max_x = int(tokens[7].strip(' \t\n\r'))
+                    max_y = int(tokens[8].strip(' \t\n\r'))
+                    bbox = create_box(min_x, min_y, max_x, max_y)
+                    feature_count += 1
+                    print "Writing to shapefile: [{0}, {1}, {2}]".format(feature_count, rb_name, uploaded)
+                    dtm_shp.write({
+                            #'geometry': mapping(Polygon([tile_ulp, tile_dlp, tile_drp, tile_urp])),
+                            'geometry': mapping(bbox),
+                            'properties': {'gid': feature_count,
+                                           'uploaded' : 7,
+                                           'rb' : rb_name,
+                                           },
+                                   })
 """
+from utils import find_fmc_dtms
 toplevel_dir="/mnt/geostorage/EXCHANGE/DPC/MISCELLANEOUS/For_FMC"
-output_log_file="/home/AD/autotiler/fmc_dtms_20160603.log"
+output_log_file="/home/AD/autotiler/fmc_dtms_20160603-2.log"
 prj_file="/home/AD/autotiler/scripts/tile_dem/WGS_84_UTM_zone_51N.prj"
 from_date="2016/06/02"
 
