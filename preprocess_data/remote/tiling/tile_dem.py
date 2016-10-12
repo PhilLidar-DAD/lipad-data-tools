@@ -5,12 +5,11 @@ import logging
 import math
 import os
 import osgeotools
-import random
-import string
 import sys
+import subprocess
 
 
-_version = "0.3.2"
+_version = "0.3.5"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _LOG_LEVEL = logging.DEBUG
@@ -88,7 +87,25 @@ if __name__ == '__main__':
     _setup_logging(args)
 
     # Open DEM raster
-    dem = osgeotools.open_raster(args.dem, args.prj_file)
+    try:
+        dem = osgeotools.open_raster(args.dem, args.prj_file)
+    except osgeotools.ProjectionDoesNotMatchError:
+        _logger.info('Projection from %s does not match raster dataset!',
+                     args.prj_file)
+        _logger.info('Reprojecting DEM...')
+        reprojected_dem_path = osgeotools.get_tempfile(args.temp_dir) + '.tif'
+        try:
+            gdalwarp = subprocess.check_output(['gdalwarp', '-t_srs',
+                                                os.path.abspath(args.prj_file),
+                                                os.path.abspath(args.dem),
+                                                reprojected_dem_path])
+            _logger.info('Reprojecting DEM...Done!')
+        except subprocess.CalledProcessError:
+            _logger.exception('Error reprojecting DEM! Exiting.')
+            exit(1)
+        # Open new DEM
+        dem = osgeotools.open_raster(reprojected_dem_path, args.prj_file)
+        # exit(1)
 
     _logger.info("Current DEM geotransform:\n%s", dem["geotransform"])
     _logger.info("Current DEM extents:\n%s", dem["extents"])
@@ -105,11 +122,12 @@ if __name__ == '__main__':
     # Resample DEM to tile extents
     _logger.info("Resampling image...")
     # Get a temporary file for resampled raster
-    random_string = ''.join(random.choice(string.ascii_lowercase +
-                                          string.digits) for _ in range(16))
-    temp_dir = osgeotools.isexists(args.temp_dir)
-    resampled_dem_path = os.path.join(temp_dir,
-                                      "tile_dem_tmp_" + random_string)
+    # random_string = ''.join(random.choice(string.ascii_lowercase +
+    #                                       string.digits) for _ in range(16))
+    # temp_dir = osgeotools.isexists(args.temp_dir)
+    # resampled_dem_path = os.path.join(temp_dir,
+    #                                   "tile_dem_tmp_" + random_string)
+    resampled_dem_path = osgeotools.get_tempfile(args.temp_dir)
     _logger.debug("resample_raster = %s", resampled_dem_path)
     osgeotools.resample_raster(dem, tile_extents, resampled_dem_path)
 
@@ -158,9 +176,9 @@ if __name__ == '__main__':
 
                 # Construct filename
                 filename = "E%sN%s_%s_%s.tif" % (tile_x / _TILE_SIZE,
-                                              tile_y / _TILE_SIZE,
-                                              args.type.upper(),
-                                              args.rbid.upper())
+                                                 tile_y / _TILE_SIZE,
+                                                 args.type.upper(),
+                                                 args.rbid.upper())
                 tile_path = os.path.join(output_dir, filename)
 
                 # Check if output filename is already exists
@@ -168,14 +186,15 @@ if __name__ == '__main__':
                     print '\nWARNING:', tile_path, 'already exists'
                     ctr += 1
                     filename = filename.replace(
-                        '.tif', '_' + str(ctr) + '_PL1'+'.tif')
+                        '.tif', '_' + str(ctr) + '_PL1' + '.tif')
                     tile_path = os.path.join(output_dir, filename)
 
                 # Save new GeoTIFF
                 osgeotools.write_raster(tile_path, "GTiff", tile,
                                         osgeotools.gdalconst.GDT_Float32,
                                         tile_gt, dem, raster_band)
-                _logger.info(args.dem + ' --------- ' + filename + ' --------- ')
+                _logger.info(args.dem + ' --------- ' +
+                             filename + ' --------- ')
 
             tile_counter += 1
 

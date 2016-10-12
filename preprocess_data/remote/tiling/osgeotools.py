@@ -1,25 +1,27 @@
-
 import logging
 import numpy
 import os
 import random
+import string
 import sys
 
 
 try:
-    #from osgeo import ogr, osr, gdal, gdalnumeric, gdalconst
-    #hacked because importing gdalnumeric causes error
-    from osgeo import ogr, osr, gdal, gdalconst
+    from osgeo import ogr, osr, gdal, gdalnumeric, gdalconst
 except:
     sys.exit('ERROR: cannot find GDAL/OGR modules')
 
-_version = "0.1.57"
+_version = "0.4.3"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _BUFFER = 50  # meters
 
 # Enable GDAL/OGR exceptions
 gdal.UseExceptions()
+
+
+class ProjectionDoesNotMatchError(Exception):
+    pass
 
 
 def pixel2world(gt, col_id, row_id):
@@ -41,12 +43,12 @@ def _image2array(i):
 
 
 def isexists(path):
-    normpath = os.path.normpath(path)
+    abspath = os.path.abspath(path)
     # Check if path exists
-    if not os.path.exists(normpath):
+    if not os.path.exists(abspath):
         _logger.error("%s path does not exist! Exiting.", path)
         exit(1)
-    return normpath
+    return abspath
 
 
 def _open_ogr_driver(driver_name):
@@ -75,7 +77,7 @@ def open_vector(path, driver_name, mode=gdalconst.GA_ReadOnly):
     if datasource is None:
         _logger.error("Cannot open %s! Exiting.", path)
         exit(3)
-    _logger.debug("Opened vector datasource: %s.", path)
+    _logger.info("Opened vector datasource: %s.", path)
     return datasource
 
 
@@ -86,7 +88,7 @@ def open_raster(path, prj_file):
     if dataset is None:
         _logger.error("Cannot open %s! Exiting.", path)
         exit(4)
-    _logger.debug("Opened raster dataset: %s.", path)
+    _logger.info("Opened raster dataset: %s.", path)
     raster = {"dataset": dataset,
               "projection": dataset.GetProjection(),
               "geotransform": dataset.GetGeoTransform(),
@@ -117,7 +119,7 @@ def open_raster_band(raster, bandno, open_band_array=False):
     data = {"nodata": raster_band.GetNoDataValue(),
             "unit_type": raster_band.GetUnitType()}
     if open_band_array:
-        _logger.debug("Opening raster band of %s...", raster["name"])
+        _logger.info("Opening raster band of %s...", raster["name"])
         data["band_array"] = raster_band.ReadAsArray()
     _logger.debug('data["nodata"] = %s' % data["nodata"])
     return data
@@ -134,11 +136,13 @@ def _check_projection(prj_file, raster_dataset):
     prj_raster_srs = osr.SpatialReference(wkt=prj_raster)
     # Check if they are the same
     if not prj_srs.IsSame(prj_raster_srs):
-        _logger.error("Projection from %s does not match raster dataset! \
-Exiting.",
-                      prj_file)
-        exit(5)
-    _logger.debug("Projection from %s matches raster dataset.", prj_file)
+        #         _logger.error("Projection from %s does not match raster dataset! \
+        # Exiting.",
+        #                       prj_file)
+        #         exit(5)
+        raise ProjectionDoesNotMatchError('Projection from ' + prj_file +
+                                          ' does not match raster dataset!')
+    _logger.info("Projection from %s matches raster dataset.", prj_file)
     return prj
 
 
@@ -162,7 +166,9 @@ def get_band_array_tile(raster, raster_band, xoff, yoff, size):
 
     # Check if band subset has data
     nodata = raster_band["nodata"]
-    if nodata == tile.min() == tile.max():
+    _logger.debug('type(tile): %s', type(tile))
+    _logger.debug('len(tile): %s', len(tile))
+    if len(tile) == 0 or nodata == tile.min() == tile.max():
         _logger.debug("Tile has no data! Skipping.")
         return None
 
@@ -266,13 +272,13 @@ def _estimate_sample_size(N):
 
 
 def compare_rasters(src_raster, dst_raster):
-    _logger.debug("Computing average difference...")
+    _logger.info("Computing average difference...")
     # Compute sample size
     pop_size = src_raster["rows"] * src_raster["cols"]
     # Comma-separated integer?
-    _logger.debug("Total no. of pixels: %s", pop_size)
+    _logger.info("Total no. of pixels: %s", pop_size)
     sample_size = _estimate_sample_size(pop_size)
-    _logger.debug("Sample size: %s", sample_size)
+    _logger.info("Sample size: %s", sample_size)
     # Open raster bands (assuming 1-band raster)
     src_raster_band = open_raster_band(src_raster, 1, True)
     dst_raster_band = open_raster_band(dst_raster, 1, True)
@@ -303,9 +309,17 @@ def compare_rasters(src_raster, dst_raster):
         # Display progress
         cur_pct = int(i / float(sample_size) * 100)
         if cur_pct % 10 == 0 and cur_pct > last_pct:
-            _logger.debug("Progress: {0}%".format(cur_pct))
+            _logger.info("Progress: {0}%".format(cur_pct))
             last_pct = cur_pct
     # Compute average and standard deviation
     avg = numpy.average(samples)
     std = numpy.std(samples)
     return avg, std
+
+
+def get_tempfile(temp_dir):
+    # Get a temporary file for resampled raster
+    random_string = ''.join(random.choice(string.ascii_lowercase +
+                                          string.digits) for _ in range(16))
+    temp_dir = isexists(temp_dir)
+    return os.path.join(temp_dir, "tile_dem_tmp_" + random_string)
