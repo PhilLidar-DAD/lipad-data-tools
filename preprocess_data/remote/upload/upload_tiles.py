@@ -177,24 +177,10 @@ class BulkUpload:
                                                                             obj_dict['content_type'],
                                                                             obj_dict['hash'],
                                                                             obj_dict['grid_ref'])
+                            self.metadata_logger.info(metadata_csv)
                         except:
-                            #DEBUG
-                            obj_dict = dict()
-                            obj_dict['name'] = name
-                            obj_dict['last_modified'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #2016-03-23 14:59:18
-                            obj_dict['bytes'] = os.path.getsize(file_path)
-                            obj_dict['content_type'] = "#DEBUGTYPE"
-                            obj_dict['hash'] = "#DEBUGHASH"
-                            obj_dict['grid_ref'] = grid_ref
-                            metadata_csv="{0},{1},{2},{3},{4},{5}".format(obj_dict['name'],
-                                                                            obj_dict['last_modified'],
-                                                                            obj_dict['bytes'],
-                                                                            obj_dict['content_type'],
-                                                                            obj_dict['hash'],
-                                                                            obj_dict['grid_ref'])
-                        self.metadata_logger.info(metadata_csv)
+                            self.metadata_logger.debug("Skipped unallowed file [{0}]".format(join(path, name)))
                         
-        
         # Write metadata log footer
         self.metadata_logger.info(self.footer_line)
         
