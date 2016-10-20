@@ -143,7 +143,6 @@ class BulkUpload:
 
         # Parse list of allowed file extensions from config.ini
         allowed_files_exts = self.config.get("file_types", "allowed").replace(' ', '').split(',')
-        
         print "Script will now upload files with the extensions {0}".format(allowed_files_exts)
         print "=====================================================================".format(allowed_files_exts)
 
@@ -157,7 +156,6 @@ class BulkUpload:
                 #if (self.resume_dict is None) or (self.resume_dict is not None and name not in self.resume_dict):
                     # Upload each file
                     filename_tokens = name.rsplit(".")
-                    
                     # Check if file is in allowed file extensions list 
                     if filename_tokens[-1] in allowed_files_exts:
                         grid_ref = filename_tokens[0].rsplit("_")[0]
@@ -178,8 +176,10 @@ class BulkUpload:
                                                                             obj_dict['hash'],
                                                                             obj_dict['grid_ref'])
                             self.metadata_logger.info(metadata_csv)
-                        except:
-                            self.metadata_logger.debug("Skipped unallowed file [{0}]".format(join(path, name)))
+                        except Exception as e:
+                            print e
+                    else:
+                        print "Skipped unallowed file [{0}]".format(join(path, name))
                         
         # Write metadata log footer
         self.metadata_logger.info(self.footer_line)
@@ -190,14 +190,25 @@ class BulkUpload:
         print "Ceph metadata logged at [{0}]".format(new_metadata_log_file_path)
         
 
+def upload_tiles(data_tiles_dir,resume_log=None):
+    if not isdir(data_tiles_dir):
+        raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
+    else:
+        print("Uploading files from [{0}].".format(data_tiles_dir))
+    
+    bupload = BulkUpload(data_tiles_dir)
+    if resume_log is not None:
+        bupload.build_resume_dict(resume_log)
+    
+    bupload.upload_data_tiles()
+
+
 if __name__ == "__main__": 
     
     # CLI Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", 
                         help="Directory containing the tiled files and named according to their grid reference")
-    parser.add_argument("-l", "--logfile",dest="logfile",
-                        help="Path to resume log file for this upload")
     parser.add_argument("-r", "--resume",dest="resume",
                         help="Resume from a interrupted upload using the CSV dump")
     args = parser.parse_args()
