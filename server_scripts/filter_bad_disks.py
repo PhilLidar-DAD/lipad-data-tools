@@ -6,6 +6,7 @@ import os
 import os.path
 import subprocess
 import sys
+import re
 from pprint import pprint
 
 
@@ -79,9 +80,22 @@ def smart_check(hdd_name):
                 if tokens[0] in CRITICAL_SMART_VALS and int(tokens[-1]) > 0:
                     output += "{0},{1},{2},".format(tokens[0],tokens[1],tokens[-1])
     except Exception as e:
-        output +="ERR_NO_SMART,"
+        output +="ERR_NO_SMART"
     return output
 
+def get_hdd_serial(hdd_name):
+    cmd = "camcontrol identify {0}".format(hdd_name)
+    #regex filter
+    r = re.compile('^serial')
+    
+    output=""
+    try:
+        camctrl_out = subprocess.check_output(cmd)
+        output = filter(r.match, camctrl_out.split("\n"))[0].split()[2]
+    except Exception as e:
+        output +="NO_SERIAL"
+    return output
+    
 if __name__ == '__main__':
 
     # Parse arguments
@@ -95,5 +109,6 @@ if __name__ == '__main__':
     for hdd_num in xrange(max_disk+1):
         hdd_name = "/dev/da"+str(hdd_num)
         smart_stats = smart_check(hdd_name)
+        serial_num = get_hdd_serial(hdd_name)
         if smart_stats:
-            _logger.info(hdd_name+","+smart_stats)
+            _logger.info(serial_num+","+hdd_name+","+smart_stats)
