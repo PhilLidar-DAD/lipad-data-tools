@@ -5,7 +5,7 @@
 import time
 from shapely.geometry.geo import shape
 from shapely.geometry.polygon import Polygon
-from automation.index.utils import is_square, write_tile_to_shape, TILE_SIZE
+from .utils import is_square, write_tile_to_shape, TILE_SIZE
 
     
 class Node():
