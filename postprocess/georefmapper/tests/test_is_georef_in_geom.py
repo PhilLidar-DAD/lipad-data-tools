@@ -5,6 +5,7 @@ from shapely.geometry.multipolygon import MultiPolygon
 import fiona
 from shapely.geometry.geo import shape, mapping
 from fiona.crs import from_epsg
+from shapely.ops import cascaded_union
 sys.path.append(os.path.dirname(os.path.realpath(__file__)).split('georefmapper')[0])
 from georefmapper.mapper import georef_to_extents, extents_to_bbox, is_georef_in_geom
 from georefmapper.index.utils import write_tile_to_shape, TILE_SIZE
@@ -32,7 +33,8 @@ if __name__=="__main__":
         
             #get feature geometry
             df_geom = shape(data_feature['geometry'])
-            
+            if not df_geom.is_valid:
+                df_geom = cascaded_union(df_geom)
             if df_geom.type == 'Polygon':
                 poly_list.append(df_geom)
             elif df_geom.type == 'MultiPolygon':
