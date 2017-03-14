@@ -3,6 +3,8 @@
 *.pydevproject
 *.ini
 *.conf
+*.csv
+*.log
 preprocess_data/remote/logs/
 preprocess_data/remote/upload/logs/
 preprocess_data/remote/upload/dump/
