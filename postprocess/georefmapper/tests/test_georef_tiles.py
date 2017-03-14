@@ -27,12 +27,13 @@ if __name__=="__main__":
     schema = {  'geometry': 'Polygon',
                 'properties': dict([('GRID_REF', 'str:254'), ('TYPE', 'int:1'),('MINX', 'float:19'), ('MINY', 'float:19'), ('MAXX', 'float:19'), ('MAXY', 'float:19')])
                 }
-    print "INPUT: "+args.input
+    print "\nINPUT: "+args.input
     print "OUTPUT: "+args.output
     with fiona.open(args.input, 'r', 'ESRI Shapefile') as src_shp_fh, fiona.open(args.output, 'w','ESRI Shapefile', schema, crs=from_epsg(32651), ) as out_shp_fh:
         
         for data_feature in src_shp_fh:
             
+            print "\nSHAPEFILE PROPERTIES:"
             pprint(data_feature['properties'])
         
             #get feature geometry
