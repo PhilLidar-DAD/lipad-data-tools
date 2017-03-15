@@ -27,23 +27,27 @@ if __name__=="__main__":
     args = parse_arguments()
     with fiona.open(args.input, 'r', 'ESRI Shapefile') as src_shp_fh:
         poly_list = []
+        f_count = 0
         for data_feature in src_shp_fh:
             print "\nSHAPEFILE PROPERTIES:"
             pprint(data_feature['properties'])
         
             #get feature geometry
             df_geom = shape(data_feature['geometry'])
-            if not df_geom.is_valid:
-                df_geom = cascaded_union(df_geom)
+            
+            #print "\nEvaluating GeoRefs for feature #{0}:"
+            #for georef in args.georefs:
+                #print " {0} : {1}".format(georef, is_georef_in_geom(georef, df_geom))
+                
             if df_geom.type == 'Polygon':
                 poly_list.append(df_geom)
             elif df_geom.type == 'MultiPolygon':
                 poly_list.extend(list(df_geom))
-        
+         
         shp_mp = MultiPolygon(poly_list)
+        if not shp_mp.is_valid:
+                shp_mp = cascaded_union(shp_mp)
         
         print "\nEvaluating GeoRefs:"
         for georef in args.georefs:
             print " {0} : {1}".format(georef, is_georef_in_geom(georef, shp_mp))
-            
-            
