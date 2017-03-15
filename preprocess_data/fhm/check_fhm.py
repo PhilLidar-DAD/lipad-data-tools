@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # Salad VM
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 import os
 import ogr
@@ -51,7 +51,7 @@ def check_schema(layer_fhm, path_fhm):
 		if layerDef_fhm.GetFieldDefn(i).GetName() == "Var":
 			schema = True
 			# check if dissolved
-			if feature_count_fhm <= 4:
+			if feature_count_fhm == 4:
 				for feature_fhm in layer_fhm:
 					var_value = feature_fhm.GetFieldAsInteger("Var")
 
@@ -62,6 +62,10 @@ def check_schema(layer_fhm, path_fhm):
 						spamwriter.writerow([path_fhm, layer_fhm.GetName(), "Incorrect class"])
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]", \
 						layer_fhm.GetName(), "Incorrect class"
+			elif feature_count_fhm < 4
+				spamwriter.writerow([path_fhm, layer_fhm.GetName(), "Less than 4 features"])
+				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]", \
+				layer_fhm.GetName(), "Less than 4 features"
 			else:
 				spamwriter.writerow([path_fhm, layer_fhm.GetName(), "More than 4 features"])
 				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]", \
