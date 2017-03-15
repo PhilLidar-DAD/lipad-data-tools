@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# Salad VM
+
 __version__ = "0.2.0"
 
 import os
