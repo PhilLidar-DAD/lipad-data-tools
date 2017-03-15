@@ -62,7 +62,7 @@ def check_schema(layer_fhm, path_fhm):
 						spamwriter.writerow([path_fhm, layer_fhm.GetName(), "Incorrect class"])
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]", \
 						layer_fhm.GetName(), "Incorrect class"
-			elif feature_count_fhm < 4
+			elif feature_count_fhm < 4:
 				spamwriter.writerow([path_fhm, layer_fhm.GetName(), "Less than 4 features"])
 				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]", \
 				layer_fhm.GetName(), "Less than 4 features"
