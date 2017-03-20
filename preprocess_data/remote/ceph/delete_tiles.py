@@ -18,26 +18,92 @@ def get_cwd():
     else:
         return cur_path.rpartition(os.path.sep)[0]+os.path.sep
 
+def parse_ceph_config():
+    #Init Ceph OGW settings from config.ini
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.ini")) 
+    
+    ceph_ogw = dict()
+    options = config.options("ceph")
+    for option in options:
+        try:
+            ceph_ogw[option] = config.get("ceph", option)
+            if ceph_ogw[option] == -1:
+                print("skip: %s" % option)
+        except:
+            print("exception on %s!" % option)
+            ceph_ogw[option] = None
+    
+    return ceph_ogw
+
+def ceph_connect(ceph_ogw_dict):
+    #Return a Ceph Client Connection
+    return CephStorageClient(   ceph_ogw_dict['user'],
+                                ceph_ogw_dict['key'],
+                                ceph_ogw_dict['url'],
+                                container_name=ceph_ogw_dict['container'])
+
+def delete_tiles(csv_file_path):
+    ceph_ogw_dict = parse_ceph_config()
+    ceph_conn = ceph_connect(ceph_ogw_dict)
+    
+    # Parse csv and delete files
+    header_line = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH,GRID_REF"
+    footer_line = "===END==="
+    csv_delimiter = ","
+    with open(csv_file_path, "r") as tiles_csv_fh:
+        for csv_line in tiles_csv_fh:
+            if not csv_line == header_line:
+                metadata_list = csv_line.split(csv_delimiter) # Write each line to new metadata log as well
+                object_name = metadata_list[0]
+                ceph_conn.delete_object(object_name, container_name=ceph_ogw_dict['container'])
+
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("\nPlease respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
+                
 if __name__ == "__main__": 
     
     # CLI Arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("dir", 
-                        help="Directory containing the tiled files and named according to their grid reference")
-    parser.add_argument("-r", "--resume",dest="resume",
-                        help="Resume from a interrupted upload using the CSV dump")
+    parser.add_argument("csv", 
+                        help="CSV file containing files to be deleted    ")
+    parser.add_argument("-f", "--force",dest="force",
+                        help="Skip confirmation fo deletion")
     args = parser.parse_args()
 
-    data_tiles_dir = None
-    if isdir(args.dir):
-        data_tiles_dir = args.dir
-        print("Uploading files from [{0}].".format(args.dir))
-    else:
-        raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
-
-    bupload = BulkUpload(args.dir)
-    # No resume log specified
-    if args.resume is not None:
-        bupload.build_resume_dict(args.resume)
+    if not args.force:
+        if not query_yes_no("Are you sure to delete all objects listed in:\n[{0}]?\n".format(args.csv)):
+            print "\nExiting script..."
+            sys.exit()
     
-    bupload.upload_data_tiles()
+    print "Deleting listed files/objects..."
+    delete_tiles(args.csv)
