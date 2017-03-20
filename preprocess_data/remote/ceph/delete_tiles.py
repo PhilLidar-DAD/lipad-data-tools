@@ -1,12 +1,6 @@
 #!/usr/bin/python
 from pprint import pprint
-from os import listdir, walk
-from os.path import isfile, isdir, join
-import argparse, time, os
-from collections import OrderedDict
-from ConfigParser import SafeConfigParser
-from datetime import datetime
-import argparse, ConfigParser, os, sys, shutil, logging
+import argparse, ConfigParser, os, sys, logging
 from ceph_client import CephStorageClient
 import swiftclient
 from utils import query_yes_no
@@ -51,9 +45,9 @@ def parse_ceph_config():
         try:
             ceph_ogw[option] = config.get("ceph", option)
             if ceph_ogw[option] == -1:
-                print("skip: %s" % option)
+                _logger.warn("skip: %s" % option)
         except:
-            print("exception on %s!" % option)
+            _logger.error("exception on %s!" % option)
             ceph_ogw[option] = None
     
     return ceph_ogw
