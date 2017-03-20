@@ -8,15 +8,37 @@ from ConfigParser import SafeConfigParser
 from datetime import datetime
 import argparse, ConfigParser, os, sys, shutil, logging
 from ceph_client import CephStorageClient
+import swiftclient
+from utils import query_yes_no
 
-# Utility Functions
+_logger = logging.getLogger(__name__)
+_LOG_LEVEL = logging.DEBUG
+_CONS_LOG_LEVEL = logging.INFO
+_FILE_LOG_LEVEL = logging.DEBUG
 
-def get_cwd():
-    cur_path = os.path.realpath(__file__)
-    if "?" in cur_path:
-        return cur_path.rpartition("?")[0].rpartition(os.path.sep)[0]+os.path.sep
-    else:
-        return cur_path.rpartition(os.path.sep)[0]+os.path.sep
+def _setup_logging(args):
+    # Setup logging
+    _logger.setLevel(_LOG_LEVEL)
+    formatter = logging.Formatter("[%(asctime)s] %(filename)s \
+(%(levelname)s,%(lineno)d) : %(message)s")
+
+    # Check verbosity for console
+    if args.verbose and args.verbose >= 1:
+        global _CONS_LOG_LEVEL
+        _CONS_LOG_LEVEL = logging.DEBUG
+        
+    # Setup console logging
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(_CONS_LOG_LEVEL)
+    ch.setFormatter(formatter)
+    _logger.addHandler(ch)
+
+    # Setup file logging
+    if args.logfile is not None:
+        fh = logging.FileHandler(args.logfile)
+        fh.setLevel(_FILE_LOG_LEVEL)
+        fh.setFormatter(formatter)
+        _logger.addHandler(fh)
 
 def parse_ceph_config():
     #Init Ceph OGW settings from config.ini
@@ -38,10 +60,12 @@ def parse_ceph_config():
 
 def ceph_connect(ceph_ogw_dict):
     #Return a Ceph Client Connection
-    return CephStorageClient(   ceph_ogw_dict['user'],
+    ceph_conn = CephStorageClient(   ceph_ogw_dict['user'],
                                 ceph_ogw_dict['key'],
                                 ceph_ogw_dict['url'],
                                 container_name=ceph_ogw_dict['container'])
+    ceph_conn.connect()
+    return ceph_conn
 
 def delete_tiles(csv_file_path):
     ceph_ogw_dict = parse_ceph_config()
@@ -53,42 +77,18 @@ def delete_tiles(csv_file_path):
     csv_delimiter = ","
     with open(csv_file_path, "r") as tiles_csv_fh:
         for csv_line in tiles_csv_fh:
-            if not csv_line == header_line:
-                metadata_list = csv_line.split(csv_delimiter) # Write each line to new metadata log as well
-                object_name = metadata_list[0]
-                ceph_conn.delete_object(object_name, container_name=ceph_ogw_dict['container'])
+            csv_line = csv_line.strip()
+            if not csv_line == header_line and not csv_line == footer_line:
+                metadata_tokens = csv_line.split(csv_delimiter) # Write each line to new metadata log as well
+                object_name = metadata_tokens[0]
+                try:
+                    ceph_conn.delete_object(object_name, container=ceph_ogw_dict['container'])
+                except swiftclient.exceptions.ClientException as e:
+                    if "404 Not Found" in str(e):
+                        _logger.info("Skipping [{0}], not found.".format(metadata_tokens[0]))
+                    else:
+                        raise e
 
-def query_yes_no(question, default="yes"):
-    """Ask a yes/no question via raw_input() and return their answer.
-
-    "question" is a string that is presented to the user.
-    "default" is the presumed answer if the user just hits <Enter>.
-        It must be "yes" (the default), "no" or None (meaning
-        an answer is required of the user).
-
-    The "answer" return value is True for "yes" or False for "no".
-    """
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
-    if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError("invalid default answer: '%s'" % default)
-
-    while True:
-        sys.stdout.write(question + prompt)
-        choice = raw_input().lower()
-        if default is not None and choice == '':
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            sys.stdout.write("\nPlease respond with 'yes' or 'no' "
-                             "(or 'y' or 'n').\n")
                 
 if __name__ == "__main__": 
     
@@ -98,12 +98,19 @@ if __name__ == "__main__":
                         help="CSV file containing files to be deleted    ")
     parser.add_argument("-f", "--force",dest="force",
                         help="Skip confirmation fo deletion")
+    parser.add_argument("-v", "--verbose", action="count")
+    parser.add_argument("-l", "--logfile",
+                        help="Filename of logfile")
+    
     args = parser.parse_args()
+    
+    _setup_logging(args)
+    
 
     if not args.force:
         if not query_yes_no("Are you sure to delete all objects listed in:\n[{0}]?\n".format(args.csv)):
-            print "\nExiting script..."
+            _logger.info( "\nExiting script...")
             sys.exit()
     
-    print "Deleting listed files/objects..."
+    _logger.info("Deleting listed files/objects...")
     delete_tiles(args.csv)
