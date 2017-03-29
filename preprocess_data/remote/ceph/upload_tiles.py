@@ -9,220 +9,181 @@ from datetime import datetime
 import argparse, ConfigParser, os, sys, shutil, logging
 from ceph_client import CephStorageClient
 
-# Utility Functions
+_logger = logging.getLogger(__name__)
+_LOG_LEVEL = logging.DEBUG
+_CONS_LOG_LEVEL = logging.INFO
+_FILE_LOG_LEVEL = logging.DEBUG
 
-def get_cwd():
-    cur_path = os.path.realpath(__file__)
-    if "?" in cur_path:
-        return cur_path.rpartition("?")[0].rpartition(os.path.sep)[0]+os.path.sep
-    else:
-        return cur_path.rpartition(os.path.sep)[0]+os.path.sep
+HEADER_LINE = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH,GRID_REF"
+FOOTER_LINE = "===END==="
+CSV_DELIMITER = ","
 
+def _setup_logging(args):
+    # Setup logging
+    _logger.setLevel(_LOG_LEVEL)
+    formatter = logging.Formatter("[%(asctime)s] %(filename)s \
+(%(levelname)s,%(lineno)d) : %(message)s")
 
-class BulkUpload:
-    
-    def __init__(self, data_tiles_dir):
+    # Check verbosity for console
+    if args.verbose and args.verbose >= 1:
+        global _CONS_LOG_LEVEL
+        _CONS_LOG_LEVEL = logging.DEBUG
         
-        # Init config from config.ini
-        self.config = ConfigParser.ConfigParser()
-        self.config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.ini"))
-        
-        # Init Ceph OGW settings 
-        self.ceph_ogw = dict()
-        self.ceph_sc = None
-        options = self.config.options("ceph")
-        for option in options:
-            try:
-                self.ceph_ogw[option] = self.config.get("ceph", option)
-                if self.ceph_ogw[option] == -1:
-                    print("skip: %s" % option)
-            except:
-                print("exception on %s!" % option)
-                self.ceph_ogw[option] = None
-        
-        # Activate virtualenv
-        self.activate_venv()
-        
-        # Initialize metadata attributes
-        self.metadata_logger = None
-        self.metadata_log_file_path = None
-        self.resume_dict = None
-        
-        # Setup log files
-        self.header_line = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH,GRID_REF"
-        self.footer_line = "===END==="
-        
-        self.setup_logs()
-        self.data_tiles_dir = data_tiles_dir
-        self.setup_metadata_log()
-            
-    def activate_venv(self):
-        #Try activating the virtualenv, error out if it cannot be activated
+    # Setup console logging
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(_CONS_LOG_LEVEL)
+    ch.setFormatter(formatter)
+    _logger.addHandler(ch)
+
+    # Setup file logging
+    if args.logfile is not None:
+        fh = logging.FileHandler(args.logfile)
+        fh.setLevel(_FILE_LOG_LEVEL)
+        fh.setFormatter(formatter)
+        _logger.addHandler(fh)
+
+def parse_ceph_config(config):
+    ceph_ogw = dict()
+    options = config.options("ceph")
+    for option in options:
         try:
-            activate_this_file = self.config.get("env", "activatethis")
-            if not isfile(activate_this_file):
-                raise Exception("ERROR: Failed to activate environment. Cannot find\n \
-                                    virtualenv activate file in: [{0}]".format(activate_this_file))
-            try:
-                execfile(activate_this_file, dict(__file__=activate_this_file))
-                from ceph_client import CephStorageClient
-                import warnings, mimetypes, logging 
-            except IOError as e:
-                print "ERROR: Failed to activate environment. Check if virtualenv\n \
-                         activate file is found in [{0}]".format(activate_this_file)
-                raise e
-        except ConfigParser.NoOptionError as e:
-            print "No virtualenv activatethis setting found in config.ini, using default python environment. "
-            
+            ceph_ogw[option] = config.get("ceph", option)
+            if ceph_ogw[option] == -1:
+                _logger.warn("skip: %s" % option)
+        except:
+            _logger.error("exception on %s!" % option)
+            ceph_ogw[option] = None
     
-    def setup_logs(self):    
-        directories = ["dump", "logs"]
-        cwd = get_cwd()
-        for d in directories:
-            if not os.path.exists(join(cwd,d)):
-                os.makedirs(join(cwd,d))
-        logfiles = ["logs/ceph_storage.log"]
-        for f in logfiles:  
-            if not os.path.isfile(os.path.join(cwd, f)): 
-                with open(os.path.join(cwd, f), 'wb') as temp_file:
-                    temp_file.write("")
-        
-    def setup_metadata_log(self):
-        # Set up metadata logger
-        self.metadata_logger = logging.getLogger('MetadataLogger')
-        self.metadata_logger.setLevel(logging.DEBUG)
+    return ceph_ogw
 
-        # Add the log message handler to the logger
-        dir_tokens = filter(None, self.data_tiles_dir.split(os.path.sep))
-        
-        if len(dir_tokens) > 1:
-            self.metadata_log_file_path = "dump/dt_{0}_{1}_{2}.inc".format(dir_tokens[-2], dir_tokens[-1], time.strftime("%Y-%m-%d-%H%M-%S"))
-        else:
-            self.metadata_log_file_path = "dump/dt_{0}_{1}.inc".format(dir_tokens[-1], time.strftime("%Y-%m-%d-%H%M-%S"))
-            
-        log_file_handler = logging.FileHandler(self.metadata_log_file_path)
-        log_file_handler.setFormatter(logging.Formatter('%(message)s'))
-        log_file_handler.setLevel(logging.INFO)
+def ceph_connect(ceph_ogw_dict):
+    #Return a Ceph Client Connection
+    ceph_conn = CephStorageClient(   ceph_ogw_dict['user'],
+                                ceph_ogw_dict['key'],
+                                ceph_ogw_dict['url'],
+                                container_name=ceph_ogw_dict['container'])
+    ceph_conn.connect()
+    return ceph_conn
 
-        self.metadata_logger.addHandler(log_file_handler)
-        
-        # Write metadata log header
-        self.metadata_logger.info(self.header_line)
-        
-        
-    def build_resume_dict(self, data_tiles_resume_log):
-        csv_delimiter =','
-        csv_columns   = 6
-        self.resume_dict=OrderedDict()     # Use ordered dictionary to remember roder fo insertion
-        filenames_list=[]
-        
-        # Check and read specified dump file to resume to
-        if not os.path.isfile(data_tiles_resume_log):
-            raise Exception("Metadata log file [{0}] is not a valid file!".format(data_tiles_resume_log))
-        else:
-            print "Resuming previous upload from metadata log file[{0}]".format(data_tiles_resume_log)
-        
-        # Index all previously uploaded files into list, using the filename as key
-        with open(data_tiles_resume_log, "r") as resume_log:
-            for csv_line in resume_log:
-                if not csv_line == self.header_line:
-                    metadata_list = csv_line.split(csv_delimiter) # Write each line to new metadata log as well
-                    self.resume_dict[metadata_list[0]]=csv_line.rstrip()
-                    
-        print "Loaded [{0}] objects from previous metadata log file".format(len(self.resume_dict))
-        
-    def upload_data_tiles(self):
-        # Connect to Ceph
-        self.ceph_sc = CephStorageClient(   self.ceph_ogw['user'],
-                                                self.ceph_ogw['key'],
-                                                self.ceph_ogw['url'],
-                                                container_name=self.ceph_ogw['container'])
-        #Connect to Ceph Storage
-        self.ceph_sc.connect()
-        print "Connected to Ceph OGW at URI [{0}]".format(self.ceph_ogw['url'])
-
-        # Parse list of allowed file extensions from config.ini
-        allowed_files_exts = self.config.get("file_types", "allowed").replace(' ', '').split(',')
-        print "Script will now upload files with the extensions {0}".format(allowed_files_exts)
-        print "=====================================================================".format(allowed_files_exts)
-
-        # Begin uploading data tiles
-        for path, subdirs, files in walk(self.data_tiles_dir):
-            for name in files:
-                if (self.resume_dict is not None and name in self.resume_dict):
-                    print "Skipping previously uploaded file [{0}]".format(join(path, name))
-                    self.metadata_logger.info(self.resume_dict[name])
-                else:
-                #if (self.resume_dict is None) or (self.resume_dict is not None and name not in self.resume_dict):
-                    # Upload each file
-                    filename_tokens = name.rsplit(".")
-                    # Check if file is in allowed file extensions list 
-                    if filename_tokens[-1] in allowed_files_exts:
-                        grid_ref = filename_tokens[0].rsplit("_")[0]
-                        file_path = join(path, name)
-                        
-                        try:
-                            # Upload_file(file_path, grid_ref)
-                            obj_dict = self.ceph_sc.upload_file_from_path(file_path)
-                            obj_dict['grid_ref'] = grid_ref
-                            #uploaded_objects.append(obj_dict)
-                            print "Uploaded file [{0}]".format(join(path, name))
-                            
-                            # Write metadata for file into dumpfile in CSV format
-                            metadata_csv="{0},{1},{2},{3},{4},{5}".format(obj_dict['name'],
-                                                                            obj_dict['last_modified'],
-                                                                            obj_dict['bytes'],
-                                                                            obj_dict['content_type'],
-                                                                            obj_dict['hash'],
-                                                                            obj_dict['grid_ref'])
-                            self.metadata_logger.info(metadata_csv)
-                        except Exception as e:
-                            print e
-                    else:
-                        print "Skipped unallowed file [{0}]".format(join(path, name))
-                        
-        # Write metadata log footer
-        self.metadata_logger.info(self.footer_line)
-        
-        # Rename completed log from .inc into .log
-        new_metadata_log_file_path = ".".join(self.metadata_log_file_path.split('.')[:-1]) + ".log"
-        os.rename(self.metadata_log_file_path, new_metadata_log_file_path)
-        print "Ceph metadata logged at [{0}]".format(new_metadata_log_file_path)
-        
-
-def upload_tiles(data_tiles_dir,resume_log=None):
-    if not isdir(data_tiles_dir):
-        raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
+def build_resume_dict(tiles_resume_csv):
+    csv_delimiter =','
+    csv_columns   = 6
+    resume_dict=OrderedDict()     # Use ordered dictionary to remember order of insertion
+    filenames_list=[]
+    
+    # Check and read specified dump file to resume to
+    if not os.path.isfile(tiles_resume_csv):
+        _logger.error("Metadata log file [{0}] is not a valid file!".format(tiles_resume_csv))
+        sys.exit(1)
     else:
-        print("Uploading files from [{0}].".format(data_tiles_dir))
+        _logger.info("Resuming previous upload from metadata log file[{0}]".format(tiles_resume_csv))
     
-    bupload = BulkUpload(data_tiles_dir)
-    if resume_log is not None:
-        bupload.build_resume_dict(resume_log)
+    # Index all previously uploaded files into list, using the filename as key
+    with open(tiles_resume_csv, "r") as resume_log:
+        for csv_line in resume_log:
+            if not csv_line == HEADER_LINE:
+                metadata_list = csv_line.split(csv_delimiter) # Write each line to new metadata log as well
+                resume_dict[metadata_list[0]]=csv_line.rstrip()
+                
+    _logger.info("Loaded [{0}] objects from previous metadata log file".format(len(resume_dict)))
     
-    bupload.upload_data_tiles()
+    return resume_dict
+    
+def setup_metadata_log(meta_log_file_path):
+    # Set up metadata logger
+    meta_logger = logging.getLogger('MetadataLogger')
+    meta_logger.setLevel(logging.DEBUG)
 
+    if "." in meta_log_file_path:
+        path_tokens = meta_log_file_path.split('.')
+        meta_log_file_path = "{0}_{1}.{2}.inc".format(path_tokens[0], time.strftime("%Y-%m-%d-%H%M-%S"), path_tokens[1])
+    else:
+        meta_log_file_path = "{0}_{1}.csv.inc".format(meta_log_file_path, time.strftime("%Y-%m-%d-%H%M-%S"))
+    
+    # Add the log message handler to the logger
+    log_file_handler = logging.FileHandler(meta_log_file_path)
+    log_file_handler.setFormatter(logging.Formatter('%(message)s'))
+    log_file_handler.setLevel(logging.INFO)
+    meta_logger.addHandler(log_file_handler)
+    
+    return meta_logger, meta_log_file_path
 
+def upload_tiles(tiles_dir, csv_out_file, resume_csv=None):
+    #Init Ceph OGW settings from config.ini
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.ini")) 
+    
+    
+    ceph_ogw_dict = parse_ceph_config(config)
+    ceph_conn = ceph_connect(ceph_ogw_dict)
+    
+    print csv_out_file
+    meta_logger, meta_log_file_path = setup_metadata_log(csv_out_file)
+    
+    resume_dict = None
+    if resume_csv:
+        resume_dict = build_resume_dict(resume_csv)
+    
+    allowed_files_exts = config.get("file_types", "allowed").replace(' ', '').split(',')
+    _logger.info("Script will now upload files with the extensions {0}".format(allowed_files_exts))
+    _logger.info("=====================================================================")
+    # Begin uploading data tiles
+    meta_logger.info(HEADER_LINE)   # Write CSV header
+    for path, subdirs, files in walk(tiles_dir):
+        for name in files:
+            if (resume_dict is not None and name in resume_dict):
+                _logger.info("Skipping previously uploaded file [{0}]".format(join(path, name)))
+                meta_logger.info(resume_dict[name])
+            else:
+                # Upload each file
+                filename_tokens = name.rsplit(".")
+                # Check if file is in allowed file extensions list 
+                if filename_tokens[-1] in allowed_files_exts:
+                    grid_ref = filename_tokens[0].rsplit("_")[0]
+                    file_path = join(path, name)
+                    
+                    try:
+                        # Upload_file(file_path, grid_ref)
+                        obj_dict = ceph_conn.upload_file_from_path(file_path)
+                        obj_dict['grid_ref'] = grid_ref
+                        #uploaded_objects.append(obj_dict)
+                        print "Uploaded file [{0}]".format(join(path, name))
+                        
+                        # Write metadata for file into dumpfile in CSV format
+                        metadata_csv="{0},{1},{2},{3},{4},{5}".format(obj_dict['name'],
+                                                                        obj_dict['last_modified'],
+                                                                        obj_dict['bytes'],
+                                                                        obj_dict['content_type'],
+                                                                        obj_dict['hash'],
+                                                                        obj_dict['grid_ref'])
+                        meta_logger.info(metadata_csv)
+                    except Exception as e:
+                        print e
+                else:
+                    _logger.info("Skipped unallowed file [{0}]".format(join(path, name)))
+    
+    meta_logger.info(FOOTER_LINE)   # Write CSV footer
+    os.rename(meta_log_file_path, meta_log_file_path.replace(".inc",""))    # Remove .inc in completed logger
+    _logger.info("Done, CSV dump found at [{0}]".format(meta_log_file_path))
+    
+    
 if __name__ == "__main__": 
     
+    # CLI Arguments
     # CLI Arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", 
                         help="Directory containing the tiled files and named according to their grid reference")
+    parser.add_argument("-c", "--csv",dest="csv",required=True,
+                        help="CSV file path to write Ceph Object meta info")
     parser.add_argument("-r", "--resume",dest="resume",
                         help="Resume from a interrupted upload using the CSV dump")
-    args = parser.parse_args()
-
-    data_tiles_dir = None
-    if isdir(args.dir):
-        data_tiles_dir = args.dir
-        print("Uploading files from [{0}].".format(args.dir))
-    else:
-        raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
-
-    bupload = BulkUpload(args.dir)
-    # No resume log specified
-    if args.resume is not None:
-        bupload.build_resume_dict(args.resume)
+    parser.add_argument("-v", "--verbose", action="count")
+    parser.add_argument("-l", "--logfile",
+                        help="Filename of logfile")
     
-    bupload.upload_data_tiles()
+    args = parser.parse_args()
+    
+    _setup_logging(args)
+    
+    upload_tiles(args.dir, args.csv, args.resume)
