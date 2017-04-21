@@ -22,10 +22,43 @@ def parse_arguments():
     args = parser.parse_args()
     return args
 
+def write_tile_to_shape_test(tile_extents,shp_file, tile_size, node_type):
+    min_x, min_y, max_x, max_y = tile_extents
+    tile_ulp = (min_x, max_y)
+    tile_dlp = (min_x, min_y)
+    tile_drp = (max_x, min_y)
+    tile_urp = (max_x, max_y)
+    gridref = "E{0}N{1}".format(min_x / tile_size, max_y / tile_size,)
+    shp_file.write({
+                #'geometry': mapping(Polygon([tile_ulp, tile_dlp, tile_drp, tile_urp])),
+                'geometry': mapping(Polygon([tile_ulp, tile_dlp, tile_drp, tile_urp])),
+                'properties': {'GRID_REF': gridref,
+                               'TYPE' : node_type,
+                               'MINX' : min_x,
+                               'MINY' : min_y,
+                               'MAXX' : max_x,
+                               'MAXY' : max_y,
+                               'DSM' : 0,
+                               'DTM' : 0,
+                               'ORTHO' : 0,
+                               'LAZ' : 0,
+                               
+                               },
+            })
+
 if __name__=="__main__":
     args = parse_arguments()
     schema = {  'geometry': 'Polygon',
-                'properties': dict([('GRID_REF', 'str:254'), ('TYPE', 'int:1'),('MINX', 'float:19'), ('MINY', 'float:19'), ('MAXX', 'float:19'), ('MAXY', 'float:19')])
+                'properties': dict([('GRID_REF', 'str:254'), 
+                                    ('TYPE', 'int:1'),
+                                    ('MINX', 'float:19'), 
+                                    ('MINY', 'float:19'), 
+                                    ('MAXX', 'float:19'), 
+                                    ('MAXY', 'float:19'),
+                                    ('DSM', 'int:3'),
+                                    ('DTM', 'int:3'),
+                                    ('ORTHO', 'int:3'),
+                                    ('LAZ', 'int:3'),])
                 }
     print "\nINPUT: "+args.input
     print "OUTPUT: "+args.output
@@ -41,17 +74,17 @@ if __name__=="__main__":
             georef_list = mapper.georefs_in_geom(df_geom)
             
             #write feature to output
-            out_shp_fh.write({
+#             out_shp_fh.write({
                     #'geometry': mapping(Polygon([tile_ulp, tile_dlp, tile_drp, tile_urp])),
-                'geometry': mapping(df_geom),
-                'properties': {'GRID_REF': "FEATURE",
-                               'TYPE' : 0,
-                               'MINX' : 0.0,
-                               'MINY' : 0.0,
-                               'MAXX' : 0.0,
-                               'MAXY' : 0.0,
-                               },
-            })
+#                'geometry': mapping(df_geom),
+#                'properties': {'GRID_REF': "FEATURE",
+#                               'TYPE' : 0,
+#                               'MINX' : 0.0,
+#                               'MINY' : 0.0,
+#                               'MAXX' : 0.0,
+#                               'MAXY' : 0.0,
+#                               },
+#            })
                 
             for georef in georef_list:
-                write_tile_to_shape(mapper.georef_to_extents(georef), out_shp_fh, TILE_SIZE, 2)
+                write_tile_to_shape_test(mapper.georef_to_extents(georef), out_shp_fh, TILE_SIZE, 2)
