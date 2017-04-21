@@ -1,7 +1,7 @@
 # Windows
 # ArcPy
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 import arcpy
 import os
@@ -42,7 +42,7 @@ muni_fields = ['REG_NAME', 'PRO_NAME', 'MUN_NAME', 'MUN_CODE', 'RB_FP', 'Return_
 temp_erase = os.path.join(output_directory,"temp_erase.shp")
 temp_select = os.path.join(output_directory,"temp_select.shp")
 temp_fhm = os.path.join(output_directory,"temp_fhm.shp")
-temp_diss = os.path.join(output_directory,"temp_diss.shp")
+temp_duplicate = os.path.join(output_directory,"temp_duplicate.shp")
 
 # layers
 muni_layer = "muni_layer"
@@ -61,7 +61,7 @@ arcpy.MakeFeatureLayer_management(muni_boundary, muni_layer, "", "", \
 
 # loop through the flood hazard shapefiles
 for path, dirs, files in os.walk(input_directory,topdown=False):
-	for f in files:		
+	for f in files:
 		if f.endswith(".shp"):
 			print "\n" + "#" * 70 + "\n"
 			try:
@@ -77,7 +77,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				"Return period:", year
 				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 				"Resolution:", resolution
-				
+
 				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 				"Selecting municipalities intersected with fhm"
 				arcpy.SelectLayerByLocation_management(muni_layer, "INTERSECT", fhm_path,\
@@ -95,7 +95,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					print "\n" + "-" * 70 + "\n"
 
 					output_path = os.path.join(output_directory, region, province, muni)
-							
+
 					if not os.path.exists(output_path):
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Creating output directories"
@@ -126,31 +126,31 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Erasing muni index"
 						arcpy.Erase_analysis(geom, temp_fhm, temp_erase)
-						
+
 						# add fields to the temporary "area not assessed" shapefile
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Adding Var field to temporary 'area not assessed' shapefile"
 						arcpy.AddField_management(temp_erase, "Var", "SHORT")
-						
+
 						# arcpy.AddField_management(temp_erase, "Muncode", "TEXT")
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Calculating temp_erase's Var field"
 						arcpy.CalculateField_management(temp_erase, "Var", "-1","PYTHON_9.3")
-						
+
 						# append the "area not assessed" to fhm output
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-						"Appending 'area not assessed' to fhm output" 
+						"Appending 'area not assessed' to fhm output"
 						arcpy.Append_management(temp_erase, temp_fhm, "NO_TEST")
 
 						# dissolve the fhm
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-						"Dissolving fhm output" 
+						"Dissolving fhm output"
 						arcpy.Dissolve_management (temp_fhm, output_fhm, "Var")
-						
+
 					else:
 
 						# create a duplicate copy of the old fhm
-						arcpy.CopyFeatures_management(output_fhm, temp_fhm)
+						arcpy.CopyFeatures_management(output_fhm, temp_duplicate)
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Creating a duplicate copy of the old fhm"
 
@@ -162,27 +162,27 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 						# clip flood hazard shapefile using muni index as extent
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Clipping flood hazard shapefile"
-						arcpy.Clip_analysis(fhm_path, geom, temp_diss, "")
-			
-						# erase the muni index extent using fhm to generate "area not assessed"
+						arcpy.Clip_analysis(fhm_path, geom, temp_fhm, "")
+
+						# erase the duplicate fhm using clipped fhm"
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 						"Erasing muni index"
-						arcpy.Erase_analysis(temp_fhm, temp_diss, temp_erase)
+						arcpy.Erase_analysis(temp_duplicate, temp_fhm, temp_erase)
 
-						# append the "area not assessed" to fhm output
+						# append the erased fhm to to fhm output
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-						"Appending 'area not assessed' to fhm output" 
-						arcpy.Append_management(temp_erase, temp_diss, "NO_TEST")
+						"Appending 'area not assessed' to fhm output"
+						arcpy.Append_management(temp_erase, temp_fhm, "NO_TEST")
 
 						# dissolve the fhm
 						print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-						"Dissolving fhm output" 
-						arcpy.Dissolve_management (temp_diss, output_fhm, "Var")
-					
+						"Dissolving fhm output"
+						arcpy.Dissolve_management (temp_fhm, output_fhm, "Var")
+
 					print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 					"Adding Muncode field to fhm output"
 					arcpy.AddField_management(output_fhm, "Muncode", "TEXT")
-					
+
 					print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
 					"Calculating output fhm's Muncode"
 					arcpy.CalculateField_management(output_fhm, "Muncode", '"' + geocode + '"', \
@@ -230,9 +230,9 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					arcpy.Delete_management(temp_erase)
 					arcpy.Delete_management(temp_select)
 					arcpy.Delete_management(temp_fhm)
-					arcpy.Delete_management(temp_diss)
+					arcpy.Delete_management(temp_duplicate)
 					arcpy.Delete_management(temp_fhm_layer)
-					
+
 				fhm_list_ok.append(fhm_path)
 			except Exception, e:
 				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", e
