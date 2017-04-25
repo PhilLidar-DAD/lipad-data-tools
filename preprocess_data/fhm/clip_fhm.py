@@ -43,6 +43,8 @@ temp_erase = os.path.join(output_directory,"temp_erase.shp")
 temp_select = os.path.join(output_directory,"temp_select.shp")
 temp_fhm = os.path.join(output_directory,"temp_fhm.shp")
 temp_duplicate = os.path.join(output_directory,"temp_duplicate.shp")
+temp_dissolve = os.path.join(output_directory,"temp_dissolve.shp")
+temp_intersect = os.path.join(output_directory,"temp_intersect.shp")
 
 # layers
 muni_layer = "muni_layer"
@@ -83,6 +85,24 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				arcpy.SelectLayerByLocation_management(muni_layer, "INTERSECT", fhm_path,\
 				 "", "NEW_SELECTION", "NOT_INVERT")
 
+				################### fhm coverage #####################
+				
+				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
+				"Dissolving fhm"
+				arcpy.Dissolve_management(fhm, temp_dissolve)
+
+				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
+				"Adding fields to dissolved fhm"
+				arcpy.AddField_management(temp_dissolve, "RBFP_shp", "TEXT")
+				arcpy.AddField_management(temp_dissolve, "RBFP_name", "TEXT")
+				arcpy.AddField_management(temp_dissolve, "Processor", "TEXT")
+
+				print "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
+				"Calculating field of dissolved fhm "
+				arcpy.CalculateField_management(temp_dissolve, "RBFP_shp",'"' + rbfp_name + '"', "PYTHON_9.3")
+
+				################### fhm coverage #####################
+
 				cursor = arcpy.da.UpdateCursor(muni_layer, muni_fields)
 				for row in cursor:
 					fhm_exists = False
@@ -93,6 +113,10 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					geom = row[8]
 
 					print "\n" + "-" * 70 + "\n"
+
+					arcpy.Intersect_analysis([temp_dissolve,geom], temp_intersect)
+					arcpy.AddField_management(temp_intersect, "Area_hazard", "DOUBLE")
+					
 
 					output_path = os.path.join(output_directory, region, province, muni)
 
