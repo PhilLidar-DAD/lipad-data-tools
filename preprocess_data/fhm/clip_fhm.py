@@ -33,6 +33,7 @@ log_file = open("logs_" + current_date + ".txt", "a")
 input_directory = args.input_directory
 output_directory = r"E:\FLOOD_HAZARD_MAPS\Testing\Clipped_FHM"
 muni_boundary = r"E:\FLOOD_HAZARD_MAPS\Testing\Clip_FHM\FHM_Index.gdb\PSA_Muni_Boundary"
+fhm_coverage = r"D:\fhm_testing\FHM.gdb\FHM_Coverage"
 
 # muni boundary fields
 muni_fields = ['REG_NAME', 'PRO_NAME', 'MUN_NAME', 'MUN_CODE', 'RB_FP', 'Return_Period', \
@@ -82,6 +83,10 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				"Selecting municipalities intersected with fhm"
 				arcpy.SelectLayerByLocation_management(muni_layer, "INTERSECT", fhm_path,\
 				 "", "NEW_SELECTION", "NOT_INVERT")
+
+				 print "[" + datetimet.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
+ 				"Dissolving fhm"
+ 				arcpy.Dissolve_management(fhm_path, r"in_memory\temp_dissolve")
 
 				cursor = arcpy.da.UpdateCursor(muni_layer, muni_fields)
 				for row in cursor:
