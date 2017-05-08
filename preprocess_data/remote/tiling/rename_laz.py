@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/env python
 
 import subprocess, ogr, os, shutil, time, math, argparse, sys, logging
 
@@ -88,10 +88,10 @@ for path, dirs, files in os.walk(inDir,topdown=False):
                 minY = float(tokens[2])
                 maxX = float(tokens[3])
                 maxY = float(tokens[4])
-                
-                bbox_center_x = (minX+(maxX-minX)/2) 
+
+                bbox_center_x = (minX+(maxX-minX)/2)
                 bbox_center_y = (minY+(maxY-minY)/2)
-                
+
                 _TILE_SIZE=1000
                 tile_x =  int(math.floor(bbox_center_x / float(_TILE_SIZE)))
                 tile_y =  int(math.floor(bbox_center_y / float(_TILE_SIZE))) + 1
@@ -108,14 +108,15 @@ for path, dirs, files in os.walk(inDir,topdown=False):
                     outFN = 'E{0}N{1}_{2}_{3}.{4}'.format(tile_x, tile_y, typeFile, str(ctr), typeFile.lower())
                     outPath = os.path.join(outDir,outFN)
                 print os.path.join(path, las), outFN
-                
+
                 _logger.info(os.path.join(path, las)+' --------- '+outFN+'\n')
-                
+
                 print outPath, 'copied successfully'
                 shutil.copy(laz_file_path, outPath)
             else:
                 _logger.error("Error reading extents of [{0}]. Trace from lasbb:\n{1}".format(laz_file_path, out))
-                
-            
+
+
 endTime = time.time()  # End timing
 print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime,2))), 'seconds'
+
