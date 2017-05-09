@@ -15,6 +15,7 @@ class BaseModel(peewee.Model):
 
 
 class Automation_AutomationJob(BaseModel):
+    id = peewee.IntegerField()
     datatype = peewee.CharField(max_length=10)
     input_dir = peewee.CharField(max_length=255, null=False)
     output_dir = peewee.CharField(max_length=255)
@@ -27,4 +28,14 @@ class Automation_AutomationJob(BaseModel):
     class Meta:
         primary_key = peewee.CompositeKey(
             'datatype', 'date_submitted', 'status')
+
+class Cephgeo_LidarCoverageBlock(BaseModel):
+    """
+        From geonode.cephgeo.models LidarCoverageBlock
+        Only UID and Block Name needed for renaming laz
+    """
+    uid = peewee.IntegerField(primary_key=True)
+    block_name = peewee.CharField()
+
+
 

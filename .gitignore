@@ -8,4 +8,6 @@
 preprocess_data/remote/logs/
 preprocess_data/remote/upload/logs/
 preprocess_data/remote/upload/dump/
-server_scripts/settings.py
+automation/settings.py
+automation/dump
+automation/logs
