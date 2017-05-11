@@ -4,6 +4,30 @@ import random
 from datetime import datetime
 
 
+def ceph_upload(input_dir_ceph):
+    print 'Upload to Ceph'
+    try:
+        output = subprocess.check_output(
+            ['./bulk_upload_nonthreaded.py', input_dir_ceph])
+        print 'Ceph Output...'
+        print output, len(output)
+        if 'Done Uploading!' in output:
+            print 'Caught Done Uploading!'
+        return True
+
+    except Exception:
+        print 'Error in Ceph upload!'
+        return False
+
+
+def transfer_metadata():
+    print 'Uploading metadata to LiPAD...'
+
+
+def files_renamed(input_dir):
+    return False
+
+
 def get_delay(min_, max_):
     return float('%.2f' % random.uniform(min_, max_))
 
