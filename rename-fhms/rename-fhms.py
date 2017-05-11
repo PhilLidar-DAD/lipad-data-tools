@@ -205,7 +205,7 @@ def get_rbfp_name(fn_head, year, filename_rbfp_map, file_path):
     # logger.debug('fn_100yr: %s', fn_100yr)
     rbfp_name = None
     try:
-        rbfp_name = filename_rbfp_map[fn_100yr].lower()
+        rbfp_name = filename_rbfp_map[fn_100yr].lower().replace(' ', '_')
     except KeyError:
         logger.error('No rbfp name for: fn_100yr=%s file_path=%s',
                      fn_100yr, file_path)
