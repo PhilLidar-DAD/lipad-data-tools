@@ -34,7 +34,7 @@ class Automation_AutomationJob(BaseModel):
 class Cephgeo_LidarCoverageBlock(BaseModel):
     """
         From geonode.cephgeo.models LidarCoverageBlock
-        Only UID and Block Name needed for renaming laz
+        Only UID and Block Name needed for renaming tiles
     """
     uid = peewee.IntegerField(primary_key=True)
     block_name = peewee.CharField()

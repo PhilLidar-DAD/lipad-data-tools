@@ -91,7 +91,7 @@ def rename_tiles(inDir, outDir, processor, block_uid):
     # Start timing
     startTime = time.time()
 
-    print  'Renaming ...'
+    print 'Renaming ...'
 
     # outDir = outDir.__add__('/' + block_name)
     print 'OutDir:', outDir
@@ -160,7 +160,6 @@ def rename_tiles(inDir, outDir, processor, block_uid):
 
     endTime = time.time()  # End timing
     print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime, 2))), 'seconds'
-
 
 
 def assign_processor(processor):

@@ -1,5 +1,5 @@
 from models import *
-from rename_laz_v2 import *
+from rename_tiles import *
 from utils import *
 import os
 import sys
@@ -77,55 +77,12 @@ def ceph_upload(input_dir_ceph):
         return False
 
 
-def assign_status(q, status):
-    if status == 1:
-        new_status = 'in_salad'
-    elif status == 2:
-        new_status = 'in_ceph'
-
-    print 'Q ID', q.id
-    with PSQL_DB.atomic() as txn:
-        new_q = (Automation_AutomationJob
-                 .update(status=new_status, status_timestamp=datetime.now())
-                 .where(Automation_AutomationJob.id == q.id))
-        new_q.execute()
-
-
-def find_in_coverage(block_name):
-    """
-        Lidar coverage block in LiPAD DB
-        Assume an active connection is present
-    """
-    try:
-        block = Cephgeo_LidarCoverageBlock.get(block_name=block_name)
-        uid = block.uid
-        print 'Block in Lidar Coverage'
-        print 'Block UID:', uid
-        return True, uid
-    except Exception:
-        print 'Block not in Lidar Coverage', block_name
-        return False, 0
-
-
-def proper_block_name(block_path):
-
-    # input format: ../../Agno_Blk5C_20130418
-
-    # parses blockname from path
-    block_name = block_path.split(os.sep)[-1]
-    if block_name == '':
-        block_name = block_path.split(os.sep)[-2]
-    # remove date flown
-    block_name = block_name.rsplit('_', 1)[0]
-
-    return block_name
-
-
 def transfer_metadata():
-    pass
+    print 'Uploading metadata to LiPAD...'
 
 
 def laz_ortho_worker(q):
+    print 'Woker: laz, ortho'
     assign_status(q, 1)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
@@ -151,7 +108,7 @@ def laz_ortho_worker(q):
         # Should upload directly to Ceph
         ceph_uploaded = ceph_upload(output_dir)
         if ceph_uploaded:
-            print 'Uploading metadata to LiPAD...'
+            assign_status(q, 3)
             transfer_metadata()
 
     else:
@@ -164,17 +121,32 @@ def db_watcher():
     """
     print 'Starting...'
     setup_logging()
-    connect_db()
-    try:
-        q = Automation_AutomationJob.get(status='pending')
-        if q.target_os == 'linux':
-            # os_linux()
-            if q.datatype.lower() == 'laz' or q.datatype.lower() == 'ortho':
-                laz_ortho_worker()
-            # elif q.datatype.lower() == 'dtm':
-        else:
-            print 'PASS TO WINDOWS'
-            # windows_poller()
-    except Exception as e:
-        logger.exception('No pending task')
-    close_db()
+    while True:
+        connect_db()
+        status = ['pending_process', 'done_ceph']
+        for s in status:
+            try:
+                q = Automation_AutomationJob.get(status=s)
+                if s.__eq__('pending_process'):
+                    if q.target_os.lower() == 'linux':
+                        if q.datatype.lower() == ('laz' | 'ortho'):
+                            print 'Pass to worker'
+                            laz_ortho_worker(q)
+                        # elif q.datatype.lower() == 'dtm':
+                    else:
+                        print 'PASS TO WINDOWS'
+                        # Windows poller
+                elif s.__eq__('done_ceph'):
+                    transfer_metadata()
+
+            except Automation_AutomationJob.DoesNotExist:
+                logger.error('No %s task', s)
+
+            except Exception:
+                logger.exception('Database watcher error!')
+            finally:
+                close_db()
+
+        delay = get_delay(1, 10)
+        logger.info('Worker Sleeping for %ssecs...', delay)
+        time.sleep(delay)
