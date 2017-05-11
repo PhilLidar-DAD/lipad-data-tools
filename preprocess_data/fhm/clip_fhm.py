@@ -1,7 +1,7 @@
 # Windows
 # ArcPy
 
-__version__ = "0.7"
+__version__ = "0.7.1"
 
 import arcpy
 import os
@@ -13,10 +13,10 @@ import traceback
 import logging
 from datetime import datetime as dt
 
-LOG_FILENAME = 'clip_fhm.log'
+LOG_FILENAME = "clip_fhm.log"
 logging.basicConfig(filename=LOG_FILENAME,level=logging.ERROR, format='%(asctime)s: %(levelname)s: %(message)s')
 
-logger = logging.getLogger("error.log")
+logger = logging.getLogger("clip_fhm.log")
 logger.setLevel(logging.DEBUG)
 # create console handler and set level to debug
 ch = logging.StreamHandler()
@@ -48,7 +48,7 @@ if os.path.exists("clip_fhm.csv"):
 else:
 	csvfile = open("clip_fhm.csv", 'ab')
 	spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-	spamwriter.writerow(['Riverbasin/Floodplain', 'Return Period','Province', 'City/Municipality','Geocode','Status', 'Timestamp'])
+	spamwriter.writerow(['Riverbasin/Floodplain', 'Return Period', 'Resolution','Province', 'City/Municipality','Geocode','Status', 'Timestamp'])
 
 # define variables
 # replace output directory
@@ -59,7 +59,7 @@ muni_index= r"\\pmsat-nas.prd.dream.upd.edu.ph\geostorage\DAD\FLOOD_HAZARD\FHM_M
 
 # muni boundary fields
 muni_fields = ['REG_NAME', 'PRO_NAME', 'MUN_NAME', 'MUN_CODE', 'RB_FP', 'Return_Period', \
-'Last_Clipped', 'Resolution', 'FHM_80_coverage', 'Builtup_coverage', 'Status', 'SHAPE@']
+'Last_Clipped', 'Resolution', 'FHM_80_coverage', 'Builtup_coverage', 'Status', 'Projected_Resolution', 'SHAPE@']
 
 # temporary shapefiles
 erase = r"in_memory\temp_erase"
@@ -83,6 +83,7 @@ arcpy.MakeFeatureLayer_management(muni_index, muni_layer, "", "", \
 				PRO_NAME VISIBLE NONE;MUN_CODE MUN_CODE VISIBLE NONE;MUN_NAME MUN_NAME VISIBLE \
 				NONE;ISCITY ISCITY VISIBLE NONE;FHM_80_coverage FHM_80_coverage VISIBLE NONE;\
 				Builtup_coverage Builtup_coverage VISIBLE NONE;Status Status VISIBLE NONE;\
+				Projected_Resolution Projected_Resolution VISIBLE NONE\
 				Shape_Length Shape_Length VISIBLE NONE;Shape_Area Shape_Area VISIBLE NONE")
 
 # loop through the flood hazard shapefiles
@@ -127,7 +128,8 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					province = row[1]
 					muni = row[2]
 					geocode = row[3]
-					geom = row[11]
+					proj_res = row[11]
+					geom = row[12]
 
 					coverage_80 = False
 					builtup = False
@@ -155,7 +157,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 						logger.info("Output directory already exists")
 
 					output_fhm = os.path.join(output_path_archive, geocode + "_FH" + year + "yr"\
-					+ "_" + resolution + ".shp")
+					+ "_" + proj_res + ".shp")
 
 					logger.info("FHM output: {0}".format(output_fhm))
 
@@ -313,7 +315,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					row[6] = dt.now()
 					cursor.updateRow(row)
 
-					spamwriter.writerow([rbfp_name, year, province, muni, geocode, row[10], dt.now().strftime('%Y-%m-%d %H:%M:%S')])
+					spamwriter.writerow([rbfp_name, year, resolution,province, muni, geocode, row[10], dt.now().strftime('%Y-%m-%d %H:%M:%S')])
 
 					# deleting temporary files
 					logger.info("Deleting in_memory workspace")
@@ -321,8 +323,6 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 
 			except Exception, e:
 				logger.exception(f)
-				# logger.error(f + " " + str(sys.exc_info()))
-				# traceback.print_exc()
 				spamwriter.writerow([f, "", "", "", "", "ERROR", dt.now().strftime('%Y-%m-%d %H:%M:%S')])
 
 				# deleting temporary files
