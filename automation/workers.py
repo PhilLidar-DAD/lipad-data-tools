@@ -1,5 +1,6 @@
 from models import *
 from rename_tiles import *
+from transfer_metadata import *
 from utils import *
 import os
 import sys
@@ -76,7 +77,7 @@ def process_job(q):
     # check first if Block Name is in Lidar Coverage
     if in_coverage:
         print 'Found in Lidar Coverage model', block_name, block_uid
-        if q.datatype.lower() == ('laz' | 'ortho'):
+        if q.datatype.lower() == ('laz' or 'ortho'):
             if not files_renamed(input_dir):
                 rename_tiles(input_dir, output_dir, processor, block_uid)
         else:
@@ -85,11 +86,13 @@ def process_job(q):
         assign_status(q, 2)
         print 'Status', q.status
         print 'Status Timestamp', q.status_timestamp
-        ceph_uploaded = ceph_upload(output_dir)
+        ceph_uploaded, log_file = ceph_upload(output_dir)
 
         if ceph_uploaded:
             assign_status(q, 3)
-            transfer_metadata()
+            transfer_metadata(log_file)
+
+
 
     else:
         print 'ERROR NOT FOUND IN MODEL', block_name, block_uid

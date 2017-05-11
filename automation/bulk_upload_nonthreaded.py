@@ -300,4 +300,6 @@ print("Done Uploading!")
 # pprint(uploaded_objects)
 print("wrote metadata to file:")
 print("[{0}]".format(data_dump_file_path))
-print("====================")
+
+# print 'File Path: ', data_dump_file_path
+# return data_dump_file_path

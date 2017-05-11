@@ -1,6 +1,7 @@
 import os
 from models import *
 import random
+import subprocess
 from datetime import datetime
 
 
@@ -11,17 +12,13 @@ def ceph_upload(input_dir_ceph):
             ['./bulk_upload_nonthreaded.py', input_dir_ceph])
         print 'Ceph Output...'
         print output, len(output)
+        filename = output.split('\n')[-1]
         if 'Done Uploading!' in output:
             print 'Caught Done Uploading!'
-        return True
-
+        return True, filename
     except Exception:
         print 'Error in Ceph upload!'
-        return False
-
-
-def transfer_metadata():
-    print 'Uploading metadata to LiPAD...'
+        return False, None
 
 
 def files_renamed(input_dir):
