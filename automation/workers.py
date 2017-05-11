@@ -125,17 +125,14 @@ def transfer_metadata():
     pass
 
 
-def process_job(q):
+def laz_ortho_worker(q):
     assign_status(q, 1)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
-    datatype = q.datatype
     input_dir = q.input_dir
-    # output_dir = q.output_dir
+    output_dir = q.output_dir
     processor = q.processor
-    date = q.date_submitted
-    target_os = q.target_os
 
     block_name = proper_block_name(input_dir)
     output_dir = q.output_dir.__add__('/' + block_name)
@@ -146,7 +143,7 @@ def process_job(q):
     if in_coverage:
         print 'Found in Lidar Coverage model', block_name, block_uid
         if not files_renamed(input_dir):
-            rename_laz(input_dir, output_dir, processor, block_uid)
+            rename_tiles(input_dir, output_dir, processor, block_uid)
             assign_status(q, 2)
             print 'Status', q.status
             print 'Status Timestamp', q.status_timestamp
@@ -170,7 +167,14 @@ def db_watcher():
     connect_db()
     try:
         q = Automation_AutomationJob.get(status='pending')
-        process_job(q)
+        if q.target_os == 'linux':
+            # os_linux()
+            if q.datatype.lower() == 'laz' or q.datatype.lower() == 'ortho':
+                laz_ortho_worker()
+            # elif q.datatype.lower() == 'dtm':
+        else:
+            print 'PASS TO WINDOWS'
+            # windows_poller()
     except Exception as e:
         logger.exception('No pending task')
     close_db()

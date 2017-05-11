@@ -87,11 +87,11 @@ def proper_block_name(block_path):
     return block_name
 
 
-def rename_laz(inDir, outDir, processor, block_uid):
+def rename_tiles(inDir, outDir, processor, block_uid):
     # Start timing
     startTime = time.time()
 
-    print  'Renaming laz...'
+    print  'Renaming ...'
 
     # outDir = outDir.__add__('/' + block_name)
     print 'OutDir:', outDir
@@ -100,15 +100,15 @@ def rename_laz(inDir, outDir, processor, block_uid):
 
     # Loop through the input directory
     for path, dirs, files in os.walk(inDir, topdown=False):
-        for laz in files:
-            if laz.endswith(".laz"):  # or las.endswith(".las"):
-                typeFile = laz.split(".")[-1].upper()
+        for tile in files:
+            if tile.endswith(".laz") or tile.endswith(".tif"):
+                typeFile = tile.split(".")[-1].upper()
                 ctr = 0
-                laz_file_path = os.path.join(path, laz)
+                tile_file_path = os.path.join(path, tile)
 
                 # get LAZ bounding box/extents
                 p = subprocess.Popen([os.path.join(get_cwd(), 'lasbb'), '-get_bb',
-                                      laz_file_path], stdout=subprocess.PIPE,
+                                      tile_file_path], stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT)
                 out, err = p.communicate()
                 returncode = p.returncode
@@ -145,9 +145,9 @@ def rename_laz(inDir, outDir, processor, block_uid):
                         # print outFN
                         outPath = os.path.join(outDir, outFN)
 
-                    print os.path.join(path, laz), outFN
+                    print os.path.join(path, tile), outFN
 
-                    _logger.info(os.path.join(path, laz) +
+                    _logger.info(os.path.join(path, tile) +
                                  ' --------- ' + outFN + '\n')
 
                     print outPath, 'Filename okay'
@@ -156,7 +156,7 @@ def rename_laz(inDir, outDir, processor, block_uid):
                 else:
                     _logger.error("Error reading extents of [{0}]. Trace from \
                         lasbb:\n{1}".format(
-                        laz_file_path, out))
+                        tile_file_path, out))
 
     endTime = time.time()  # End timing
     print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime, 2))), 'seconds'
