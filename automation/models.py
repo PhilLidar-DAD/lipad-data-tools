@@ -17,8 +17,8 @@ class BaseModel(peewee.Model):
 class Automation_AutomationJob(BaseModel):
     id = peewee.IntegerField(primary_key=True)
     datatype = peewee.CharField(max_length=10)
-    input_dir = peewee.CharField(max_length=255, null=False)
-    output_dir = peewee.CharField(max_length=255)
+    input_dir = peewee.TextField(null=False)
+    output_dir = peewee.TextField(null=False)
     processor = peewee.CharField(max_length=10)
     date_submitted = peewee.DateTimeField(null=False)
     status = peewee.CharField(max_length=20)
