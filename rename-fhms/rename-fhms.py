@@ -56,6 +56,7 @@ import arcpy
 import re
 import errno
 import glob
+import shutil
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
@@ -229,7 +230,7 @@ def rename_shapefile(src_path, old_fn_head, dst_path, new_fn_head, rename):
             # Delete dest. file if it exists
             if os.path.isfile(dst_file):
                 os.remove(dst_file)
-            os.rename(src_file, dst_file)
+            shutil.copy2(src_file, dst_file)
         logger.info('%s,%s', src_file, dst_file)
 
 
