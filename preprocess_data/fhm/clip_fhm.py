@@ -1,7 +1,7 @@
 # Windows
 # ArcPy
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 
 import arcpy
 import os
@@ -94,9 +94,9 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 			try:
 				for_checking_value = True
 				fhm_path = os.path.join(path,f)
-				rbfp_name = f.split("_FH")[0]
-				year = f.split("_FH")[1].split("yr")[0]
-				resolution = f.split("_FH")[1].split("yr_")[1].replace(".shp","")
+				rbfp_name = f.split("_fh")[0]
+				year = f.split("_fh")[1].split("yr")[0]
+				resolution = f.split("_fh")[1].split("yr_")[1].replace(".shp","")
 				logger.info("FHM path: {0}".format(fhm_path))
 				logger.info("Riverbasin/Floodplain name: {0}".format(rbfp_name))
 				logger.info("Return period: {0}".format(year))
@@ -156,7 +156,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					else:
 						logger.info("Output directory already exists")
 
-					output_fhm = os.path.join(output_path_archive, geocode + "_FH" + year + "yr"\
+					output_fhm = os.path.join(output_path_archive, geocode + "_fh" + year + "yr"\
 					+ "_" + proj_res + ".shp")
 
 					logger.info("FHM output: {0}".format(output_fhm))
@@ -298,11 +298,11 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 
 					# Return period
 					if row[5] is None:
-						row[5] = "FH" + year
-					elif row[5].__contains__("FH" + year):
+						row[5] = "fh" + year
+					elif row[5].__contains__("fh" + year):
 						pass
 					else:
-						row[5] = row[5] + ", " + "FH" + year
+						row[5] = row[5] + ", " + "fh" + year
 
 					# Resolution
 					if row[7] is None:
@@ -323,7 +323,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 
 			except Exception, e:
 				logger.exception(f)
-				spamwriter.writerow([f, "", "", "", "", "ERROR", dt.now().strftime('%Y-%m-%d %H:%M:%S')])
+				spamwriter.writerow([f, "", "", "", "", "", "ERROR", dt.now().strftime('%Y-%m-%d %H:%M:%S')])
 
 				# deleting temporary files
 				logger.info("Deleting in_memory workspace")
