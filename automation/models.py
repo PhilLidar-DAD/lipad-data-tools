@@ -38,3 +38,14 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
     """
     uid = peewee.IntegerField(primary_key=True)
     block_name = peewee.CharField()
+
+
+class CephDataObject(BaseModel):
+    id = peewee.IntegerField(primary_key=True)
+    size_in_bytes = peewee.IntegerField()
+    file_hash = peewee.CharField(max_length=40)
+    name = peewee.CharField(max_length=100)
+    last_modified = peewee.DateTimeField()
+    content_type = peewee.CharField(max_length=20)
+    data_class = peewee.CharField(max_length=20)
+    grid_ref = peewee.CharField(max_length=10)

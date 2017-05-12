@@ -63,6 +63,7 @@ def process_job(q):
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
+    datatype = q.datatype
     input_dir = q.input_dir
     output_dir = q.output_dir
     processor = q.processor
@@ -77,7 +78,7 @@ def process_job(q):
     # check first if Block Name is in Lidar Coverage
     if in_coverage:
         print 'Found in Lidar Coverage model', block_name, block_uid
-        if q.datatype.lower() == ('laz' or 'ortho'):
+        if datatype.lower() == ('laz' or 'ortho'):
             if not files_renamed(input_dir):
                 rename_tiles(input_dir, output_dir, processor, block_uid)
         else:
@@ -90,9 +91,7 @@ def process_job(q):
 
         if ceph_uploaded:
             assign_status(q, 3)
-            transfer_metadata(log_file)
-
-
+            transfer_metadata(log_file, datatype)
 
     else:
         print 'ERROR NOT FOUND IN MODEL', block_name, block_uid

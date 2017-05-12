@@ -13,6 +13,7 @@ def ceph_upload(input_dir_ceph):
         print 'Ceph Output...'
         print output, len(output)
         filename = output.split('\n')[-1]
+        print 'Logfile', filename
         if 'Done Uploading!' in output:
             print 'Caught Done Uploading!'
         return True, filename
