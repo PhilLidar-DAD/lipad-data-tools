@@ -2,6 +2,7 @@
 
 import peewee
 from settings import *
+from peewee import *
 
 
 PSQL_DB = peewee.PostgresqlDatabase(
@@ -49,3 +50,35 @@ class CephDataObject(BaseModel):
     content_type = peewee.CharField(max_length=20)
     data_class = peewee.CharField(max_length=20)
     grid_ref = peewee.CharField(max_length=10)
+
+
+class DataClassification(Field):
+    UNKNOWN = 0
+    LAZ = 1
+#    DEM = 2
+    DTM = 3
+    DSM = 4
+    ORTHOPHOTO = 5
+
+    labels = {
+        UNKNOWN: "Unknown Type",
+        LAZ: "LAZ",
+        #        DEM         : "DEM TIF",
+        DSM: "DSM TIF",
+        DTM: "DTM TIF",
+        ORTHOPHOTO: "Orthophoto", }
+
+    gs_feature_labels = {
+        UNKNOWN: "UNSUPPORTED",
+        LAZ: "LAZ",
+        #        DEM         : "UNSUPPORTED",
+        DSM: "DSM",
+        DTM: "DTM",
+        ORTHOPHOTO: "ORTHO", }
+
+    filename_suffixes = {
+        ".laz": LAZ,
+        #        "_dem.tif"         : DEM,
+        "_dsm.tif": DSM,
+        "_dtm.tif": DTM,
+        "_ortho.tif": ORTHOPHOTO, }
