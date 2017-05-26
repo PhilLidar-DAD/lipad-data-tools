@@ -4,7 +4,7 @@ KEY  = secret_key
 URL  = ceph_uri
 CONTAINER = test-container
 [env]
-activatethis = /home/ken/.virtualenv/geonode/bin/activate_this.py
+activatethis = /home/geonode/.venvs/geonode/bin/activate_this.py
 [tmp_folder]
 path=/tmp/tmp_ceph_objects/
 [file_types]
