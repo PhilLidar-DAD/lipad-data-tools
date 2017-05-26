@@ -10,4 +10,3 @@ preprocess_data/remote/upload/logs/
 preprocess_data/remote/upload/dump/
 automation/dump
 automation/logs
-automation/settings.py
