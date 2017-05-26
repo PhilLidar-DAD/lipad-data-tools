@@ -40,7 +40,6 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
     uid = peewee.IntegerField(primary_key=True)
     block_name = peewee.CharField()
 
-
 class CephDataObject(BaseModel):
     id = peewee.IntegerField(primary_key=True)
     size_in_bytes = peewee.IntegerField()
@@ -82,3 +81,16 @@ class DataClassification(Field):
         "_dsm.tif": DSM,
         "_dtm.tif": DTM,
         "_ortho.tif": ORTHOPHOTO, }
+
+class Cephgeo_DemDataStore():
+    demid   = peewee.IntegerField(primary_key=True)
+    name    = peewee.CharField(max_length=20)
+    suc     = peewee.CharField(max_length=5)
+    type    = peewee.CharField(max_length=5)
+    shifting_val_x = peewee.FloatField(primary_key=True) 
+    shifting_val_y = peewee.FloatField(primary_key=True) 
+    shifting_val_z = peewee.FloatField(primary_key=True)
+    height_diff    = peewee.FloatField(primary_key=True)
+    rmse           = peewee.FloatField(primary_key=True)
+    unix_path       = peewee.TextField(null=False)
+    block_name_list = peewee.TextField(null=False)
