@@ -21,6 +21,51 @@ def ceph_upload(input_dir_ceph):
         print 'Error in Ceph upload!'
         return False, None
 
+def tile_dtm(dem_dir, output_dir):
+    """./tile_dem.py -d data/MINDANAO1/v_mdn/ -t dtm -p WGS_84_UTM_zone_51N.prj -o output/"""
+    
+    print 'Tiling DTM'
+    
+    dtm_dir = [name for name in os.listdir(dem_dir) if ("cv_" in name or "uv_" in name ) and os.path.isdir(os.path.join(dem_dir,name))][0]
+    
+    try:
+        output = subprocess.check_output(
+            ['./tile_dem.py', 
+                '-d', dtm_dir,
+                '-t','dtm',
+                '-p','WGS_84_UTM_zone_51N.prj',
+                '-o', os.path.join(output_dir,'DTM'),
+                ])
+        
+        if 'Done Tiling' in output:
+            print 'DTM Tiling Done!'
+        return True
+    except Exception:
+        print 'Error in DTM tiling. DTM directory: ' + dtm_dir
+        return False
+
+def tile_dsm(dem_dir, output_dir):
+    """./tile_dem.py -d data/MINDANAO1/d_mdn/ -t dsm -p WGS_84_UTM_zone_51N.prj -o output/"""
+    
+    print 'Tiling DSM'
+    
+    dsm_dir = [name for name in os.listdir(dem_dir) if ("cd_" in name or "ud_" in name ) and os.path.isdir(os.path.join(dem_dir,name))][0]
+    
+    try:
+        output = subprocess.check_output(
+            ['./tile_dem.py', 
+                '-d', dsm_dir,
+                '-t','dsm',
+                '-p','WGS_84_UTM_zone_51N.prj',
+                '-o', os.path.join(output_dir,'DSM'),
+                ])
+        
+        if 'Done Tiling' in output:
+            print 'DSM Tiling Done!'
+        return True
+    except Exception:
+        print 'Error in DSM tiling. DSM directory: ' + dsm_dir
+        return False, None
 
 def files_renamed(input_dir):
     return False
