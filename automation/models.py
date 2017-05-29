@@ -47,7 +47,6 @@ class DataClassification(Field):
         "_ortho.tif": ORTHOPHOTO, }
 
 
-
 class Automation_AutomationJob(BaseModel):
 
     STATUS_CHOICES = [
@@ -107,10 +106,10 @@ class Cephgeo_DemDataStore():
     name = peewee.CharField(max_length=20)
     suc = peewee.CharField(max_length=5)
     type = peewee.CharField(max_length=5)
-    shifting_val_x = peewee.FloatField(primary_key=True)
-    shifting_val_y = peewee.FloatField(primary_key=True)
-    shifting_val_z = peewee.FloatField(primary_key=True)
-    height_diff = peewee.FloatField(primary_key=True)
-    rmse = peewee.FloatField(primary_key=True)
-    unix_path = peewee.TextField(null=False)
+    shifting_val_x = peewee.FloatField()
+    shifting_val_y = peewee.FloatField()
+    shifting_val_z = peewee.FloatField()
+    height_diff = peewee.FloatField()
+    rmse = peewee.FloatField()
+    dem_file_path = peewee.TextField(null=False)
     block_name_list = peewee.TextField(null=False)
