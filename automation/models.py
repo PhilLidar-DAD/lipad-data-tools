@@ -15,42 +15,6 @@ class BaseModel(peewee.Model):
         database = PSQL_DB
 
 
-class Automation_AutomationJob(BaseModel):
-    id = peewee.IntegerField(primary_key=True)
-    datatype = peewee.CharField(max_length=10)
-    input_dir = peewee.TextField(null=False)
-    output_dir = peewee.TextField(null=False)
-    processor = peewee.CharField(max_length=10)
-    date_submitted = peewee.DateTimeField(null=False)
-    status = peewee.CharField(max_length=20)
-    status_timestamp = peewee.DateTimeField(null=True)
-    target_os = peewee.CharField(max_length=20)
-    log = peewee.TextField(null=False)
-
-    # class Meta:
-    #     primary_key = peewee.CompositeKey(
-    #         'datatype', 'date_submitted', 'status')
-
-
-class Cephgeo_LidarCoverageBlock(BaseModel):
-    """
-        From geonode.cephgeo.models LidarCoverageBlock
-        Only UID and Block Name needed for renaming tiles
-    """
-    uid = peewee.IntegerField(primary_key=True)
-    block_name = peewee.CharField()
-
-class CephDataObject(BaseModel):
-    id = peewee.IntegerField(primary_key=True)
-    size_in_bytes = peewee.IntegerField()
-    file_hash = peewee.CharField(max_length=40)
-    name = peewee.CharField(max_length=100)
-    last_modified = peewee.DateTimeField()
-    content_type = peewee.CharField(max_length=20)
-    data_class = peewee.CharField(max_length=20)
-    grid_ref = peewee.CharField(max_length=10)
-
-
 class DataClassification(Field):
     UNKNOWN = 0
     LAZ = 1
@@ -82,15 +46,71 @@ class DataClassification(Field):
         "_dtm.tif": DTM,
         "_ortho.tif": ORTHOPHOTO, }
 
+
+
+class Automation_AutomationJob(BaseModel):
+
+    STATUS_CHOICES = [
+        ('pending_process'),
+        ('done_process'),
+        ('pending_ceph'),
+        ('done_ceph'),
+        ('done'),
+        # (-1, 'error', _('Error')),
+    ]
+
+    OS_CHOICES = [
+        ('linux', ('Process in Linux')),
+        ('windows', ('Process in Windows')),
+    ]
+
+    id = peewee.IntegerField(primary_key=True)
+    datatype = peewee.CharField(max_length=10)
+    input_dir = peewee.TextField(null=False)
+    output_dir = peewee.TextField(null=False)
+    processor = peewee.CharField(max_length=10)
+    date_submitted = peewee.DateTimeField(null=False)
+    # status = peewee.CharField(max_length=20)
+    status = peewee.CharField(choices=STATUS_CHOICES)
+    status_timestamp = peewee.DateTimeField(null=True)
+    target_os = peewee.CharField(choices=OS_CHOICES)
+    # target_os = OSChoice(choices=OS_CHOICES)
+    log = peewee.TextField(null=False)
+
+    # class Meta:
+    #     primary_key = peewee.CompositeKey(
+    #         'datatype', 'date_submitted', 'status')
+
+
+class Cephgeo_LidarCoverageBlock(BaseModel):
+    """
+        From geonode.cephgeo.models LidarCoverageBlock
+        Only UID and Block Name needed for renaming tiles
+    """
+    uid = peewee.IntegerField(primary_key=True)
+    block_name = peewee.CharField()
+
+
+class CephDataObject(BaseModel):
+    id = peewee.IntegerField(primary_key=True)
+    size_in_bytes = peewee.IntegerField()
+    file_hash = peewee.CharField(max_length=40)
+    name = peewee.CharField(max_length=100)
+    last_modified = peewee.DateTimeField()
+    content_type = peewee.CharField(max_length=20)
+    data_class = peewee.CharField(max_length=20)
+    grid_ref = peewee.CharField(max_length=10)
+
+
 class Cephgeo_DemDataStore():
-    demid   = peewee.IntegerField(primary_key=True)
-    name    = peewee.CharField(max_length=20)
-    suc     = peewee.CharField(max_length=5)
-    type    = peewee.CharField(max_length=5)
-    shifting_val_x = peewee.FloatField(primary_key=True) 
-    shifting_val_y = peewee.FloatField(primary_key=True) 
+    demid = peewee.IntegerField(primary_key=True)
+    name = peewee.CharField(max_length=20)
+    suc = peewee.CharField(max_length=5)
+    type = peewee.CharField(max_length=5)
+    shifting_val_x = peewee.FloatField(primary_key=True)
+    shifting_val_y = peewee.FloatField(primary_key=True)
     shifting_val_z = peewee.FloatField(primary_key=True)
-    height_diff    = peewee.FloatField(primary_key=True)
-    rmse           = peewee.FloatField(primary_key=True)
-    unix_path       = peewee.TextField(null=False)
+    height_diff = peewee.FloatField(primary_key=True)
+    rmse = peewee.FloatField(primary_key=True)
+    unix_path = peewee.TextField(null=False)
     block_name_list = peewee.TextField(null=False)
