@@ -92,5 +92,5 @@ class Cephgeo_DemDataStore():
     shifting_val_z = peewee.FloatField()
     height_diff    = peewee.FloatField()
     rmse           = peewee.FloatField()
-    unix_path       = peewee.TextField(null=False)
+    dem_file_path  = peewee.TextField(null=False)
     block_name_list = peewee.TextField(null=False)
