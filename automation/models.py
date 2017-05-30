@@ -82,7 +82,7 @@ class DataClassification(Field):
         "_dtm.tif": DTM,
         "_ortho.tif": ORTHOPHOTO, }
 
-class Cephgeo_DemDataStore():
+class Cephgeo_DemDataStore(BaseModel):
     demid   = peewee.IntegerField(primary_key=True)
     name    = peewee.CharField(max_length=20)
     suc     = peewee.CharField(max_length=5)
