@@ -85,7 +85,8 @@ def process_job(q):
             if not files_renamed(input_dir):
                 rename_tiles(input_dir, output_dir, processor, block_uid)
         else:
-            raise Exception('Handler not implemented for type: '+str(q.datatype))
+            raise Exception(
+                'Handler not implemented for type: ' + str(q.datatype))
 
         assign_status(q, 2)
         print 'Status', q.status
@@ -99,16 +100,20 @@ def process_job(q):
     else:
         print 'ERROR NOT FOUND IN MODEL', block_name, block_uid
 
+
 def parse_dem_input(input_str):
     tokens = input_str.strip().replace(' ', '').split(',')
     block_names = tokens[1:]
-    dem_dir = os.path.join("/mnt/pmsat_pool/geostorage/DPC/",tokens[0].replace('\\', '/').split('DPC/')[1])
-    
-    #if not os.path.isdir(dem_dir):
+    dem_dir = os.path.join("/mnt/pmsat_pool/geostorage/DPC/",
+                           tokens[0].replace('\\', '/').split('DPC/')[1])
+
+    # if not os.path.isdir(dem_dir):
     if False:
-        raise DirectoryNotFoundException("Directory does not exist: "+dem_dir)
-    
+        raise DirectoryNotFoundException(
+            "Directory does not exist: " + dem_dir)
+
     return dem_dir, block_names
+
 
 def handle_dem(q):
     assign_status(q, 1)
@@ -118,35 +123,35 @@ def handle_dem(q):
     input_dir = q.input_dir
     output_dir = q.output_dir
     processor = q.processor
-    
+
     dem_dir, block_name_list = parse_dem_input(input_dir)
-    
+
     print 'BLOCKS: ' + str(block_name_list)
-    
-    #Convert block_names to block_uids
+
+    # Convert block_names to block_uids
     block_uid_list = []
     for block_name in block_name_list:
         in_coverage, block_uid = find_in_coverage(block_name)
         block_uid_list.append(tuple(block_uid, in_coverage))
-        
+
     block_uid_list_json = py_json.dumps(block_uid_list)
-    
+
     """
         @TODO:
         1) Tile blocks for each metadata
         2) Pass to LiPAD db
         3) Talk to DJ about file and metadata naming conventions
     """
-    
+
     if q.datatype.lower == 'DTM':
         """Tile DTM only"""
         tile_dtm(dem_dir, output_dir)
     elif q.datatype.lower == 'DSM':
         """Tile DSM only"""
         tile_dsm(dem_dir, output_dir)
-    elif q.datatype.lower == 'DEM' or q.datatype.lower == 'DTM/DSM' :
+    elif q.datatype.lower == 'DEM' or q.datatype.lower == 'DTM/DSM':
         """Tile both DEMS"""
-        
+
     """
         @TODO:
         1) Upload tiles
@@ -162,7 +167,6 @@ def handle_dem(q):
         transfer_metadata(log_file)
 
 
-
 def db_watcher():
     """
         Watch LiPAD DB Automation Table for pending jobs
@@ -171,24 +175,26 @@ def db_watcher():
     setup_logging()
     while True:
         connect_db()
-        status = ['pending_process', 'done_ceph']
-        for s in status:
+
+        for status in Automation_AutomationJob.STATUS_CHOICES:
             try:
-                q = Automation_AutomationJob.get(status=s)
-                if s.__eq__('pending_process'):
-                    if q.target_os.lower() == 'linux':
-                        process_job(q)
-                        # elif q.datatype.lower() == 'dtm':
-                    else:
-                        print 'PASS TO WINDOWS'
-                        # Windows poller
-                elif s.__eq__('done_ceph'):
-                    # in case upload from ceph to lipad was interrupted
-                    assign_status(q, 3)
-                    transfer_metadata()
+                q = Automation_AutomationJob.get(status=status)
+                print 'Query found!'
+                print q.status
+                # if s.__eq__('pending_process'):
+                #     if q.target_os.lower() == 'linux':
+                #         process_job(q)
+                #         # elif q.datatype.lower() == 'dtm':
+                #     else:
+                #         print 'PASS TO WINDOWS'
+                #         # Windows poller
+                # elif s.__eq__('done_ceph'):
+                #     # in case upload from ceph to lipad was interrupted
+                #     assign_status(q, 3)
+                #     transfer_metadata()
 
             except Automation_AutomationJob.DoesNotExist:
-                logger.error('No %s task', s)
+                logger.error('No %s task', status)
 
             except Exception:
                 logger.exception('Database watcher error!')
