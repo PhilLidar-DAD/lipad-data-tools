@@ -3,6 +3,7 @@ from models import *
 import random
 import subprocess
 from datetime import datetime
+import json
 
 
 def ceph_upload(input_dir_ceph):
@@ -20,6 +21,9 @@ def ceph_upload(input_dir_ceph):
     except Exception:
         print 'Error in Ceph upload!'
         return False, None
+
+def parse_dem_input(dem_input):
+    return json.loads(dem_input)
 
 def tile_dtm(dem_dir, output_dir):
     """./tile_dem.py -d data/MINDANAO1/v_mdn/ -t dtm -p WGS_84_UTM_zone_51N.prj -o output/"""
