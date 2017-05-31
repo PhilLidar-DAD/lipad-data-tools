@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-from geonode.settings import GEONODE_APPS
-import geonode.settings as settings
+#from geonode.settings import GEONODE_APPS
+#import geonode.settings as settings
 
 import subprocess
 import ogr
@@ -15,7 +15,7 @@ import logging
 
 from workers import *
 
-from geonode.cephgeo.models import CephDataObject, LidarCoverageBlock
+from models import CephDataObject, Cephgeo_LidarCoverageBlock as LidarCoverageBlock
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "geonode.settings")
 
