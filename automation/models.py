@@ -83,15 +83,15 @@ class DataClassification(Field):
         "_dtm.tif": DTM,
         "_ortho.tif": ORTHOPHOTO, }
 
-class DemDataStore(BaseModel):
-    demid   = peewee.IntegerField(primary_key=True)
-    name    = peewee.CharField(max_length=20)
-    suc     = peewee.CharField(max_length=5)
-    type    = peewee.CharField(max_length=5)
-    shifting_val_x = peewee.FloatField() 
-    shifting_val_y = peewee.FloatField() 
-    shifting_val_z = peewee.FloatField()
-    height_diff    = peewee.FloatField()
-    rmse           = peewee.FloatField()
-    dem_file_path  = peewee.TextField(null=False)
-    block_name_list = peewee.TextField(null=False)
+class Automation_Demdatastore(BaseModel):
+    demid = PrimaryKeyField()
+    block_name_list = TextField()
+    dem_file_path = TextField()
+    height_diff = FloatField()
+    name = CharField()
+    rmse = FloatField()
+    shifting_val_x = FloatField()
+    shifting_val_y = FloatField()
+    shifting_val_z = FloatField()
+    suc = CharField()
+    type = CharField()
