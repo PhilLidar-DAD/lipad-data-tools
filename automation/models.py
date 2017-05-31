@@ -37,8 +37,24 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
         From geonode.cephgeo.models LidarCoverageBlock
         Only UID and Block Name needed for renaming tiles
     """
-    uid = peewee.IntegerField(primary_key=True)
-    block_name = peewee.CharField()
+    adjusted_l = TextField()
+    block_name = CharField(index=True)
+    cal_ref_pt = TextField()
+    date_flown = DateField(null=True)
+    flight_num = TextField()
+    floodplain = TextField()
+    height_dif = TextField()
+    mission_na = TextField()
+    pl1_suc = TextField()
+    pl2_suc = TextField()
+    processor = TextField()
+    rmse_val_m = TextField()
+    sensor = TextField()
+    uid = PrimaryKeyField()
+    val_ref_pt = TextField()
+    x_shift_m = TextField()
+    y_shift_m = TextField()
+    z_shift_m = TextField()
 
 
 class CephDataObject(BaseModel):
