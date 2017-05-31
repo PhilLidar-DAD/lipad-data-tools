@@ -10,6 +10,7 @@ import random
 import time
 import subprocess
 from datetime import datetime
+from pprint import pprint
 import json as py_json
 
 
@@ -108,55 +109,63 @@ def handle_dem(q):
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
-    input_dir = q.input_dir
-    output_dir = q.output_dir
+    input_dir = q.input_dir.strip("\'\"")
+    output_dir = q.output_dir.strip("\'\"")
     processor = q.processor
-
+    
     dem_dict = parse_dem_input(input_dir)
-    dem_file_path = dem_dict["dem_file_path"] 
+    dem_file_path = dem_dict["dem_file_path"].strip("\'\"")
     block_list =  dem_dict["blocks"]
 
-    print 'BLOCKS: ' + str(block_list)
+    print 'BLOCKS FOUND: ', len(block_list)
 
     # Convert block_names to block_uids
     block_uid_list = []
     for block in block_list:
         block_name = block[0]
-        in_coverage, block_uid = find_in_coverage(block_name)
-        block_uid_list.append(tuple(block_uid, in_coverage))
+        block_uid_list.append(find_in_coverage(block_name))
+        
+    print "DEBUG: BLOCK UIDs"
+    pprint(block_uid_list)
 
     block_uid_list_json = py_json.dumps(block_uid_list)
 
+    if q.datatype.lower() == 'dtm':
+        """Tile DTM only"""
+        tile_dtm(dem_file_path, output_dir)
+    elif q.datatype.lower() == 'dsm':
+        """Tile DSM only"""
+        tile_dsm(dem_file_path, output_dir)
+    elif q.datatype.lower() == 'dem' or q.datatype.lower == 'dtm/dsm':
+        """Tile both DEMS"""
+        print "dtm/dsm dual tiling not yet implemented"
+    else:
+        print "Nothing to do with dataype of ["+str(q.datatype)+"]"
+    
     """
         @TODO:
         1) Tile blocks for each metadata
         2) Pass to LiPAD db
-        3) Talk to DJ about file and metadata naming conventions
+        3) Upload Lidar Coverage to test VM -DONE
     """
 
-    if q.datatype.lower == 'DTM':
-        """Tile DTM only"""
-        tile_dtm(dem_dir, output_dir)
-    elif q.datatype.lower == 'DSM':
-        """Tile DSM only"""
-        tile_dsm(dem_dir, output_dir)
-    elif q.datatype.lower == 'DEM' or q.datatype.lower == 'DTM/DSM':
-        """Tile both DEMS"""
-
-    """
-        @TODO:
-        1) Upload tiles
-        2) Pass CephDataObject metadata to LiPAD db
-    """
     assign_status(q, 2)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     ceph_uploaded, log_file = ceph_upload(output_dir)
 
+    #DEBUG    
+    return
+
     if ceph_uploaded:
         assign_status(q, 3)
         transfer_metadata(log_file)
-
+    """
+        @TODO:
+        1) Upload tiles - DONE
+        2) Pass CephDataObject metadata to LiPAD db
+    """
+    
 
 def db_watcher():
     """
