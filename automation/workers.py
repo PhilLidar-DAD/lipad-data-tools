@@ -101,18 +101,6 @@ def process_job(q):
         print 'ERROR NOT FOUND IN MODEL', block_name, block_uid
 
 
-def parse_dem_input(input_str):
-    tokens = input_str.strip().replace(' ', '').split(',')
-    block_names = tokens[1:]
-    dem_dir = os.path.join("/mnt/pmsat_pool/geostorage/DPC/",
-                           tokens[0].replace('\\', '/').split('DPC/')[1])
-
-    # if not os.path.isdir(dem_dir):
-    if False:
-        raise DirectoryNotFoundException(
-            "Directory does not exist: " + dem_dir)
-
-    return dem_dir, block_names
 
 
 def handle_dem(q):
@@ -124,13 +112,16 @@ def handle_dem(q):
     output_dir = q.output_dir
     processor = q.processor
 
-    dem_dir, block_name_list = parse_dem_input(input_dir)
+    dem_dict = parse_dem_input(input_dir)
+    dem_file_path = dem_dict["dem_file_path"] 
+    block_list =  dem_dict["blocks"]
 
-    print 'BLOCKS: ' + str(block_name_list)
+    print 'BLOCKS: ' + str(block_list)
 
     # Convert block_names to block_uids
     block_uid_list = []
-    for block_name in block_name_list:
+    for block in block_list:
+        block_name = block[0]
         in_coverage, block_uid = find_in_coverage(block_name)
         block_uid_list.append(tuple(block_uid, in_coverage))
 
