@@ -11,7 +11,15 @@ import time
 import subprocess
 from datetime import datetime
 import json as py_json
-
+import psycopg2
+import settings
+import json
+from shapely.geometry.geo import shape
+#add georefmapper location to python path for import
+georefmapper_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)).split('automation')[0],"postprocess")
+print "Importing georefmapper from ", georefmapper_dir 
+sys.path.append(georefmapper_dir)
+import georefmapper.mapper
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
@@ -134,8 +142,9 @@ def handle_dem(q):
         in_coverage, block_uid = find_in_coverage(block_name)
         block_uid_list.append(tuple(block_uid, in_coverage))
 
-    block_metadata_objects = get_block_metadata(block_uid_list)
-    get_georefs_from_blocks(block_uid_list)
+    #block_metadata_objects = get_block_metadata(block_uid_list)
+    #get_georefs_from_blocks(block_uid_list)
+    lidar_coverage_block_metadata_dict = get_lidar_coverage_block_metadata_dict(settings.LIDAR_COVERAGE_TABLE_NAME,block_uid_list)
     """
         @TODO:
         block uid -> georefs 
@@ -168,11 +177,83 @@ def handle_dem(q):
         transfer_metadata(log_file)
 
 
-def get_block_metadata(block_uid_list):
-    return Cephgeo_LidarCoverageBlock.select().where(Cephgeo_LidarCoverageBlock.uid << block_uid_list)
 
-def get_georefs_from_blocks(block_uid_list):
-    pass
+def get_lidar_coverage_block_metadata_dict(gis_table_name, block_uid_list):
+    """
+        Returns a dictionary of dictionaries, each dictionary representing 
+        a lidar coverage block with the following mapping:
+        
+        UID : lidar_block_metadata_dict
+        
+        lidar_block_metadata_dict contents:
+            UID            - uid of the block
+            Block_Name     - name of the block
+            Adjusted_L     -
+            Sensor         - sensor used for data acquisition
+            Base_Used
+            Processor
+            Flight_Num
+            Mission_Na
+            Date_Flown
+            X_Shift_m
+            Y_Shift_m
+            Z_Shift_m
+            Height_dif
+            RMSE_Val_m
+            Cal_Ref_Pt
+            Val_Ref_Pt
+            Floodplain
+            PL1_SUC
+            PL2_SUC
+            Area_sqkm
+            Shapely_Geom    - Shapely geometry for use with georefmapper
+            Georefs         - List of georefs intersected by this block
+    """
+    postgis_query = """
+SELECT 
+    "UID", "Block_Name", "Adjusted_L", "Sensor", "Base_Used", "Processor",
+    "Flight_Num", "Mission_Na", "Date_Flown", "X_Shift_m", "Y_Shift_m",
+    "Z_Shift_m", "Height_dif", "RMSE_Val_m", "Cal_Ref_Pt", "Val_Ref_Pt",
+    "Floodplain", "PL1_SUC", "PL2_SUC", "Area_sqkm", ST_AsGeoJSON(the_geom) 
+FROM {0}
+WHERE
+    "UID" IN {1};""".format(gis_table_name, str(tuple(block_uid_list)))
+    conn = psycopg2.connect(("host={0} dbname={1} user={2} password={3}".format
+                             (settings.DB_HOST, settings.GIS_DB_NAME,
+                              settings.DB_USER, settings.DB_PASS)))
+    dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    dict_cur.execute(postgis_query)
+    # result is a queryset of Python dictionaries
+    result = dict_cur.fetchall() 
+    
+    lidar_coverage_block_metadata_dict = dict()
+    time_total = 0.0
+    count = 0
+    
+    for lidar_coverage_block_db_data in result:
+        start_time = time.time()
+        
+        # parse attribute table into a new dictionary, disregard geometry 
+        dict_keys = list(result[0].keys())
+        dict_keys.remove('st_asgeojson')
+        block_metadata_dict = {k: lidar_coverage_block_db_data[k] for k in dict_keys}
+        
+        # convert block geometry into shapely geometry format
+        block_metadata_dict["Shapely_Geom"] = shape(json.loads(lidar_coverage_block_db_data['st_asgeojson']))
+        block_metadata_dict["Georefs"] = georefmapper.mapper.georefs_in_geom(block_metadata_dict["Shapely_Geom"])
+        
+        lidar_coverage_block_metadata_dict[lidar_coverage_block_db_data["UID"]] = block_metadata_dict
+        
+        end_time = time.time()
+        elapsed_time=round(end_time - start_time,2)
+        time_total += elapsed_time
+        count += 1
+    
+    print "Average time for {0} blocks: {1}".format(count, time_total/float(count))
+    
+    return lidar_coverage_block_metadata_dict
+
+
 
 def db_watcher():
     """
