@@ -11,18 +11,20 @@ from models import Cephgeo_LidarCoverageBlock as LidarCoverageBlock
 import collections
 
 
-def ceph_upload(input_dir_ceph):
+def ceph_upload(input_dir_ceph, output_log_file_path):
     print 'Upload to Ceph'
     try:
         output = subprocess.check_output(
-            ['./bulk_upload_nonthreaded.py', input_dir_ceph])
+            ['./bulk_upload_nonthreaded.py', input_dir_ceph, "-df", output_log_file_path])
         print 'Ceph Output...'
         print output, len(output)
         filename = output.split('\n')[-1]
         print 'Logfile', filename
         if 'Done Uploading!' in output:
             print 'Caught Done Uploading!'
-        return True, filename
+        output_log_file_path
+        print "LOG FILE: " + output_log_file_path
+        return True, output_log_file_path
     except Exception:
         print 'Error in Ceph upload!'
         return False, None
@@ -38,8 +40,8 @@ def convert_to_string(data):
     else:
         return data.strip("\"\'")
     
-def parse_dem_input(dem_input):
-    parsed_input = unicodedata.normalize('NFKD', dem_input).encode('ascii','ignore').strip("\\'")
+def parse_unicode_json(unicode_json):
+    parsed_input = unicodedata.normalize('NFKD', unicode_json).encode('ascii','ignore').strip("\\'")
     #return json.loads(convert_to_string(parsed_input))
     return json.loads(parsed_input)
 
@@ -65,10 +67,10 @@ def tile_dtm(dem_dir, output_dir):
         
         if 'Done Tiling' in output:
             print 'DTM Tiling Done!'
-        return True
+        return True, tile_output_dir
     except Exception:
         print 'Error in DTM tiling. DTM directory: ' + dtm_dir
-        return False
+        return False, None
 
 def tile_dsm(dem_dir, output_dir):
     """./tile_dem.py -d data/MINDANAO1/d_mdn/ -t dsm -p WGS_84_UTM_zone_51N.prj -o output/"""
@@ -99,7 +101,7 @@ def tile_dsm(dem_dir, output_dir):
         
         if 'Done Tiling' in output:
             print 'DSM Tiling Done!'
-        return True
+        return True, tile_output_dir
     except subprocess.CalledProcessError as e:
         print 'Error in DSM tiling. DSM directory: ' + dsm_dir
         print e.output
