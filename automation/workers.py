@@ -1,20 +1,17 @@
-from models import *
-from rename_tiles import *
+from automation_exceptions import *
+
 from transfer_metadata import *
 from utils import *
 from exceptions import *
-import os
-import sys
-import logging
-import random
-import time
-import subprocess
 from datetime import datetime
-import json as py_json
+import os, sys, logging, time, csv
 import psycopg2
 import settings
-import json
 from shapely.geometry.geo import shape
+from exceptions import *
+from exceptions import *
+import ast
+
 #add georefmapper location to python path for import
 georefmapper_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)).split('automation')[0],"postprocess")
 print "Importing georefmapper from ", georefmapper_dir 
@@ -91,7 +88,7 @@ def process_job(q):
         print 'Found in Lidar Coverage model', block_name, block_uid
         if datatype.lower() == ('laz' or 'ortho'):
             if not files_renamed(input_dir):
-                rename_tiles(input_dir, output_dir, processor, block_uid)
+                rename_tiles.rename_tiles(input_dir, output_dir, processor, block_uid)
         else:
             raise Exception(
                 'Handler not implemented for type: ' + str(q.datatype))
@@ -108,57 +105,40 @@ def process_job(q):
     else:
         print 'ERROR NOT FOUND IN MODEL', block_name, block_uid
 
-
-def parse_dem_input(input_str):
-    tokens = input_str.strip().replace(' ', '').split(',')
-    block_names = tokens[1:]
-    dem_dir = os.path.join("/mnt/pmsat_pool/geostorage/DPC/",
-                           tokens[0].replace('\\', '/').split('DPC/')[1])
-
-    # if not os.path.isdir(dem_dir):
-    if False:
-        raise DirectoryNotFoundException(
-            "Directory does not exist: " + dem_dir)
-
-    return dem_dir, block_names
-
-
 def handle_dem(q):
     assign_status(q, 1)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
     input_dir = q.input_dir
-    output_dir = q.output_dir
-    processor = q.processor
+    output_dir = ast.literal_eval(q.output_dir)
+    processor = convert_to_string(q.processor)
 
-    dem_dir, block_name_list = parse_dem_input(input_dir)
-
-    print 'BLOCKS: ' + str(block_name_list)
+    dem_input_dict = ast.literal_eval(input_dir.replace("\'",""))
+    
+    dem_name = dem_input_dict["dem_name"]
+    dem_dir = dem_input_dict["dem_file_path"]
+    block_list = dem_input_dict["blocks"]
+    
+    print "DEM job input:"
+    pprint(dem_input_dict)
 
     # Convert block_names to block_uids
     block_uid_list = []
-    for block_name in block_name_list:
-        in_coverage, block_uid = find_in_coverage(block_name)
-        block_uid_list.append(tuple(block_uid, in_coverage))
+    for block_tokens in block_list:
+        block_name=block_tokens[0]
+        in_coverage, block_uid, block_name = find_in_coverage(block_name)
+        block_uid_list.append(block_uid)
 
     #block_metadata_objects = get_block_metadata(block_uid_list)
     #get_georefs_from_blocks(block_uid_list)
-    lidar_coverage_block_metadata_dict = get_lidar_coverage_block_metadata_dict(settings.LIDAR_COVERAGE_TABLE_NAME,block_uid_list)
-    """
-        @TODO:
-        block uid -> georefs 
-        1) Spawn metadata tiler and tile blocks for each metadata
-        2) Pass to LiPAD db
-        3) Talk to DJ about file and metadata naming conventions
-    """
-    
-    if q.datatype.lower == 'DTM':
+    tile_output_dir=""
+    if q.datatype.upper() == DataClassification.gs_feature_labels[DataClassification.DTM]:
         """Tile DTM only"""
-        tile_dtm(dem_dir, output_dir)
-    elif q.datatype.lower == 'DSM':
+        status, tile_output_dir = tile_dtm(dem_dir, output_dir)
+    elif q.datatype.upper() == DataClassification.gs_feature_labels[DataClassification.DSM]:
         """Tile DSM only"""
-        tile_dsm(dem_dir, output_dir)
+        status, tile_output_dir = tile_dsm(dem_dir, output_dir)
     else:
         raise NotImplementedException("Unhandled type in DEM worker: {0}".format(q.datatype))
     
@@ -170,15 +150,71 @@ def handle_dem(q):
     assign_status(q, 2)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
-    ceph_uploaded, log_file = ceph_upload(output_dir)
+    ceph_uploaded, ceph_upload_log_file = ceph_upload(output_dir, os.path.join(tile_output_dir,"ceph_upload.dump"))
 
     if ceph_uploaded:
         assign_status(q, 3)
-        transfer_metadata(log_file)
+        lidar_coverage_block_metadata_dict = map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_file, dem_name, convert_to_string(q.datatype.upper()), dem_dir)
+    
+    else:
+        raise CephUploadFailedException("Upload to Ceph failed for job of type: "+q.datatype)
 
+def make_psql_list(input_list):
+    pprint(input_list)
+    if len(input_list) > 1:
+        return  str(tuple(input_list))
+    else:
+        return "({0})".format(input_list[0])
 
+def fetch_lidar_blocks_from_postgis(block_uid_list):
+    """
+        Remotely accesses postgis and retrieves lidar block metadata from settings.LIDAR_COVERAGE_TABLE_NAME
+        
+        @param block_uid_list: list of block uids to retrieve from postgis
+             
+        @return queryset for  blocks in block_uid_list, containing attributes and the block's geometry in geojson
+    """
+    POSTGIS_QUERY = """
+SELECT 
+    "UID", "Block_Name", "Adjusted_L", "Sensor", "Base_Used", "Processor",
+    "Flight_Num", "Mission_Na", "Date_Flown", "X_Shift_m", "Y_Shift_m",
+    "Z_Shift_m", "Height_dif", "RMSE_Val_m", "Cal_Ref_Pt", "Val_Ref_Pt",
+    "Floodplain", "PL1_SUC", "PL2_SUC", "Area_sqkm", ST_AsGeoJSON(the_geom) 
+FROM {0}
+WHERE
+    "UID" IN {1};""".format(settings.LIDAR_COVERAGE_TABLE_NAME, make_psql_list(block_uid_list))
+    conn = psycopg2.connect(("host={0} dbname={1} user={2} password={3}".format
+                             (settings.DB_HOST, settings.GIS_DB_NAME,
+                              settings.DB_USER, settings.DB_PASS)))
+    dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    dict_cur.execute(POSTGIS_QUERY)
+    # result is a queryset of Python dictionaries
+    return dict_cur.fetchall()
 
-def get_lidar_coverage_block_metadata_dict(gis_table_name, block_uid_list):
+def create_georef_ceph_object_map(ceph_upload_log_file):
+    """
+        Remotely accesses postgis and retrieves lidar block metadata from settings.LIDAR_COVERAGE_TABLE_NAME
+        
+        @param ceph_upload_log_file: output file of Ceph upload script
+             
+        @return dictionary mapping each georef to the Ceph objects of that georef
+    """
+    
+    georef_dict = dict()
+    
+    with open(ceph_upload_log_file, 'rb') as f:
+        reader = csv.reader(f)
+        next(reader)    # Skip first line, header of CSV file
+        for row in reader:
+            if len(row) == 6:
+                if row[5] in georef_dict:
+                    georef_dict[row[5]].append(row)
+                else:
+                    georef_dict[row[5]] = [row]
+    
+    return georef_dict        
+
+def map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_file, dem_name, dem_type, dem_path):
     """
         Returns a dictionary of dictionaries, each dictionary representing 
         a lidar coverage block with the following mapping:
@@ -209,32 +245,20 @@ def get_lidar_coverage_block_metadata_dict(gis_table_name, block_uid_list):
             Shapely_Geom    - Shapely geometry for use with georefmapper
             Georefs         - List of georefs intersected by this block
     """
-    postgis_query = """
-SELECT 
-    "UID", "Block_Name", "Adjusted_L", "Sensor", "Base_Used", "Processor",
-    "Flight_Num", "Mission_Na", "Date_Flown", "X_Shift_m", "Y_Shift_m",
-    "Z_Shift_m", "Height_dif", "RMSE_Val_m", "Cal_Ref_Pt", "Val_Ref_Pt",
-    "Floodplain", "PL1_SUC", "PL2_SUC", "Area_sqkm", ST_AsGeoJSON(the_geom) 
-FROM {0}
-WHERE
-    "UID" IN {1};""".format(gis_table_name, str(tuple(block_uid_list)))
-    conn = psycopg2.connect(("host={0} dbname={1} user={2} password={3}".format
-                             (settings.DB_HOST, settings.GIS_DB_NAME,
-                              settings.DB_USER, settings.DB_PASS)))
-    dict_cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    dict_cur.execute(postgis_query)
-    # result is a queryset of Python dictionaries
-    result = dict_cur.fetchall() 
+    
     
     lidar_coverage_block_metadata_dict = dict()
     time_total = 0.0
     count = 0
+    blocks_from_postgis = fetch_lidar_blocks_from_postgis(block_uid_list)
     
-    for lidar_coverage_block_db_data in result:
+    georef_to_ceph_objects_dict = create_georef_ceph_object_map(ceph_upload_log_file)
+    
+    for lidar_coverage_block_db_data in blocks_from_postgis:
         start_time = time.time()
         
         # parse attribute table into a new dictionary, disregard geometry 
-        dict_keys = list(result[0].keys())
+        dict_keys = list(lidar_coverage_block_db_data.keys())
         dict_keys.remove('st_asgeojson')
         block_metadata_dict = {k: lidar_coverage_block_db_data[k] for k in dict_keys}
         
@@ -244,16 +268,101 @@ WHERE
         
         lidar_coverage_block_metadata_dict[lidar_coverage_block_db_data["UID"]] = block_metadata_dict
         
+        """
+            @todo: 
+            Create DemDataStore mapping here?
+            
+            Loop through georefs:
+            For each georef
+                DONE: a. get corresponding Ceph object metadata, and get_or_create Automation_CephDataObject instances
+                b. create Automation_DemDataStore instance, map to corresponding:
+                    - CephgGeo_LidarBlockMetadata [UID]
+                    - Automation_CephDataObject [id]
+            
+        """
+        
+        #Create DEM data store object for this DEM upload
+        demdatastore_obj, dds_created = Automation_Demdatastore.create( name=dem_name,
+                                                                        type=dem_type,
+                                                                        dem_file_path=dem_path,)
+
+        
+        #Loop through georefs
+        skipped_georefs = 0
+        for georef in block_metadata_dict["Georefs"]:
+            try:
+                ceph_object_metas = georef_to_ceph_objects_dict[georef]
+                
+                #Loop through all ceph object metadata with said georef
+                for com in ceph_object_metas:
+                    print "processing meta for: ", str(com)
+                    #Create CephDataObject instance
+                    ceph_obj = None
+                    ceph_objects_inserted = 0
+                    ceph_objects_updated = 0
+                    ceph_obj, cdo_created = CephDataObject.get_or_create(name=com[0],
+                                                                        last_modified=com[1],
+                                                                        size_in_bytes=com[2],
+                                                                        content_type=com[3],
+                                                                        data_class=get_data_class_from_filename(
+                                                                            com[0]),
+                                                                        file_hash=com[4],
+                                                                        grid_ref=com[5])
+        
+                    if cdo_created:
+                        ceph_objects_inserted += 1
+                    else:
+                        ceph_objects_updated += 1
+                    lidar_block_obj = Cephgeo_LidarCoverageBlock.get(uid=lidar_coverage_block_db_data["UID"])
+                    
+                    """
+                    """
+                    """
+                    demdatastore_obj.type=dem_type
+                    demdatastore_obj.dem_file_path=dem_path
+                    demdatastore_obj.cephdataobject=ceph_obj
+                    demdatastore_obj.lidar_block=lidar_block_obj
+                    demdatastore_obj.save()
+                    """
+                      
+                    """
+                        HERE
+                        @todo:
+                        1. Create CephDataObject instance
+                        2. Create DemDataStore instance
+                    """
+            except KeyError:
+                print "WARNING: No Ceph Object found with georef [{0}] from lidar block [{1}]. Skipping...".format(georef, block_metadata_dict["Block_Name"])
+                skipped_georefs += 1 
+            
+        print "Total skipped georefs: " + str(skipped_georefs)
         end_time = time.time()
         elapsed_time=round(end_time - start_time,2)
         time_total += elapsed_time
         count += 1
+        
+        
+        
     
     print "Average time for {0} blocks: {1}".format(count, time_total/float(count))
     
     return lidar_coverage_block_metadata_dict
 
-
+def transfer_dem_metadata(lidar_coverage_block_metadata_dict, ceph_log_file_path):
+    """
+    @todo: 
+    1. Create dictionary of gridref to ceph objects
+    2. Loop through lidar block metadata
+        For each block metadata: 
+        a. Loop through georefs:
+            For each georef
+            a. get corresponding Ceph object metadata, and get_or_create Automation_CephDataObject instances
+            b. create Automation_DemDataStore instance, map to corresponding:
+                - CephgGeo_LidarBlockMetadata [UID]
+                - Automation_CephDataObject [id]
+        b. 
+        
+    """
 
 def db_watcher():
     """
