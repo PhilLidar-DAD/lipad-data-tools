@@ -110,12 +110,12 @@ def handle_dem(q):
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
+    
+    # Convert to ASCII and assign variables
     input_dir = q.input_dir
     output_dir = ast.literal_eval(q.output_dir)
     processor = convert_to_string(q.processor)
-
     dem_input_dict = ast.literal_eval(input_dir.replace("\'",""))
-    
     dem_name = dem_input_dict["dem_name"]
     dem_dir = dem_input_dict["dem_file_path"]
     block_list = dem_input_dict["blocks"]
@@ -130,8 +130,7 @@ def handle_dem(q):
         in_coverage, block_uid, block_name = find_in_coverage(block_name)
         block_uid_list.append(block_uid)
 
-    #block_metadata_objects = get_block_metadata(block_uid_list)
-    #get_georefs_from_blocks(block_uid_list)
+    # Tile DEM
     tile_output_dir=""
     if q.datatype.upper() == DataClassification.gs_feature_labels[DataClassification.DTM]:
         """Tile DTM only"""
@@ -142,20 +141,16 @@ def handle_dem(q):
     else:
         raise NotImplementedException("Unhandled type in DEM worker: {0}".format(q.datatype))
     
-    """
-        @TODO:
-        1) Upload tiles
-        2) Pass CephDataObject metadata to LiPAD db
-    """
+    # Upload to Ceph
     assign_status(q, 2)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     ceph_uploaded, ceph_upload_log_file = ceph_upload(output_dir, os.path.join(tile_output_dir,"ceph_upload.dump"))
 
+    # Map metadata to tiles in LiPAD
     if ceph_uploaded:
         assign_status(q, 3)
         lidar_coverage_block_metadata_dict = map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_file, dem_name, convert_to_string(q.datatype.upper()), dem_dir)
-    
     else:
         raise CephUploadFailedException("Upload to Ceph failed for job of type: "+q.datatype)
 
@@ -268,19 +263,6 @@ def map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_fil
         
         lidar_coverage_block_metadata_dict[lidar_coverage_block_db_data["UID"]] = block_metadata_dict
         
-        """
-            @todo: 
-            Create DemDataStore mapping here?
-            
-            Loop through georefs:
-            For each georef
-                DONE: a. get corresponding Ceph object metadata, and get_or_create Automation_CephDataObject instances
-                b. create Automation_DemDataStore instance, map to corresponding:
-                    - CephgGeo_LidarBlockMetadata [UID]
-                    - Automation_CephDataObject [id]
-            
-        """
-        
         #Create DEM data store object for this DEM upload
         demdatastore_obj = Automation_Demdatastore.create( name=dem_name,
                                                                         type=dem_type,
@@ -320,35 +302,18 @@ def map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_fil
                                                                                     demdatastore=demdatastore_obj,
                                                                                     lidar_block=lidar_block_obj) 
                     dcom_obj.save()
-                    """
-                    """
-                    """
-                    demdatastore_obj.type=dem_type
-                    demdatastore_obj.dem_file_path=dem_path
-                    demdatastore_obj.cephdataobject=ceph_obj
-                    demdatastore_obj.lidar_block=lidar_block_obj
-                    demdatastore_obj.save()
-                    """
-                      
-                    """
-                        HERE
-                        @todo:
-                        1. Create CephDataObject instance
-                        2. Create DemDataStore instance
-                    """
+
             except KeyError:
                 print "WARNING: No Ceph Object found with georef [{0}] from lidar block [{1}]. Skipping...".format(georef, block_metadata_dict["Block_Name"])
                 skipped_georefs += 1 
             
+        # Print stats
         print "Total skipped georefs: " + str(skipped_georefs)
         end_time = time.time()
         elapsed_time=round(end_time - start_time,2)
         time_total += elapsed_time
         count += 1
-        
-        
-        
-    
+
     print "Average time for {0} blocks: {1}".format(count, time_total/float(count))
     
     return lidar_coverage_block_metadata_dict
