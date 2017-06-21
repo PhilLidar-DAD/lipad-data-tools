@@ -3,6 +3,7 @@
 import peewee
 from settings import *
 from peewee import *
+import datetime
 
 
 PSQL_DB = peewee.PostgresqlDatabase(
@@ -128,12 +129,12 @@ class Automation_Demdatastore(BaseModel):
     demid = PrimaryKeyField()
     name = CharField()
     type = CharField()
-    upload_date = DateTimeField()
+    upload_date = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
         db_table = 'automation_demdatastore'
         
-class AutomationDemcephobjectmap(BaseModel):
+class Automation_Demcephobjectmap(BaseModel):
     cephdataobject = ForeignKeyField(db_column='cephdataobject_id', rel_model=CephDataObject, to_field='id')
     demdatastore = ForeignKeyField(db_column='demdatastore_id', rel_model=Automation_Demdatastore, to_field='demid')
     lidar_block = ForeignKeyField(db_column='lidar_block_id', rel_model=Cephgeo_LidarCoverageBlock, to_field='uid')
