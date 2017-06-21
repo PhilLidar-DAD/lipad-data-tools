@@ -282,7 +282,7 @@ def map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_fil
         """
         
         #Create DEM data store object for this DEM upload
-        demdatastore_obj, dds_created = Automation_Demdatastore.create( name=dem_name,
+        demdatastore_obj = Automation_Demdatastore.create( name=dem_name,
                                                                         type=dem_type,
                                                                         dem_file_path=dem_path,)
 
@@ -308,13 +308,18 @@ def map_ceph_objects_to_lidar_block_metadata(block_uid_list, ceph_upload_log_fil
                                                                             com[0]),
                                                                         file_hash=com[4],
                                                                         grid_ref=com[5])
-        
+                    ceph_obj.save()
                     if cdo_created:
                         ceph_objects_inserted += 1
                     else:
                         ceph_objects_updated += 1
                     lidar_block_obj = Cephgeo_LidarCoverageBlock.get(uid=lidar_coverage_block_db_data["UID"])
                     
+                    #Create mapping instance between DEM Data Store, Ceph Object, and Lidar Coverage Block instances
+                    dcom_obj = Automation_Demcephobjectmap.create(    cephdataobject=ceph_obj,
+                                                                                    demdatastore=demdatastore_obj,
+                                                                                    lidar_block=lidar_block_obj) 
+                    dcom_obj.save()
                     """
                     """
                     """
