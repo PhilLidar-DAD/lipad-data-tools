@@ -63,7 +63,7 @@ def _setup_logging(args):
 def find_in_coverage(block_name):
     try:
         # get block_name in LidarCoverageBlock Model
-        block = LidarCoverageBlock.objects.get(block_name=block_name)
+        block = LidarCoverageBlock.select(block_name=block_name)
         print 'Block in Lidar Coverage'
         print 'Block UID:', block.uid
         return True, block.uid
