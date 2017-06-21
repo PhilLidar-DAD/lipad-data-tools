@@ -82,6 +82,8 @@ parser.add_argument("-e", "--virtualenv", dest="venv",
                     help="Path to the virtualenv activate_this.py file")
 parser.add_argument("-l", "--logfile", dest="logfile",
                     help="Path to log file for this upload")
+parser.add_argument("-df", "--dumpfile", dest="dumpfile",
+                    help="Path to ceph metadata dump file for this upload")
 parser.add_argument("-r", "--resume", dest="resume",
                     help="Resume from a interrupted upload using the CSV dump")
 
@@ -170,8 +172,11 @@ logger.info("===================================================================
     allowed_files_exts))
 
 top_dir_name = filter(None, grid_files_dir.split(os.path.sep))[-1]
-data_dump_file_path = "dump/uploaded_objects_[{0}]_{1}.txt".format(
-    top_dir_name, time.strftime("%Y-%m-%d-%H%M-%S"))
+# Check if --dumpfile is set
+if args.dumpfile is None:
+    data_dump_file_path = "dump/uploaded_objects_[{0}]_{1}.txt".format(top_dir_name, time.strftime("%Y-%m-%d-%H%M-%S"))
+else:
+    data_dump_file_path = args.dumpfile
 
 with open(data_dump_file_path, 'w') as dump_file:
     header_str = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH GRID_REF\n"
