@@ -80,21 +80,6 @@ class Automation_AutomationJob(BaseModel):
     #     primary_key = peewee.CompositeKey(
     #         'datatype', 'date_submitted', 'status')
 
-class Automation_Demdatastore(BaseModel):
-    block_name_list = TextField()
-    dem_file_path = TextField()
-    demid = PrimaryKeyField()
-    height_diff = FloatField()
-    name = CharField()
-    rmse = FloatField()
-    shifting_val_x = FloatField()
-    shifting_val_y = FloatField()
-    shifting_val_z = FloatField()
-    suc = CharField()
-    type = CharField()
-
-    class Meta:
-        db_table = 'automation_demdatastore'
 
 class Cephgeo_LidarCoverageBlock(BaseModel):
     """
@@ -134,14 +119,24 @@ class CephDataObject(BaseModel):
     data_class = peewee.CharField(max_length=20)
     grid_ref = peewee.CharField(max_length=10)
 
+    class Meta:
+        db_table = 'cephgeo_cephdataobject'
 
-class Cephgeo_DemDataStore():
+
+class Automation_Demdatastore(BaseModel):
+    dem_file_path = TextField()
     demid = PrimaryKeyField()
     name = CharField()
     type = CharField()
-    dem_file_path = TextField(null=False)
-    cephdataobject = ForeignKeyField(db_column='cephdataobject_id', rel_model=CephDataObject, to_field='id')
-    lidar_block = ForeignKeyField(db_column='lidar_block_id', rel_model=Cephgeo_LidarCoverageBlock, to_field='uid')
-    
+    upload_date = DateTimeField()
+
     class Meta:
         db_table = 'automation_demdatastore'
+        
+class AutomationDemcephobjectmap(BaseModel):
+    cephdataobject = ForeignKeyField(db_column='cephdataobject_id', rel_model=CephDataObject, to_field='id')
+    demdatastore = ForeignKeyField(db_column='demdatastore_id', rel_model=Automation_Demdatastore, to_field='demid')
+    lidar_block = ForeignKeyField(db_column='lidar_block_id', rel_model=Cephgeo_LidarCoverageBlock, to_field='uid')
+
+    class Meta:
+        db_table = 'automation_demcephobjectmap'
