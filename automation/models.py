@@ -138,6 +138,12 @@ class Automation_Demcephobjectmap(BaseModel):
     cephdataobject = ForeignKeyField(db_column='cephdataobject_id', rel_model=CephDataObject, to_field='id')
     demdatastore = ForeignKeyField(db_column='demdatastore_id', rel_model=Automation_Demdatastore, to_field='demid')
     lidar_block = ForeignKeyField(db_column='lidar_block_id', rel_model=Cephgeo_LidarCoverageBlock, to_field='uid')
+    shifting_val_x = FloatField(decimal_places=3)
+    shifting_val_y = FloatField(decimal_places=3)
+    shifting_val_z = FloatField(decimal_places=3)
+    height_diff = FloatField(decimal_places=3)
+    rmse = FloatField(decimal_places=3)
+
 
     class Meta:
         db_table = 'automation_demcephobjectmap'
