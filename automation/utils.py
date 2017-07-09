@@ -156,3 +156,6 @@ def find_in_coverage(block_name):
     except Exception:
         print 'No Block ['+str(block_name)+'] in Lidar Coverage'
         return [False, 0, block_name.encode('ascii') ]
+
+def convert_windows_dem_path(windows_dem_path, automation_prefix_path, component_folder="DPC/ARC"):
+    return os.path.join(automation_prefix_path,windows_dem_path.replace("\\","/").split(component_folder)[1])

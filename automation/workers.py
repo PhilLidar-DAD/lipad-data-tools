@@ -113,11 +113,19 @@ def handle_dem(q):
     
     # Convert to ASCII and assign variables
     input_dir = q.input_dir
+    
+    # Check if input_dir is windows, convert if so
+    if input_dir.contains("\\"):
+        input_dir = convert_windows_dem_path(input_dir)
     output_dir = ast.literal_eval(q.output_dir)
     processor = convert_to_string(q.processor)
     dem_input_dict = ast.literal_eval(input_dir.replace("\'",""))
     dem_name = dem_input_dict["dem_name"]
+    
+    # Check if DEM dir is windows, convert if so
     dem_dir = dem_input_dict["dem_file_path"]
+    if dem_dir.contains("\\"):
+        dem_dir = convert_windows_dem_path(dem_dir)
     input_block_list = dem_input_dict["blocks"]
     
     print "DEM job input:"
@@ -234,7 +242,8 @@ def map_ceph_objects_to_lidar_block_metadata(input_block_list, ceph_upload_log_f
             Georefs         - List of georefs intersected by this block
     """
     
-    # Convert block_names to block_uids, store the list as in a dict with UIDs as keys
+    # Convert block_names to block_uids, 
+    # for encoding later, store the list as in a dict with UIDs as keys
     block_uid_list = []
     uid_to_block_input_data_dict = dict()
     for block_tokens in input_block_list:
@@ -243,10 +252,7 @@ def map_ceph_objects_to_lidar_block_metadata(input_block_list, ceph_upload_log_f
         block_uid_list.append(block_uid)
         uid_to_block_input_data_dict[block_uid]=block_tokens
     
-    """
-    @todo: encode shifting vals, height diff, RMSE in Automation_Demcephobjectmap
-    """
-
+    
     lidar_coverage_block_metadata_dict = dict()
     time_total = 0.0
     count = 0
@@ -302,11 +308,9 @@ def map_ceph_objects_to_lidar_block_metadata(input_block_list, ceph_upload_log_f
                         ceph_objects_updated += 1
                     lidar_block_obj = Cephgeo_LidarCoverageBlock.get(uid=lidar_coverage_block_db_data["UID"])
                     
-                    """
                     #Create mapping instance between DEM Data Store, Ceph Object, and Lidar Coverage Block instances
                     #Added shifting vals, height diff, and rmse
                     #block input list = [block_name_a,shifting_val_x,shifting_val_y,shifting_val_z,height_diff,rmse]
-                    """
                     block_input_list = uid_to_block_input_data_dict[lidar_coverage_block_db_data["UID"]]
                     dcom_obj = Automation_Demcephobjectmap.create(  cephdataobject=ceph_obj,
                                                                     demdatastore=demdatastore_obj,
