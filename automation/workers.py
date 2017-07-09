@@ -89,6 +89,9 @@ def process_job(q):
         if datatype.lower() == ('laz' or 'ortho'):
             if not files_renamed(input_dir):
                 rename_tiles.rename_tiles(input_dir, output_dir, processor, block_uid)
+        elif datatype.lower() == ('dtm' or 'dsm'):
+            if not files_renamed(input_dir):
+                handle_dem(q)
         else:
             raise Exception(
                 'Handler not implemented for type: ' + str(q.datatype))
