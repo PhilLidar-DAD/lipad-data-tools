@@ -1,5 +1,5 @@
 from models import *
-from rename_tiles import *
+# from rename_tiles import *
 from transfer_metadata import *
 from utils import *
 from exceptions import *
