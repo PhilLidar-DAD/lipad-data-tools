@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import sys
 import os
+from os.path import dirname, abspath
+parent_dir = dirname(dirname(abspath(__file__))).split('/')[-1:]
 sys.path.append(os.path.dirname(
-    os.path.realpath(__file__)).split('automation')[0])
-# from automation.models import *
-# from workers import *
-# from transfer_metadata import *
+    os.path.realpath(__file__)).split(parent_dir[0])[0])
+
+from automation.models import *
+from workers import *
+from transfer_metadata import *
 
 # file_path = 'dump/uploaded_objects_[Agno_Blk5C]_2017-05-09-1450-27.txt'
 # data_class = 'LAZ'
@@ -19,5 +22,5 @@ sys.path.append(os.path.dirname(
 #
 #
 # print Automation_AutomationJob.STATUS_CHOICES
-print os.path.dirname(os.path.realpath(__file__))
-# db_watcher()
+
+db_watcher()
