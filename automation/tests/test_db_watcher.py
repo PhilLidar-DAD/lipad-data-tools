@@ -6,7 +6,6 @@ parent_dir = dirname(dirname(abspath(__file__))).split('/')[-1:]
 sys.path.append(os.path.dirname(
     os.path.realpath(__file__)).split(parent_dir[0])[0])
 
-from automation.models import *
 from workers import *
 from transfer_metadata import *
 
