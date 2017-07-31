@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # LiPAD Data Tools documentation build configuration file, created by
-# sphinx-quickstart on Mon Jul 31 17:43:40 2017.
+# sphinx-quickstart on Mon Jul 31 20:53:51 2017.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.

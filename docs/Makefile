@@ -6,9 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
 SPHINXPROJ    = LiPADDataTools
 SOURCEDIR     = source
-# BUILDDIR      = build
-BUILDDIR = ../../lipad-sphinx-docu
-# Config for PDF BUILD not included
+BUILDDIR      = ../../lipad-sphinx-docu
 
 # Put it first so that "make" without argument is like "make help".
 help:
