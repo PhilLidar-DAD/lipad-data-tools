@@ -210,19 +210,25 @@ def db_watcher():
         for status in Automation_AutomationJob.STATUS_CHOICES:
             try:
                 q = Automation_AutomationJob.get(status=status)
-                print 'Query found!'
-                print q.status
-                if s.__eq__('pending_process'):
+                print 'Fetched Query'
+                print 'Status:', q.status
+                if q.status.__eq__('pending_process'):
                     if q.target_os.lower() == 'linux':
                         process_job(q)
                         # elif q.datatype.lower() == 'dtm':
                     else:
                         print 'PASS TO WINDOWS'
                         # Windows poller
-                elif s.__eq__('done_ceph'):
+                elif q.status.__eq__('done_ceph'):
                     # in case upload from ceph to lipad was interrupted
                     assign_status(q, 3)
-                    transfer_metadata()
+                    # transfer_metadata()
+                elif q.status.__eq__('pending_ceph'):
+                    pass
+                elif q.status.__eq__('done_ceph'):
+                    pass
+                elif q.status.__eq__('done'):
+                    pass
 
             except Automation_AutomationJob.DoesNotExist:
                 logger.error('No %s task', status)
