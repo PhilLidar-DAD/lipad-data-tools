@@ -12,6 +12,9 @@ BUILDDIR      = ../../lipad-sphinx-docu
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+buildandcommithtml: html
+	cd $(BUILDDIR)/html; git add . ; git commit -m "rebuilt docs"; git push origin gh-pages
+
 .PHONY: help Makefile
 
 # Catch-all target: route all unknown targets to Sphinx using the new

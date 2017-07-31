@@ -74,11 +74,11 @@ def process_job(q):
         - `processor`
     Get correct block name from `input_dir`. Find `block_name` in `model`
     ``Cephgeo_LidarCoverageBlock``. If found, do:
-        # Generate `output_dir` with `block_name` as parent directory.
-        # If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
-        # Upload data tiles to ``Ceph Object Storage``.
-        # Update and assign status of ``Automation_AutomationJob`` worker
-        #
+        #. Generate `output_dir` with `block_name` as parent directory.
+        #. If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
+        #. Upload data tiles to ``Ceph Object Storage``.
+        #. Update and assign status of ``Automation_AutomationJob`` worker
+        #.
 
     Args:
         q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object
