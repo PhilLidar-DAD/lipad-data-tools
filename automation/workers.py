@@ -62,6 +62,31 @@ def close_db():
 
 
 def process_job(q):
+    """Process workers fetched by ORM interface from LiPAD database.
+
+    Check corresponding status of a worker. Get the following attributes of
+    ``Automation_AutomationJob`` model object:
+        - `status`
+        - `status_timestamp`
+        - `datatype`
+        - `input_dir`
+        - `output_dir`
+        - `processor`
+    Get correct block name from `input_dir`. Find `block_name` in `model`
+    ``Cephgeo_LidarCoverageBlock``. If found, do:
+        # Generate `output_dir` with `block_name` as parent directory.
+        # If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
+        # Upload data tiles to ``Ceph Object Storage``.
+        # Update and assign status of ``Automation_AutomationJob`` worker
+        #
+
+    Args:
+        q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object
+            fetched from database.
+
+    Raises:
+        Exception: If datatype is not in `Automation_AutomationJob.DATATYPE_CHOICES`.
+    """
     assign_status(q, 1)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
@@ -168,9 +193,15 @@ def handle_dem(q):
 
 
 def db_watcher():
+    """Watch LiPAD Database AutomationJob for pending jobs.
+
+    Connect the ORM to the database. This loops watching of AutomationJob for
+    new workers. This also checks the status of each AutomationJob object. This
+    passes the worker to its repective workflow depending on its status.
+
+    This starts upon startup of processing environment.
     """
-        Watch LiPAD DB Automation Table for pending jobs
-    """
+
     print 'Starting...'
     setup_logging()
     while True:
@@ -181,17 +212,17 @@ def db_watcher():
                 q = Automation_AutomationJob.get(status=status)
                 print 'Query found!'
                 print q.status
-                # if s.__eq__('pending_process'):
-                #     if q.target_os.lower() == 'linux':
-                #         process_job(q)
-                #         # elif q.datatype.lower() == 'dtm':
-                #     else:
-                #         print 'PASS TO WINDOWS'
-                #         # Windows poller
-                # elif s.__eq__('done_ceph'):
-                #     # in case upload from ceph to lipad was interrupted
-                #     assign_status(q, 3)
-                #     transfer_metadata()
+                if s.__eq__('pending_process'):
+                    if q.target_os.lower() == 'linux':
+                        process_job(q)
+                        # elif q.datatype.lower() == 'dtm':
+                    else:
+                        print 'PASS TO WINDOWS'
+                        # Windows poller
+                elif s.__eq__('done_ceph'):
+                    # in case upload from ceph to lipad was interrupted
+                    assign_status(q, 3)
+                    transfer_metadata()
 
             except Automation_AutomationJob.DoesNotExist:
                 logger.error('No %s task', status)
