@@ -1,0 +1,186 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>automation.transfer_metadata &#8212; LiPAD Data Tools  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for automation.transfer_metadata</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.utils.encoding</span> <span class="k">import</span> <span class="n">smart_str</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="get_data_class_from_filename"><a class="viewcode-back" href="../../automation.html#automation.transfer_metadata.get_data_class_from_filename">[docs]</a><span class="k">def</span> <span class="nf">get_data_class_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">data_classification</span> <span class="o">=</span> <span class="n">DataClassification</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">DataClassification</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">DataClassification</span><span class="o">.</span><span class="n">filename_suffixes</span><span class="p">:</span>
+        <span class="n">filename_patterns</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename_patterns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">and</span> <span class="n">filename_patterns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> \
+                <span class="ow">in</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">data_classification</span> <span class="o">=</span> <span class="n">DataClassification</span><span class="o">.</span><span class="n">filename_suffixes</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">data_classification</span></div>
+
+
+<div class="viewcode-block" id="create_gridref_dict"><a class="viewcode-back" href="../../automation.html#automation.transfer_metadata.create_gridref_dict">[docs]</a><span class="k">def</span> <span class="nf">create_gridref_dict</span><span class="p">(</span><span class="n">ceph_obj</span><span class="p">,</span> <span class="n">gridref_dict_by_data_class</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">DataClassification</span><span class="o">.</span><span class="n">gs_feature_labels</span><span class="p">[</span><span class="n">ceph_obj</span><span class="o">.</span><span class="n">data_class</span><span class="p">]</span> <span class="ow">in</span> \
+            <span class="n">gridref_dict_by_data_class</span><span class="p">:</span>
+        <span class="n">gridref_dict_by_data_class</span><span class="p">[</span><span class="n">DataClassification</span><span class="o">.</span><span class="n">gs_feature_labels</span><span class="p">[</span>
+            <span class="n">ceph_obj</span><span class="o">.</span><span class="n">data_class</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)]</span> \
+            <span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ceph_obj</span><span class="o">.</span><span class="n">grid_ref</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gridref_dict_by_data_class</span><span class="p">[</span><span class="n">DataClassification</span><span class="o">.</span><span class="n">gs_feature_labels</span><span class="p">[</span>
+            <span class="n">ceph_obj</span><span class="o">.</span><span class="n">data_class</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)]</span> <span class="o">=</span> \
+            <span class="p">[</span><span class="n">ceph_obj</span><span class="o">.</span><span class="n">grid_ref</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">),</span> <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="transfer_metadata"><a class="viewcode-back" href="../../automation.html#automation.transfer_metadata.transfer_metadata">[docs]</a><span class="k">def</span> <span class="nf">transfer_metadata</span><span class="p">(</span><span class="n">log_file</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;Uploading metadata to LiPAD...&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;Reading </span><span class="si">%s</span><span class="s1"> ...&#39;</span> <span class="o">%</span> <span class="n">log_file</span></div>
+
+
+<div class="viewcode-block" id="parse_ceph_log"><a class="viewcode-back" href="../../automation.html#automation.transfer_metadata.parse_ceph_log">[docs]</a><span class="k">def</span> <span class="nf">parse_ceph_log</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">data_class</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">file_path</span><span class="p">)):</span>
+        <span class="c1"># if os.path.isfile(file_path):</span>
+        <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> file not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">csv_delimeter</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span>
+        <span class="n">gridref_dict_by_data_class</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+            <span class="n">of</span> <span class="o">=</span> <span class="n">open_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">first_line</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">of</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">csv_delimeter</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">first_line</span><span class="p">:</span>
+                    <span class="n">first_line</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+                            <span class="nb">print</span> <span class="s1">&#39;Tokens&#39;</span>
+                            <span class="nb">print</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="nb">print</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="nb">print</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                            <span class="nb">print</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                            <span class="nb">print</span> <span class="n">data_class</span>
+                            <span class="nb">print</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                            <span class="nb">print</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+                            <span class="nb">print</span> <span class="s1">&#39;Creating Ceph Data Object...&#39;</span>
+
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="c1"># Cephgeo_CephDataObject.create(name=tokens[0],</span>
+                                <span class="c1">#                               last_modified=tokens[</span>
+                                <span class="c1">#                                   1],</span>
+                                <span class="c1">#                               size_in_bytes=tokens[</span>
+                                <span class="c1">#                                   2],</span>
+                                <span class="c1">#                               content_type=tokens[</span>
+                                <span class="c1">#                                   3],</span>
+                                <span class="c1">#                               data_class=get_data_class_from_filename(</span>
+                                <span class="c1">#                               tokens[0]),</span>
+                                <span class="c1">#                               file_hash=tokens[</span>
+                                <span class="c1">#                                   4],</span>
+                                <span class="c1">#                               grid_ref=tokens[5])</span>
+                                <span class="n">ceph_obj</span> <span class="o">=</span> <span class="s1">&#39;Ceph object&#39;</span>
+                                <span class="k">if</span> <span class="n">ceph_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                    <span class="n">create_gridref_dict</span><span class="p">(</span>
+                                        <span class="n">ceph_obj</span><span class="p">,</span> <span class="n">gridref_dict_by_data_class</span><span class="p">)</span>
+
+                            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                <span class="nb">print</span> <span class="s1">&#39;Could not create ceph data object&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping invalid metadata list (invalid length): </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">metadata_list</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="nb">print</span> <span class="s1">&#39;Error in updating grid?&#39;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">LiPAD Data Tools</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Denise Jeraldyn Leviste.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,231 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>automation.models &#8212; LiPAD Data Tools  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for automation.models</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">peewee</span>
+<span class="kn">from</span> <span class="nn">settings</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">peewee</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<span class="n">PSQL_DB</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">PostgresqlDatabase</span><span class="p">(</span>
+    <span class="n">DB_NAME</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">DB_USER</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">DB_PASS</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">DB_HOST</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BaseModel"><a class="viewcode-back" href="../../automation.html#automation.models.BaseModel">[docs]</a><span class="k">class</span> <span class="nc">BaseModel</span><span class="p">(</span><span class="n">peewee</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">database</span> <span class="o">=</span> <span class="n">PSQL_DB</span></div>
+
+
+<div class="viewcode-block" id="DataClassification"><a class="viewcode-back" href="../../automation.html#automation.models.DataClassification">[docs]</a><span class="k">class</span> <span class="nc">DataClassification</span><span class="p">(</span><span class="n">Field</span><span class="p">):</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">LAZ</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1">#    DEM = 2</span>
+    <span class="n">DTM</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">DSM</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">ORTHOPHOTO</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">UNKNOWN</span><span class="p">:</span> <span class="s2">&quot;Unknown Type&quot;</span><span class="p">,</span>
+        <span class="n">LAZ</span><span class="p">:</span> <span class="s2">&quot;LAZ&quot;</span><span class="p">,</span>
+        <span class="c1">#        DEM         : &quot;DEM TIF&quot;,</span>
+        <span class="n">DSM</span><span class="p">:</span> <span class="s2">&quot;DSM TIF&quot;</span><span class="p">,</span>
+        <span class="n">DTM</span><span class="p">:</span> <span class="s2">&quot;DTM TIF&quot;</span><span class="p">,</span>
+        <span class="n">ORTHOPHOTO</span><span class="p">:</span> <span class="s2">&quot;Orthophoto&quot;</span><span class="p">,</span> <span class="p">}</span>
+
+    <span class="n">gs_feature_labels</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">UNKNOWN</span><span class="p">:</span> <span class="s2">&quot;UNSUPPORTED&quot;</span><span class="p">,</span>
+        <span class="n">LAZ</span><span class="p">:</span> <span class="s2">&quot;LAZ&quot;</span><span class="p">,</span>
+        <span class="c1">#        DEM         : &quot;UNSUPPORTED&quot;,</span>
+        <span class="n">DSM</span><span class="p">:</span> <span class="s2">&quot;DSM&quot;</span><span class="p">,</span>
+        <span class="n">DTM</span><span class="p">:</span> <span class="s2">&quot;DTM&quot;</span><span class="p">,</span>
+        <span class="n">ORTHOPHOTO</span><span class="p">:</span> <span class="s2">&quot;ORTHO&quot;</span><span class="p">,</span> <span class="p">}</span>
+
+    <span class="n">filename_suffixes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;.laz&quot;</span><span class="p">:</span> <span class="n">LAZ</span><span class="p">,</span>
+        <span class="c1">#        &quot;_dem.tif&quot;         : DEM,</span>
+        <span class="s2">&quot;_dsm.tif&quot;</span><span class="p">:</span> <span class="n">DSM</span><span class="p">,</span>
+        <span class="s2">&quot;_dtm.tif&quot;</span><span class="p">:</span> <span class="n">DTM</span><span class="p">,</span>
+        <span class="s2">&quot;_ortho.tif&quot;</span><span class="p">:</span> <span class="n">ORTHOPHOTO</span><span class="p">,</span> <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Automation_AutomationJob"><a class="viewcode-back" href="../../automation.html#automation.models.Automation_AutomationJob">[docs]</a><span class="k">class</span> <span class="nc">Automation_AutomationJob</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inherit ``BaseModel`` `model`.</span>
+
+<span class="sd">    A model interface for geonode.automation.models.AutomationJob.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (int): Corresponds to `model` ``AutomationJob`` identifier in database.</span>
+<span class="sd">        datatype (str): Corresponds to `model` ``AutomationJob`` datatype</span>
+<span class="sd">            in database.</span>
+<span class="sd">        input_dir (str): Corresponds to `model` ``AutomationJob`` input directory</span>
+<span class="sd">            in database.</span>
+<span class="sd">        output_dir (str): Corresponds to `model` ``AutomationJob`` output directory</span>
+<span class="sd">            in database.</span>
+<span class="sd">        processor (str): Corresponds to `model` ``AutomationJob`` processor</span>
+<span class="sd">            in database.</span>
+<span class="sd">        date_submitted (date): Corresponds to `model` ``AutomationJob`` date_submitted</span>
+<span class="sd">            in database.</span>
+<span class="sd">        target_os (str): Corresponds to `model` ``AutomationJob`` target_os</span>
+<span class="sd">            in database.</span>
+<span class="sd">        log (str): Corresponds to `model` ``AutomationJob`` log in database.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">STATUS_CHOICES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;pending_process&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;done_process&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;pending_ceph&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;done_ceph&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">),</span>
+        <span class="c1"># (-1, &#39;error&#39;, _(&#39;Error&#39;)),</span>
+    <span class="p">]</span>
+
+    <span class="n">OS_CHOICES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Process in Linux&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Process in Windows&#39;</span><span class="p">)),</span>
+    <span class="p">]</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">datatype</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">input_dir</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">date_submitted</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># status = peewee.CharField(max_length=20)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">STATUS_CHOICES</span><span class="p">)</span>
+    <span class="n">status_timestamp</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">target_os</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">OS_CHOICES</span><span class="p">)</span>
+    <span class="c1"># target_os = OSChoice(choices=OS_CHOICES)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="c1"># class Meta:</span>
+    <span class="c1">#     primary_key = peewee.CompositeKey(</span>
+    <span class="c1">#         &#39;datatype&#39;, &#39;date_submitted&#39;, &#39;status&#39;)</span>
+
+
+<div class="viewcode-block" id="Cephgeo_LidarCoverageBlock"><a class="viewcode-back" href="../../automation.html#automation.models.Cephgeo_LidarCoverageBlock">[docs]</a><span class="k">class</span> <span class="nc">Cephgeo_LidarCoverageBlock</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From geonode.cephgeo.models LidarCoverageBlock</span>
+<span class="sd">        Only UID and Block Name needed for renaming tiles</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uid</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">block_name</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CephDataObject"><a class="viewcode-back" href="../../automation.html#automation.models.CephDataObject">[docs]</a><span class="k">class</span> <span class="nc">CephDataObject</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">size_in_bytes</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">file_hash</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">last_modified</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">content_type</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">data_class</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">grid_ref</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Cephgeo_DemDataStore"><a class="viewcode-back" href="../../automation.html#automation.models.Cephgeo_DemDataStore">[docs]</a><span class="k">class</span> <span class="nc">Cephgeo_DemDataStore</span><span class="p">():</span>
+    <span class="n">demid</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">suc</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">shifting_val_x</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">shifting_val_y</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">shifting_val_z</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">height_diff</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">rmse</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">dem_file_path</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">block_name_list</span> <span class="o">=</span> <span class="n">peewee</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">LiPAD Data Tools</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Denise Jeraldyn Leviste.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

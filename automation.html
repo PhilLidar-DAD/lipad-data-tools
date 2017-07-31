@@ -1,0 +1,676 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>automation package &#8212; LiPAD Data Tools  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="automation-package">
+<h1>automation package<a class="headerlink" href="#automation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="automation-bulk-upload-nonthreaded-module">
+<h2>automation.bulk_upload_nonthreaded module<a class="headerlink" href="#automation-bulk-upload-nonthreaded-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-automation.ceph_client">
+<span id="automation-ceph-client-module"></span><h2>automation.ceph_client module<a class="headerlink" href="#module-automation.ceph_client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="automation.ceph_client.CephStorageClient">
+<em class="property">class </em><code class="descclassname">automation.ceph_client.</code><code class="descname">CephStorageClient</code><span class="sig-paren">(</span><em>user</em>, <em>key</em>, <em>ceph_radosgw_url</em>, <em>container_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.close_connection">
+<code class="descname">close_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.close_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.download_file_to_path">
+<code class="descname">download_file_to_path</code><span class="sig-paren">(</span><em>object_name</em>, <em>destination_path</em>, <em>container=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.download_file_to_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.download_file_to_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.download_via_http">
+<code class="descname">download_via_http</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.download_via_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.download_via_http" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.get_active_container">
+<code class="descname">get_active_container</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.get_active_container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.get_active_container" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.get_cwd">
+<code class="descname">get_cwd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.get_cwd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.get_cwd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current working directory of the python script</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.list_containers">
+<code class="descname">list_containers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.list_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.list_containers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.list_files">
+<code class="descname">list_files</code><span class="sig-paren">(</span><em>container_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.list_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.list_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.log_wrapper">
+<code class="descname">log_wrapper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.log_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.log_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper to set logging parameters for output</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.rename_file">
+<code class="descname">rename_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.rename_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.rename_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.set_active_container">
+<code class="descname">set_active_container</code><span class="sig-paren">(</span><em>container_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.set_active_container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.set_active_container" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.upload_file_from_path">
+<code class="descname">upload_file_from_path</code><span class="sig-paren">(</span><em>file_path</em>, <em>container=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.upload_file_from_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.upload_file_from_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="automation.ceph_client.CephStorageClient.upload_via_http">
+<code class="descname">upload_via_http</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/ceph_client.html#CephStorageClient.upload_via_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.ceph_client.CephStorageClient.upload_via_http" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-automation.exceptions">
+<span id="automation-exceptions-module"></span><h2>automation.exceptions module<a class="headerlink" href="#module-automation.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="automation.exceptions.DirectoryNotFoundException">
+<em class="property">exception </em><code class="descclassname">automation.exceptions.</code><code class="descname">DirectoryNotFoundException</code><a class="reference internal" href="_modules/automation/exceptions.html#DirectoryNotFoundException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.exceptions.DirectoryNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/exceptions.html#exceptions.Exception" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="automation.exceptions.NotImplementedException">
+<em class="property">exception </em><code class="descclassname">automation.exceptions.</code><code class="descname">NotImplementedException</code><a class="reference internal" href="_modules/automation/exceptions.html#NotImplementedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.exceptions.NotImplementedException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/exceptions.html#exceptions.Exception" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-automation.models">
+<span id="automation-models-module"></span><h2>automation.models module<a class="headerlink" href="#module-automation.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="automation.models.Automation_AutomationJob">
+<em class="property">class </em><code class="descclassname">automation.models.</code><code class="descname">Automation_AutomationJob</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/models.html#Automation_AutomationJob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.models.Automation_AutomationJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#automation.models.BaseModel" title="automation.models.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">automation.models.BaseModel</span></code></a></p>
+<p>Inherit <code class="docutils literal"><span class="pre">BaseModel</span></code> <cite>model</cite>.</p>
+<p>A model interface for geonode.automation.models.AutomationJob.</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd><p class="first">id (int): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> identifier in database.
+datatype (str): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> datatype</p>
+<blockquote>
+<div>in database.</div></blockquote>
+<dl class="docutils">
+<dt>input_dir (str): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> input directory</dt>
+<dd>in database.</dd>
+<dt>output_dir (str): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> output directory</dt>
+<dd>in database.</dd>
+<dt>processor (str): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> processor</dt>
+<dd>in database.</dd>
+<dt>date_submitted (date): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> date_submitted</dt>
+<dd>in database.</dd>
+<dt>target_os (str): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> target_os</dt>
+<dd>in database.</dd>
+</dl>
+<p class="last">log (str): Corresponds to <cite>model</cite> <code class="docutils literal"><span class="pre">AutomationJob</span></code> log in database.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#automation.models.Automation_AutomationJob.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">Automation_AutomationJobDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.OS_CHOICES">
+<code class="descname">OS_CHOICES</code><em class="property"> = [('linux', 'Process in Linux'), ('windows', 'Process in Windows')]</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.OS_CHOICES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.STATUS_CHOICES">
+<code class="descname">STATUS_CHOICES</code><em class="property"> = ['pending_process', 'done_process', 'pending_ceph', 'done_ceph', 'done']</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.STATUS_CHOICES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.datatype">
+<code class="descname">datatype</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.datatype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.date_submitted">
+<code class="descname">date_submitted</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.date_submitted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.input_dir">
+<code class="descname">input_dir</code><em class="property"> = &lt;peewee.TextField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.input_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.log">
+<code class="descname">log</code><em class="property"> = &lt;peewee.TextField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.output_dir">
+<code class="descname">output_dir</code><em class="property"> = &lt;peewee.TextField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.output_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.processor">
+<code class="descname">processor</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.processor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.status">
+<code class="descname">status</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.status_timestamp">
+<code class="descname">status_timestamp</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.status_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Automation_AutomationJob.target_os">
+<code class="descname">target_os</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Automation_AutomationJob.target_os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="automation.models.BaseModel">
+<em class="property">class </em><code class="descclassname">automation.models.</code><code class="descname">BaseModel</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/models.html#BaseModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.models.BaseModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">peewee.Model</span></code></p>
+<dl class="attribute">
+<dt id="automation.models.BaseModel.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#automation.models.BaseModel.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BaseModelDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.BaseModel.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.PrimaryKeyField object&gt;</em><a class="headerlink" href="#automation.models.BaseModel.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="automation.models.CephDataObject">
+<em class="property">class </em><code class="descclassname">automation.models.</code><code class="descname">CephDataObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/models.html#CephDataObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.models.CephDataObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#automation.models.BaseModel" title="automation.models.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">automation.models.BaseModel</span></code></a></p>
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#automation.models.CephDataObject.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">CephDataObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.content_type">
+<code class="descname">content_type</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.content_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.data_class">
+<code class="descname">data_class</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.data_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.file_hash">
+<code class="descname">file_hash</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.file_hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.grid_ref">
+<code class="descname">grid_ref</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.grid_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.id">
+<code class="descname">id</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.last_modified">
+<code class="descname">last_modified</code><em class="property"> = &lt;peewee.DateTimeField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.last_modified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.CephDataObject.size_in_bytes">
+<code class="descname">size_in_bytes</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#automation.models.CephDataObject.size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="automation.models.Cephgeo_DemDataStore">
+<em class="property">class </em><code class="descclassname">automation.models.</code><code class="descname">Cephgeo_DemDataStore</code><a class="reference internal" href="_modules/automation/models.html#Cephgeo_DemDataStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.block_name_list">
+<code class="descname">block_name_list</code><em class="property"> = &lt;peewee.TextField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.block_name_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.dem_file_path">
+<code class="descname">dem_file_path</code><em class="property"> = &lt;peewee.TextField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.dem_file_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.demid">
+<code class="descname">demid</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.demid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.height_diff">
+<code class="descname">height_diff</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.height_diff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.name">
+<code class="descname">name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.rmse">
+<code class="descname">rmse</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.rmse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.shifting_val_x">
+<code class="descname">shifting_val_x</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.shifting_val_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.shifting_val_y">
+<code class="descname">shifting_val_y</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.shifting_val_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.shifting_val_z">
+<code class="descname">shifting_val_z</code><em class="property"> = &lt;peewee.FloatField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.shifting_val_z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.suc">
+<code class="descname">suc</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.suc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_DemDataStore.type">
+<code class="descname">type</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_DemDataStore.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="automation.models.Cephgeo_LidarCoverageBlock">
+<em class="property">class </em><code class="descclassname">automation.models.</code><code class="descname">Cephgeo_LidarCoverageBlock</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/models.html#Cephgeo_LidarCoverageBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.models.Cephgeo_LidarCoverageBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#automation.models.BaseModel" title="automation.models.BaseModel"><code class="xref py py-class docutils literal"><span class="pre">automation.models.BaseModel</span></code></a></p>
+<p>From geonode.cephgeo.models LidarCoverageBlock
+Only UID and Block Name needed for renaming tiles</p>
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_LidarCoverageBlock.DoesNotExist">
+<code class="descname">DoesNotExist</code><a class="headerlink" href="#automation.models.Cephgeo_LidarCoverageBlock.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">Cephgeo_LidarCoverageBlockDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_LidarCoverageBlock.block_name">
+<code class="descname">block_name</code><em class="property"> = &lt;peewee.CharField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_LidarCoverageBlock.block_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.Cephgeo_LidarCoverageBlock.uid">
+<code class="descname">uid</code><em class="property"> = &lt;peewee.IntegerField object&gt;</em><a class="headerlink" href="#automation.models.Cephgeo_LidarCoverageBlock.uid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="automation.models.DataClassification">
+<em class="property">class </em><code class="descclassname">automation.models.</code><code class="descname">DataClassification</code><span class="sig-paren">(</span><em>null=False</em>, <em>index=False</em>, <em>unique=False</em>, <em>verbose_name=None</em>, <em>help_text=None</em>, <em>db_column=None</em>, <em>default=None</em>, <em>choices=None</em>, <em>primary_key=False</em>, <em>sequence=None</em>, <em>constraints=None</em>, <em>schema=None</em>, <em>undeclared=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/models.html#DataClassification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.models.DataClassification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">peewee.Field</span></code></p>
+<dl class="attribute">
+<dt id="automation.models.DataClassification.DSM">
+<code class="descname">DSM</code><em class="property"> = 4</em><a class="headerlink" href="#automation.models.DataClassification.DSM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.DTM">
+<code class="descname">DTM</code><em class="property"> = 3</em><a class="headerlink" href="#automation.models.DataClassification.DTM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.LAZ">
+<code class="descname">LAZ</code><em class="property"> = 1</em><a class="headerlink" href="#automation.models.DataClassification.LAZ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.ORTHOPHOTO">
+<code class="descname">ORTHOPHOTO</code><em class="property"> = 5</em><a class="headerlink" href="#automation.models.DataClassification.ORTHOPHOTO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.UNKNOWN">
+<code class="descname">UNKNOWN</code><em class="property"> = 0</em><a class="headerlink" href="#automation.models.DataClassification.UNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.filename_suffixes">
+<code class="descname">filename_suffixes</code><em class="property"> = {'_dsm.tif': 4, '_dtm.tif': 3, '_ortho.tif': 5, '.laz': 1}</em><a class="headerlink" href="#automation.models.DataClassification.filename_suffixes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.gs_feature_labels">
+<code class="descname">gs_feature_labels</code><em class="property"> = {0: 'UNSUPPORTED', 1: 'LAZ', 3: 'DTM', 4: 'DSM', 5: 'ORTHO'}</em><a class="headerlink" href="#automation.models.DataClassification.gs_feature_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="automation.models.DataClassification.labels">
+<code class="descname">labels</code><em class="property"> = {0: 'Unknown Type', 1: 'LAZ', 3: 'DTM TIF', 4: 'DSM TIF', 5: 'Orthophoto'}</em><a class="headerlink" href="#automation.models.DataClassification.labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-automation.rename_tiles">
+<span id="automation-rename-tiles-module"></span><h2>automation.rename_tiles module<a class="headerlink" href="#module-automation.rename_tiles" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="automation.rename_tiles.assign_processor">
+<code class="descclassname">automation.rename_tiles.</code><code class="descname">assign_processor</code><span class="sig-paren">(</span><em>processor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/rename_tiles.html#assign_processor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.rename_tiles.assign_processor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.rename_tiles.find_in_coverage">
+<code class="descclassname">automation.rename_tiles.</code><code class="descname">find_in_coverage</code><span class="sig-paren">(</span><em>block_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/rename_tiles.html#find_in_coverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.rename_tiles.find_in_coverage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.rename_tiles.get_cwd">
+<code class="descclassname">automation.rename_tiles.</code><code class="descname">get_cwd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/rename_tiles.html#get_cwd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.rename_tiles.get_cwd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.rename_tiles.parse_arguments">
+<code class="descclassname">automation.rename_tiles.</code><code class="descname">parse_arguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/rename_tiles.html#parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.rename_tiles.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.rename_tiles.proper_block_name">
+<code class="descclassname">automation.rename_tiles.</code><code class="descname">proper_block_name</code><span class="sig-paren">(</span><em>block_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/rename_tiles.html#proper_block_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.rename_tiles.proper_block_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.rename_tiles.rename_tiles">
+<code class="descclassname">automation.rename_tiles.</code><code class="descname">rename_tiles</code><span class="sig-paren">(</span><em>inDir</em>, <em>outDir</em>, <em>processor</em>, <em>block_uid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/rename_tiles.html#rename_tiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.rename_tiles.rename_tiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="automation-tile-dem-module">
+<h2>automation.tile_dem module<a class="headerlink" href="#automation-tile-dem-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-automation.transfer_metadata">
+<span id="automation-transfer-metadata-module"></span><h2>automation.transfer_metadata module<a class="headerlink" href="#module-automation.transfer_metadata" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="automation.transfer_metadata.create_gridref_dict">
+<code class="descclassname">automation.transfer_metadata.</code><code class="descname">create_gridref_dict</code><span class="sig-paren">(</span><em>ceph_obj</em>, <em>gridref_dict_by_data_class</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/transfer_metadata.html#create_gridref_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.transfer_metadata.create_gridref_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.transfer_metadata.get_data_class_from_filename">
+<code class="descclassname">automation.transfer_metadata.</code><code class="descname">get_data_class_from_filename</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/transfer_metadata.html#get_data_class_from_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.transfer_metadata.get_data_class_from_filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.transfer_metadata.parse_ceph_log">
+<code class="descclassname">automation.transfer_metadata.</code><code class="descname">parse_ceph_log</code><span class="sig-paren">(</span><em>file_path</em>, <em>data_class</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/transfer_metadata.html#parse_ceph_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.transfer_metadata.parse_ceph_log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.transfer_metadata.transfer_metadata">
+<code class="descclassname">automation.transfer_metadata.</code><code class="descname">transfer_metadata</code><span class="sig-paren">(</span><em>log_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/transfer_metadata.html#transfer_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.transfer_metadata.transfer_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-automation.utils">
+<span id="automation-utils-module"></span><h2>automation.utils module<a class="headerlink" href="#module-automation.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="automation.utils.assign_status">
+<code class="descclassname">automation.utils.</code><code class="descname">assign_status</code><span class="sig-paren">(</span><em>q</em>, <em>status</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#assign_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.assign_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.ceph_upload">
+<code class="descclassname">automation.utils.</code><code class="descname">ceph_upload</code><span class="sig-paren">(</span><em>input_dir_ceph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#ceph_upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.ceph_upload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.files_renamed">
+<code class="descclassname">automation.utils.</code><code class="descname">files_renamed</code><span class="sig-paren">(</span><em>input_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#files_renamed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.files_renamed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.find_in_coverage">
+<code class="descclassname">automation.utils.</code><code class="descname">find_in_coverage</code><span class="sig-paren">(</span><em>block_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#find_in_coverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.find_in_coverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lidar coverage block in LiPAD DB
+Assume an active connection is present</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.get_delay">
+<code class="descclassname">automation.utils.</code><code class="descname">get_delay</code><span class="sig-paren">(</span><em>min_</em>, <em>max_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#get_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.get_delay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.proper_block_name">
+<code class="descclassname">automation.utils.</code><code class="descname">proper_block_name</code><span class="sig-paren">(</span><em>block_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#proper_block_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.proper_block_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.tile_dsm">
+<code class="descclassname">automation.utils.</code><code class="descname">tile_dsm</code><span class="sig-paren">(</span><em>dem_dir</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#tile_dsm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.tile_dsm" title="Permalink to this definition">¶</a></dt>
+<dd><p>./tile_dem.py -d data/MINDANAO1/d_mdn/ -t dsm -p WGS_84_UTM_zone_51N.prj -o output/</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.tile_dtm">
+<code class="descclassname">automation.utils.</code><code class="descname">tile_dtm</code><span class="sig-paren">(</span><em>dem_dir</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#tile_dtm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.tile_dtm" title="Permalink to this definition">¶</a></dt>
+<dd><p>./tile_dem.py -d data/MINDANAO1/v_mdn/ -t dtm -p WGS_84_UTM_zone_51N.prj -o output/</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-automation.workers">
+<span id="automation-workers-module"></span><h2>automation.workers module<a class="headerlink" href="#module-automation.workers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="automation.workers.close_db">
+<code class="descclassname">automation.workers.</code><code class="descname">close_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#close_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.close_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.workers.connect_db">
+<code class="descclassname">automation.workers.</code><code class="descname">connect_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#connect_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.connect_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.workers.db_watcher">
+<code class="descclassname">automation.workers.</code><code class="descname">db_watcher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#db_watcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.db_watcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Watch LiPAD Database AutomationJob for pending jobs.</p>
+<p>Connect the ORM to the database. This loops watching of AutomationJob for
+new workers. This also checks the status of each AutomationJob object. This
+passes the worker to its repective workflow depending on its status.</p>
+<p>This starts upon startup of processing environment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="automation.workers.handle_dem">
+<code class="descclassname">automation.workers.</code><code class="descname">handle_dem</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#handle_dem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.handle_dem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.workers.parse_dem_input">
+<code class="descclassname">automation.workers.</code><code class="descname">parse_dem_input</code><span class="sig-paren">(</span><em>input_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#parse_dem_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.parse_dem_input" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.workers.process_job">
+<code class="descclassname">automation.workers.</code><code class="descname">process_job</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#process_job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.process_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process workers fetched by ORM interface from LiPAD database.</p>
+<p>Check corresponding status of a worker. Get the following attributes of
+<code class="docutils literal"><span class="pre">Automation_AutomationJob</span></code> model object:</p>
+<blockquote>
+<div><ul class="simple">
+<li><cite>status</cite></li>
+<li><cite>status_timestamp</cite></li>
+<li><cite>datatype</cite></li>
+<li><cite>input_dir</cite></li>
+<li><cite>output_dir</cite></li>
+<li><cite>processor</cite></li>
+</ul>
+</div></blockquote>
+<p>Get correct block name from <cite>input_dir</cite>. Find <cite>block_name</cite> in <cite>model</cite>
+<code class="docutils literal"><span class="pre">Cephgeo_LidarCoverageBlock</span></code>. If found, do:</p>
+<blockquote>
+<div># Generate <cite>output_dir</cite> with <cite>block_name</cite> as parent directory.
+# If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
+# Upload data tiles to <code class="docutils literal"><span class="pre">Ceph</span> <span class="pre">Object</span> <span class="pre">Storage</span></code>.
+# Update and assign status of <code class="docutils literal"><span class="pre">Automation_AutomationJob</span></code> worker
+#</div></blockquote>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>q (:obj: <cite>Automation_AutomationJob</cite>): A <code class="docutils literal"><span class="pre">Automation_AutomationJob</span></code> object</dt>
+<dd>fetched from database.</dd>
+</dl>
+</dd>
+<dt>Raises:</dt>
+<dd>Exception: If datatype is not in <cite>Automation_AutomationJob.DATATYPE_CHOICES</cite>.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="automation.workers.setup_logging">
+<code class="descclassname">automation.workers.</code><code class="descname">setup_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-automation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-automation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">LiPAD Data Tools</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Denise Jeraldyn Leviste.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/automation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
