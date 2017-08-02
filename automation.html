@@ -506,16 +506,16 @@ Only UID and Block Name needed for renaming tiles</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="automation.utils.files_renamed">
-<code class="descclassname">automation.utils.</code><code class="descname">files_renamed</code><span class="sig-paren">(</span><em>input_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#files_renamed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.files_renamed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="automation.utils.find_in_coverage">
 <code class="descclassname">automation.utils.</code><code class="descname">find_in_coverage</code><span class="sig-paren">(</span><em>block_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#find_in_coverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.find_in_coverage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lidar coverage block in LiPAD DB
 Assume an active connection is present</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.get_cwd">
+<code class="descclassname">automation.utils.</code><code class="descname">get_cwd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#get_cwd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.get_cwd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="automation.utils.get_delay">
@@ -525,6 +525,49 @@ Assume an active connection is present</p>
 <dl class="function">
 <dt id="automation.utils.proper_block_name">
 <code class="descclassname">automation.utils.</code><code class="descname">proper_block_name</code><span class="sig-paren">(</span><em>block_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#proper_block_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.proper_block_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.rename_tiles">
+<code class="descclassname">automation.utils.</code><code class="descname">rename_tiles</code><span class="sig-paren">(</span><em>inDir</em>, <em>outDir</em>, <em>processor</em>, <em>block_name</em>, <em>block_uid</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#rename_tiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.rename_tiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename each file/tile based on its grid reference.</p>
+<p>A tile is defined is a 1km by 1km division of <cite>LAZ</cite> or <cite>Orthophoto</cite> data. Each
+file is a tile. This function uses <cite>lasbb</cite>, a binary file of <cite>LAStools</cite>. The
+grid reference of a tile is computed using:</p>
+<blockquote>
+<div><ul class="simple">
+<li><cite>minX</cite>: minimum easting coordinate</li>
+<li><cite>minY</cite>: minimum northing coordinate</li>
+<li>maxX`: maximum easting coordinate</li>
+<li><cite>maxY</cite>: maximum northing coordinate</li>
+<li><cite>bbox_center_x</cite></li>
+<li><cite>bbox_center_y</cite></li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">inDir (path): Directory containing data tiles to be processed.  This is
+a <cite>block_name ` in the `Cephgeo_LidarCoverageBlock</cite> model.
+outDir (path): The directory where renamed tiles are stored.
+processor (str): Operating System used in processing data.
+block_uid (int): Corresponding <cite>uid</cite> of the <cite>block_name</cite>. This <cite>uid</cite> is from</p>
+<blockquote class="last">
+<div><cite>Cephgeo_LidarCoverageBlock</cite> model.</div></blockquote>
+</dd>
+<dt>Attributes:</dt>
+<dd>_TILE_SIZE: Tile size in meters, 1000m by 1000m.</dd>
+<dt>Returns:</dt>
+<dd>Output directory containing renamed tiles. The final format of a file is:
+<strong>Easting_Northing_FileType_Processor_BlockUID.FileType</strong></dd>
+<dt>Raises:</dt>
+<dd>Warning: A warning is raised if the output directory path already exists.
+Extents Error: If a tile is problematic or corrupted.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="automation.utils.setup_logging">
+<code class="descclassname">automation.utils.</code><code class="descname">setup_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/utils.html#setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.utils.setup_logging" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -556,10 +599,11 @@ Assume an active connection is present</p>
 <dt id="automation.workers.db_watcher">
 <code class="descclassname">automation.workers.</code><code class="descname">db_watcher</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation/workers.html#db_watcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#automation.workers.db_watcher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Watch LiPAD Database AutomationJob for pending jobs.</p>
-<p>Connect the ORM to the database. This loops watching of AutomationJob for
+<p>Connect ORM to the database. This loops watching of AutomationJob for
 new workers. This also checks the status of each AutomationJob object. This
 passes the worker to its repective workflow depending on its status.</p>
 <p>This starts upon startup of processing environment.</p>
+<p>An <cite>AutomationJob</cite> status is checked and updated.</p>
 </dd></dl>
 
 <dl class="function">
@@ -591,11 +635,14 @@ passes the worker to its repective workflow depending on its status.</p>
 <p>Get correct block name from <cite>input_dir</cite>. Find <cite>block_name</cite> in <cite>model</cite>
 <code class="docutils literal"><span class="pre">Cephgeo_LidarCoverageBlock</span></code>. If found, do:</p>
 <blockquote>
-<div># Generate <cite>output_dir</cite> with <cite>block_name</cite> as parent directory.
-# If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
-# Upload data tiles to <code class="docutils literal"><span class="pre">Ceph</span> <span class="pre">Object</span> <span class="pre">Storage</span></code>.
-# Update and assign status of <code class="docutils literal"><span class="pre">Automation_AutomationJob</span></code> worker
-#</div></blockquote>
+<div><ol class="arabic simple">
+<li>Generate <cite>output_dir</cite> with <cite>block_name</cite> as parent directory.</li>
+<li>If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.</li>
+<li>Upload data tiles to <code class="docutils literal"><span class="pre">Ceph</span> <span class="pre">Object</span> <span class="pre">Storage</span></code>.</li>
+</ol>
+<p>#. Update and assign status of <code class="docutils literal"><span class="pre">Automation_AutomationJob</span></code> worker
+#.</p>
+</div></blockquote>
 <dl class="docutils">
 <dt>Args:</dt>
 <dd><dl class="first last docutils">
@@ -605,6 +652,9 @@ passes the worker to its repective workflow depending on its status.</p>
 </dd>
 <dt>Raises:</dt>
 <dd>Exception: If datatype is not in <cite>Automation_AutomationJob.DATATYPE_CHOICES</cite>.</dd>
+<dt>&#64;TODO:</dt>
+<dd>User can input a directory containing multiple child directories. Each child
+folder is a <cite>LiDAR coverage block</cite> folder.</dd>
 </dl>
 </dd></dl>
 

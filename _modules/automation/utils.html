@@ -44,6 +44,34 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+
+<span class="c1">#: Try importing StringIO for logging depending on python version</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">cStringIO</span> <span class="k">import</span> <span class="n">StringIO</span>      <span class="c1"># Python 2</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
+
+
+<div class="viewcode-block" id="setup_logging"><a class="viewcode-back" href="../../automation.html#automation.utils.setup_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">():</span>
+    <span class="c1"># Setup logging</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">LOG_LEVEL</span><span class="p">)</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%(asctime)s</span><span class="s1">] </span><span class="si">%(filename)s</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">    (</span><span class="si">%(levelname)s</span><span class="s1">,</span><span class="si">%(lineno)d</span><span class="s1">)</span><span class="se">\t</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Setup stream logging</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">sh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">sh</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">stream</span></div>
 
 
 <div class="viewcode-block" id="ceph_upload"><a class="viewcode-back" href="../../automation.html#automation.utils.ceph_upload">[docs]</a><span class="k">def</span> <span class="nf">ceph_upload</span><span class="p">(</span><span class="n">input_dir_ceph</span><span class="p">):</span>
@@ -62,22 +90,24 @@
         <span class="nb">print</span> <span class="s1">&#39;Error in Ceph upload!&#39;</span>
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span></div>
 
+
 <div class="viewcode-block" id="tile_dtm"><a class="viewcode-back" href="../../automation.html#automation.utils.tile_dtm">[docs]</a><span class="k">def</span> <span class="nf">tile_dtm</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;./tile_dem.py -d data/MINDANAO1/v_mdn/ -t dtm -p WGS_84_UTM_zone_51N.prj -o output/&quot;&quot;&quot;</span>
-    
+
     <span class="nb">print</span> <span class="s1">&#39;Tiling DTM&#39;</span>
-    
-    <span class="n">dtm_dir</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;cv_&quot;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;uv_&quot;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">,</span><span class="n">name</span><span class="p">))][</span><span class="mi">0</span><span class="p">]</span>
-    
+
+    <span class="n">dtm_dir</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span>
+        <span class="s2">&quot;cv_&quot;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;uv_&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">))][</span><span class="mi">0</span><span class="p">]</span>
+
     <span class="k">try</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
-            <span class="p">[</span><span class="s1">&#39;./tile_dem.py&#39;</span><span class="p">,</span> 
+            <span class="p">[</span><span class="s1">&#39;./tile_dem.py&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">dtm_dir</span><span class="p">,</span>
-                <span class="s1">&#39;-t&#39;</span><span class="p">,</span><span class="s1">&#39;dtm&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-p&#39;</span><span class="p">,</span><span class="s1">&#39;WGS_84_UTM_zone_51N.prj&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="s1">&#39;DTM&#39;</span><span class="p">),</span>
-                <span class="p">])</span>
-        
+                <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;dtm&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;WGS_84_UTM_zone_51N.prj&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;DTM&#39;</span><span class="p">),</span>
+             <span class="p">])</span>
+
         <span class="k">if</span> <span class="s1">&#39;Done Tiling&#39;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s1">&#39;DTM Tiling Done!&#39;</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -85,31 +115,30 @@
         <span class="nb">print</span> <span class="s1">&#39;Error in DTM tiling. DTM directory: &#39;</span> <span class="o">+</span> <span class="n">dtm_dir</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
+
 <div class="viewcode-block" id="tile_dsm"><a class="viewcode-back" href="../../automation.html#automation.utils.tile_dsm">[docs]</a><span class="k">def</span> <span class="nf">tile_dsm</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;./tile_dem.py -d data/MINDANAO1/d_mdn/ -t dsm -p WGS_84_UTM_zone_51N.prj -o output/&quot;&quot;&quot;</span>
-    
+
     <span class="nb">print</span> <span class="s1">&#39;Tiling DSM&#39;</span>
-    
-    <span class="n">dsm_dir</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;cd_&quot;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;ud_&quot;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">,</span><span class="n">name</span><span class="p">))][</span><span class="mi">0</span><span class="p">]</span>
-    
+
+    <span class="n">dsm_dir</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span>
+        <span class="s2">&quot;cd_&quot;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;ud_&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dem_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">))][</span><span class="mi">0</span><span class="p">]</span>
+
     <span class="k">try</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
-            <span class="p">[</span><span class="s1">&#39;./tile_dem.py&#39;</span><span class="p">,</span> 
+            <span class="p">[</span><span class="s1">&#39;./tile_dem.py&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">dsm_dir</span><span class="p">,</span>
-                <span class="s1">&#39;-t&#39;</span><span class="p">,</span><span class="s1">&#39;dsm&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-p&#39;</span><span class="p">,</span><span class="s1">&#39;WGS_84_UTM_zone_51N.prj&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="s1">&#39;DSM&#39;</span><span class="p">),</span>
-                <span class="p">])</span>
-        
+                <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;dsm&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;WGS_84_UTM_zone_51N.prj&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;DSM&#39;</span><span class="p">),</span>
+             <span class="p">])</span>
+
         <span class="k">if</span> <span class="s1">&#39;Done Tiling&#39;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
             <span class="nb">print</span> <span class="s1">&#39;DSM Tiling Done!&#39;</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="nb">print</span> <span class="s1">&#39;Error in DSM tiling. DSM directory: &#39;</span> <span class="o">+</span> <span class="n">dsm_dir</span>
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="files_renamed"><a class="viewcode-back" href="../../automation.html#automation.utils.files_renamed">[docs]</a><span class="k">def</span> <span class="nf">files_renamed</span><span class="p">(</span><span class="n">input_dir</span><span class="p">):</span>
-    <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="get_delay"><a class="viewcode-back" href="../../automation.html#automation.utils.get_delay">[docs]</a><span class="k">def</span> <span class="nf">get_delay</span><span class="p">(</span><span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span>
@@ -119,10 +148,16 @@
 <div class="viewcode-block" id="assign_status"><a class="viewcode-back" href="../../automation.html#automation.utils.assign_status">[docs]</a><span class="k">def</span> <span class="nf">assign_status</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">new_status</span> <span class="o">=</span> <span class="s1">&#39;done_process&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing Job&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">new_status</span> <span class="o">=</span> <span class="s1">&#39;pending_ceph&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploading in Ceph&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">new_status</span> <span class="o">=</span> <span class="s1">&#39;done_ceph&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Uploaded in Ceph&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">new_status</span> <span class="o">=</span> <span class="s1">&#39;done&#39;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Metadata uploaded in LiPAD&#39;</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">PSQL_DB</span><span class="o">.</span><span class="n">atomic</span><span class="p">()</span> <span class="k">as</span> <span class="n">txn</span><span class="p">:</span>
         <span class="n">new_q</span> <span class="o">=</span> <span class="p">(</span><span class="n">Automation_AutomationJob</span>
@@ -159,6 +194,158 @@
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="nb">print</span> <span class="s1">&#39;Block not in Lidar Coverage&#39;</span><span class="p">,</span> <span class="n">block_name</span>
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="get_cwd"><a class="viewcode-back" href="../../automation.html#automation.utils.get_cwd">[docs]</a><span class="k">def</span> <span class="nf">get_cwd</span><span class="p">():</span>
+    <span class="n">cur_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">cur_path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cur_path</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">cur_path</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span></div>
+
+
+<div class="viewcode-block" id="rename_tiles"><a class="viewcode-back" href="../../automation.html#automation.utils.rename_tiles">[docs]</a><span class="k">def</span> <span class="nf">rename_tiles</span><span class="p">(</span><span class="n">inDir</span><span class="p">,</span> <span class="n">outDir</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rename each file/tile based on its grid reference.</span>
+
+<span class="sd">    A tile is defined is a 1km by 1km division of `LAZ` or `Orthophoto` data. Each</span>
+<span class="sd">    file is a tile. This function uses `lasbb`, a binary file of `LAStools`. The</span>
+<span class="sd">    grid reference of a tile is computed using:</span>
+
+<span class="sd">        - `minX`: minimum easting coordinate</span>
+<span class="sd">        - `minY`: minimum northing coordinate</span>
+<span class="sd">        - maxX`: maximum easting coordinate</span>
+<span class="sd">        - `maxY`: maximum northing coordinate</span>
+<span class="sd">        - `bbox_center_x`</span>
+<span class="sd">        - `bbox_center_y`</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        inDir (path): Directory containing data tiles to be processed.  This is</span>
+<span class="sd">        a `block_name ` in the `Cephgeo_LidarCoverageBlock` model.</span>
+<span class="sd">        outDir (path): The directory where renamed tiles are stored.</span>
+<span class="sd">        processor (str): Operating System used in processing data.</span>
+<span class="sd">        block_uid (int): Corresponding `uid` of the `block_name`. This `uid` is from</span>
+<span class="sd">            `Cephgeo_LidarCoverageBlock` model.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _TILE_SIZE: Tile size in meters, 1000m by 1000m.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Output directory containing renamed tiles. The final format of a file is:</span>
+<span class="sd">        **Easting_Northing_FileType_Processor_BlockUID.FileType**</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Warning: A warning is raised if the output directory path already exists.</span>
+<span class="sd">        Extents Error: If a tile is problematic or corrupted.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: Time data type: Start timing</span>
+    <span class="n">startTime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+    <span class="c1">#: Separate logging for renaming tiles</span>
+    <span class="n">stream</span> <span class="o">=</span> <span class="n">setup_logging</span><span class="p">()</span>
+
+    <span class="c1">#: logger variable for log field in `Automation_AutomationJob`</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Renaming tiles ...&#39;</span><span class="p">)</span>
+
+    <span class="n">outDir</span> <span class="o">=</span> <span class="n">outDir</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">block_name</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Output Directory: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outDir</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outDir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outDir</span><span class="p">)</span>
+
+    <span class="n">inDir_error</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">inDir</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">inDir</span><span class="p">)</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Problematic Input Directory </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">inDir</span><span class="p">)</span>
+        <span class="n">inDir_error</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1">#: Loop through the input directory</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">inDir</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.laz&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">):</span>
+                <span class="n">typeFile</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="n">ctr</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">tile_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tile</span><span class="p">)</span>
+
+                <span class="c1">#: Get file bounding box/extents</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_cwd</span><span class="p">(),</span> <span class="s1">&#39;lasbb&#39;</span><span class="p">),</span> <span class="s1">&#39;-get_bb&#39;</span><span class="p">,</span>
+                                      <span class="n">tile_file_path</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                     <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+                <span class="n">returncode</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">tokens</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+                    <span class="n">minX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">minY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="n">maxX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="n">maxY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+
+                    <span class="n">bbox_center_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">minX</span> <span class="o">+</span> <span class="p">(</span><span class="n">maxX</span> <span class="o">-</span> <span class="n">minX</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">bbox_center_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">minY</span> <span class="o">+</span> <span class="p">(</span><span class="n">maxY</span> <span class="o">-</span> <span class="n">minY</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+                    <span class="n">_TILE_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+                    <span class="n">tile_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">bbox_center_x</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">_TILE_SIZE</span><span class="p">)))</span>
+                    <span class="n">tile_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
+                        <span class="n">bbox_center_y</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">_TILE_SIZE</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span>
+
+                    <span class="c1"># outFN =</span>
+                    <span class="c1"># &#39;&#39;.join([&#39;E&#39;,tile_x,&#39;N&#39;,tile_y,&#39;_&#39;,typeFile,&#39;.&#39;,typeFile.lower()])</span>
+                    <span class="n">outFN</span> <span class="o">=</span> <span class="s1">&#39;E</span><span class="si">{0}</span><span class="s1">N</span><span class="si">{1}</span><span class="s1">_</span><span class="si">{2}</span><span class="s1">_</span><span class="si">{3}</span><span class="s1">_U</span><span class="si">{4}</span><span class="s1">.</span><span class="si">{5}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">tile_x</span><span class="p">,</span> <span class="n">tile_y</span><span class="p">,</span> <span class="n">typeFile</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">,</span> <span class="n">typeFile</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                    <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outDir</span><span class="p">,</span> <span class="n">outFN</span><span class="p">)</span>
+
+                    <span class="c1">#: Check if output filename is already exists</span>
+                    <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outPath</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">WARNING:  </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span>
+                                       <span class="s1">&#39;already exists!&#39;</span><span class="p">)</span>
+                        <span class="n">ctr</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="c1"># outFN =</span>
+                        <span class="c1"># &#39;&#39;.join([&#39;E&#39;,minX,&#39;N&#39;,maxY,&#39;_&#39;,typeFile,&#39;_&#39;,str(ctr),&#39;.&#39;,typeFile.lower()])</span>
+                        <span class="n">outFN</span> <span class="o">=</span> <span class="s1">&#39;E</span><span class="si">{0}</span><span class="s1">N</span><span class="si">{1}</span><span class="s1">_</span><span class="si">{2}</span><span class="s1">_</span><span class="si">{3}</span><span class="s1">_U</span><span class="si">{4}</span><span class="s1">_</span><span class="si">{5}</span><span class="s1">.</span><span class="si">{6}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">tile_x</span><span class="p">,</span> <span class="n">tile_y</span><span class="p">,</span> <span class="n">typeFile</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">,</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="n">ctr</span><span class="p">),</span> <span class="n">typeFile</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                        <span class="c1"># print outFN</span>
+                        <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outDir</span><span class="p">,</span> <span class="n">outFN</span><span class="p">)</span>
+
+                    <span class="nb">print</span> <span class="s1">&#39;Path  </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tile</span><span class="p">),</span> <span class="s1">&#39;Filename: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outFN</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Path </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">path</span><span class="p">,</span> <span class="n">tile</span><span class="p">),</span> <span class="s1">&#39;Filename: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outFN</span><span class="p">)</span>
+
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Path + Filename  </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tile</span><span class="p">)</span> <span class="o">+</span>
+                                <span class="s1">&#39; ---------  </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">outFN</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span>
+                                <span class="s1">&#39;Filename okay. Wont copy data yet&#39;</span><span class="p">)</span>
+                    <span class="c1"># Copy data</span>
+                    <span class="c1"># print outPath, &#39;Copied success&#39;</span>
+                    <span class="c1"># shutil.copy(laz_file_path, outPath)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error reading extents of [</span><span class="si">{0}</span><span class="s2">]. Trace from </span><span class="se">\</span>
+<span class="s2">                        lasbb:</span><span class="se">\n</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">tile_file_path</span><span class="p">,</span> <span class="n">out</span><span class="p">))</span>
+
+    <span class="n">endTime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>  <span class="c1"># End timing</span>
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">endTime</span> <span class="o">-</span> <span class="n">startTime</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Elapsed Time: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="p">)</span>
+
+    <span class="nb">print</span> <span class="s1">&#39;#&#39;</span> <span class="o">*</span> <span class="mi">40</span>
+    <span class="nb">print</span> <span class="s1">&#39;Stream value&#39;</span><span class="p">,</span> <span class="n">stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+    <span class="nb">print</span> <span class="s1">&#39;#&#39;</span> <span class="o">*</span> <span class="mi">40</span>
+
+    <span class="c1">#: Save log stream from renaming tiles to `Automation_AutomationJob.log`</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inDir_error</span><span class="p">:</span>
+        <span class="n">assign_status</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">PSQL_DB</span><span class="o">.</span><span class="n">atomic</span><span class="p">()</span> <span class="k">as</span> <span class="n">txn</span><span class="p">:</span>
+        <span class="n">new_q</span> <span class="o">=</span> <span class="p">(</span><span class="n">Automation_AutomationJob</span>
+                 <span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="n">status_timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+                 <span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Automation_AutomationJob</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">q</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="n">new_q</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div>
+
 </pre></div>
 
           </div>

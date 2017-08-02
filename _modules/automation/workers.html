@@ -40,7 +40,7 @@
             
   <h1>Source code for automation.workers</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">models</span> <span class="k">import</span> <span class="o">*</span>
-<span class="c1"># from rename_tiles import *</span>
+
 <span class="kn">from</span> <span class="nn">transfer_metadata</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">utils</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">exceptions</span> <span class="k">import</span> <span class="o">*</span>
@@ -52,11 +52,11 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">py_json</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">abspath</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 <span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
-<span class="n">CONS_LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 <span class="n">FILE_LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
 
 
@@ -67,14 +67,10 @@
     <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%(asctime)s</span><span class="s1">] </span><span class="si">%(filename)s</span><span class="s1"> </span><span class="se">\</span>
 <span class="s1">(</span><span class="si">%(levelname)s</span><span class="s1">,</span><span class="si">%(lineno)d</span><span class="s1">)</span><span class="se">\t</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Setup console logging</span>
-    <span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-    <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">CONS_LOG_LEVEL</span><span class="p">)</span>
-    <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
-
     <span class="c1"># Setup file logging</span>
-    <span class="n">LOG_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">LOG_FILE_NAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
+    <span class="n">LOG_FILE</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;/logs/&#39;</span> <span class="o">+</span> <span class="n">LOG_FILE_NAME</span>
     <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">LOG_FILE</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">FILE_LOG_LEVEL</span><span class="p">)</span>
     <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
@@ -100,71 +96,6 @@
 <div class="viewcode-block" id="close_db"><a class="viewcode-back" href="../../automation.html#automation.workers.close_db">[docs]</a><span class="k">def</span> <span class="nf">close_db</span><span class="p">():</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">PSQL_DB</span><span class="o">.</span><span class="n">is_closed</span><span class="p">():</span>
         <span class="n">PSQL_DB</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="process_job"><a class="viewcode-back" href="../../automation.html#automation.workers.process_job">[docs]</a><span class="k">def</span> <span class="nf">process_job</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Process workers fetched by ORM interface from LiPAD database.</span>
-
-<span class="sd">    Check corresponding status of a worker. Get the following attributes of</span>
-<span class="sd">    ``Automation_AutomationJob`` model object:</span>
-<span class="sd">        - `status`</span>
-<span class="sd">        - `status_timestamp`</span>
-<span class="sd">        - `datatype`</span>
-<span class="sd">        - `input_dir`</span>
-<span class="sd">        - `output_dir`</span>
-<span class="sd">        - `processor`</span>
-<span class="sd">    Get correct block name from `input_dir`. Find `block_name` in `model`</span>
-<span class="sd">    ``Cephgeo_LidarCoverageBlock``. If found, do:</span>
-<span class="sd">        # Generate `output_dir` with `block_name` as parent directory.</span>
-<span class="sd">        # If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.</span>
-<span class="sd">        # Upload data tiles to ``Ceph Object Storage``.</span>
-<span class="sd">        # Update and assign status of ``Automation_AutomationJob`` worker</span>
-<span class="sd">        #</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object</span>
-<span class="sd">            fetched from database.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        Exception: If datatype is not in `Automation_AutomationJob.DATATYPE_CHOICES`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">assign_status</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="s1">&#39;Status&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span>
-    <span class="nb">print</span> <span class="s1">&#39;Status Timestamp&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status_timestamp</span>
-    <span class="nb">print</span> <span class="s1">&#39;Processing Job&#39;</span>
-    <span class="n">datatype</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">datatype</span>
-    <span class="n">input_dir</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">input_dir</span>
-    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">output_dir</span>
-    <span class="n">processor</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">processor</span>
-
-    <span class="n">block_name</span> <span class="o">=</span> <span class="n">proper_block_name</span><span class="p">(</span><span class="n">input_dir</span><span class="p">)</span>
-    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">block_name</span><span class="p">)</span>
-
-    <span class="nb">print</span> <span class="s1">&#39;BLOCK NAME&#39;</span><span class="p">,</span> <span class="n">block_name</span>
-
-    <span class="n">in_coverage</span><span class="p">,</span> <span class="n">block_uid</span> <span class="o">=</span> <span class="n">find_in_coverage</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
-
-    <span class="c1"># check first if Block Name is in Lidar Coverage</span>
-    <span class="k">if</span> <span class="n">in_coverage</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s1">&#39;Found in Lidar Coverage model&#39;</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">block_uid</span>
-        <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;laz&#39;</span> <span class="ow">or</span> <span class="s1">&#39;ortho&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">files_renamed</span><span class="p">(</span><span class="n">input_dir</span><span class="p">):</span>
-                <span class="n">rename_tiles</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s1">&#39;Handler not implemented for type: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">datatype</span><span class="p">))</span>
-
-        <span class="n">assign_status</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="s1">&#39;Status&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span>
-        <span class="nb">print</span> <span class="s1">&#39;Status Timestamp&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status_timestamp</span>
-        <span class="n">ceph_uploaded</span><span class="p">,</span> <span class="n">log_file</span> <span class="o">=</span> <span class="n">ceph_upload</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ceph_uploaded</span><span class="p">:</span>
-            <span class="n">assign_status</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="n">transfer_metadata</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="n">datatype</span><span class="p">)</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s1">&#39;ERROR NOT FOUND IN MODEL&#39;</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">block_uid</span></div>
 
 
 <div class="viewcode-block" id="parse_dem_input"><a class="viewcode-back" href="../../automation.html#automation.workers.parse_dem_input">[docs]</a><span class="k">def</span> <span class="nf">parse_dem_input</span><span class="p">(</span><span class="n">input_str</span><span class="p">):</span>
@@ -233,40 +164,136 @@
         <span class="n">transfer_metadata</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="process_job"><a class="viewcode-back" href="../../automation.html#automation.workers.process_job">[docs]</a><span class="k">def</span> <span class="nf">process_job</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Process workers fetched by ORM interface from LiPAD database.</span>
+
+<span class="sd">    Check corresponding status of a worker. Get the following attributes of</span>
+<span class="sd">    ``Automation_AutomationJob`` model object:</span>
+
+<span class="sd">        - `status`</span>
+<span class="sd">        - `status_timestamp`</span>
+<span class="sd">        - `datatype`</span>
+<span class="sd">        - `input_dir`</span>
+<span class="sd">        - `output_dir`</span>
+<span class="sd">        - `processor`</span>
+
+<span class="sd">    Get correct block name from `input_dir`. Find `block_name` in `model`</span>
+<span class="sd">    ``Cephgeo_LidarCoverageBlock``. If found, do:</span>
+
+<span class="sd">        #. Generate `output_dir` with `block_name` as parent directory.</span>
+<span class="sd">        #. If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.</span>
+<span class="sd">        #. Upload data tiles to ``Ceph Object Storage``.</span>
+<span class="sd">        #. Update and assign status of ``Automation_AutomationJob`` worker</span>
+<span class="sd">        #.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object</span>
+<span class="sd">            fetched from database.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: If datatype is not in `Automation_AutomationJob.DATATYPE_CHOICES`.</span>
+
+<span class="sd">    @TODO:</span>
+<span class="sd">        User can input a directory containing multiple child directories. Each child</span>
+<span class="sd">        folder is a `LiDAR coverage block` folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing Job&#39;</span><span class="p">)</span>
+
+    <span class="n">datatype</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">datatype</span>
+    <span class="n">input_dir</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">input_dir</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">output_dir</span>
+    <span class="n">processor</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">processor</span>
+
+    <span class="n">block_name</span> <span class="o">=</span> <span class="n">proper_block_name</span><span class="p">(</span><span class="n">input_dir</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;BLOCK NAME </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">block_name</span><span class="p">)</span>
+
+    <span class="n">in_coverage</span><span class="p">,</span> <span class="n">block_uid</span> <span class="o">=</span> <span class="n">find_in_coverage</span><span class="p">(</span><span class="n">block_name</span><span class="p">)</span>
+
+    <span class="c1">#: Check first if folder or `block_name` is in `Cephgeo_LidarCoverageBlock`</span>
+    <span class="c1">#: If not found, `output_dir` is not created and data is not processed</span>
+    <span class="k">if</span> <span class="n">in_coverage</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found in Lidar Coverage model </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">block_name</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">)</span>
+
+        <span class="c1">#: LAZ and Orthophoto are to be renamed automatically, whether datasets</span>
+        <span class="c1">#: have been renamed or not</span>
+        <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;laz&#39;</span> <span class="ow">or</span> <span class="s1">&#39;ortho&#39;</span><span class="p">):</span>
+            <span class="nb">print</span> <span class="s1">&#39;Will rename tiles ... &#39;</span>
+            <span class="n">rename_tiles</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span>
+                         <span class="n">block_name</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Status  </span><span class="si">%s</span><span class="s1"> Status Timestamp  </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status_timestamp</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="s1">&#39;1 Status&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="s1">&#39;Status Timestamp&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status_timestamp</span>
+
+    <span class="c1"># for DEM</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Handler not implemented for type:  </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">datatype</span><span class="p">))</span>
+
+        <span class="c1"># assign_status(q, 2)</span>
+        <span class="c1"># logger.info(&#39;Status  %s Status Timestamp  %s&#39;,</span>
+        <span class="c1">#             q.status, q.status_timestamp)</span>
+        <span class="c1"># print &#39;2 Status&#39;, q.status, &#39;Status Timestamp&#39;, q.status_timestamp</span>
+
+        <span class="c1"># # Upload to `Ceph` after processing</span>
+        <span class="c1"># ceph_uploaded, log_file = ceph_upload(output_dir)</span>
+        <span class="c1"># if ceph_uploaded:</span>
+        <span class="c1">#     assign_status(q, 3)</span>
+        <span class="c1">#     transfer_metadata(log_file, datatype)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;ERROR NOT FOUND IN MODEL </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">block_name</span><span class="p">,</span> <span class="n">block_uid</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="db_watcher"><a class="viewcode-back" href="../../automation.html#automation.workers.db_watcher">[docs]</a><span class="k">def</span> <span class="nf">db_watcher</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Watch LiPAD Database AutomationJob for pending jobs.</span>
 
-<span class="sd">    Connect the ORM to the database. This loops watching of AutomationJob for</span>
+<span class="sd">    Connect ORM to the database. This loops watching of AutomationJob for</span>
 <span class="sd">    new workers. This also checks the status of each AutomationJob object. This</span>
 <span class="sd">    passes the worker to its repective workflow depending on its status.</span>
 
 <span class="sd">    This starts upon startup of processing environment.</span>
+
+<span class="sd">    An `AutomationJob` status is checked and updated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">print</span> <span class="s1">&#39;Starting...&#39;</span>
     <span class="n">setup_logging</span><span class="p">()</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">connect_db</span><span class="p">()</span>
-
         <span class="k">for</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">Automation_AutomationJob</span><span class="o">.</span><span class="n">STATUS_CHOICES</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">q</span> <span class="o">=</span> <span class="n">Automation_AutomationJob</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
-                <span class="nb">print</span> <span class="s1">&#39;Query found!&#39;</span>
-                <span class="nb">print</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span>
-                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;pending_process&#39;</span><span class="p">):</span>
+                <span class="nb">print</span> <span class="s1">&#39;Fetched Query. Status: .&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span>
+                <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;pending_process&#39;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">target_os</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;linux&#39;</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Process in Linux&#39;</span><span class="p">)</span>
+                        <span class="nb">print</span> <span class="s1">&#39;Process in Linux&#39;</span>
                         <span class="n">process_job</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-                        <span class="c1"># elif q.datatype.lower() == &#39;dtm&#39;:</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="nb">print</span> <span class="s1">&#39;PASS TO WINDOWS&#39;</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Process in Windows&#39;</span><span class="p">)</span>
+                        <span class="c1"># @TODO</span>
                         <span class="c1"># Windows poller</span>
-                <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;done_ceph&#39;</span><span class="p">):</span>
+
+                <span class="k">elif</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;done_process&#39;</span><span class="p">):</span>
+                    <span class="c1"># assign_status(q, 2)</span>
+                    <span class="k">pass</span>
+
+                <span class="k">elif</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;pending_ceph&#39;</span><span class="p">):</span>
+                    <span class="c1"># assign_status(q, 3)</span>
+                    <span class="k">pass</span>
+
+                <span class="k">elif</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;done_ceph&#39;</span><span class="p">):</span>
                     <span class="c1"># in case upload from ceph to lipad was interrupted</span>
-                    <span class="n">assign_status</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-                    <span class="n">transfer_metadata</span><span class="p">()</span>
+                    <span class="c1"># assign_status(q, 3)</span>
+                    <span class="c1"># transfer_metadata()</span>
+                    <span class="k">pass</span>
+
+                <span class="k">elif</span> <span class="n">q</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">):</span>
+                    <span class="k">pass</span>
 
             <span class="k">except</span> <span class="n">Automation_AutomationJob</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No </span><span class="si">%s</span><span class="s1"> task&#39;</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No </span><span class="si">%s</span><span class="s1"> task&#39;</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
 
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Database watcher error!&#39;</span><span class="p">)</span>
@@ -276,6 +303,7 @@
         <span class="n">delay</span> <span class="o">=</span> <span class="n">get_delay</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Worker Sleeping for </span><span class="si">%s</span><span class="s1">secs...&#39;</span><span class="p">,</span> <span class="n">delay</span><span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span></div>
+
 </pre></div>
 
           </div>
