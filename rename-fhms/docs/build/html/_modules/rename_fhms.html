@@ -1,0 +1,476 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>rename_fhms &#8212; Rename FHM  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for rename_fhms</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python2</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: rename_fhms</span>
+<span class="sd">   :platform: Unix, Windows</span>
+<span class="sd">   :synopsis: A useful module indeed.</span>
+
+<span class="sd">.. moduleauthor:: Kenneth Langga &lt;andrew@invalid.com&gt;</span>
+
+<span class="sd">Description:</span>
+
+<span class="sd">This script renames FHM shapefiles based on their previous filename in the</span>
+<span class="sd">FHM Coverage shapefile.</span>
+
+<span class="sd">Run using ArcGIS Python.</span>
+
+<span class="sd">Usage example:</span>
+
+<span class="sd"># Test run</span>
+<span class="sd">C:\Python27_ArcGIS10.3\ArcGIS10.3\python.exe rename-fhms.py \</span>
+<span class="sd">-fc fhm_coverage_20170511.shp \</span>
+<span class="sd">-s Q:\DAD\FLOOD_HAZARD\Flood_Hazard_Shapefiles\QCed_FHMs\ \</span>
+<span class="sd">-d Q:\DAD\FLOOD_HAZARD\Flood_Hazard_Shapefiles\rename_test\ \</span>
+<span class="sd">-fco RBFP_shp \</span>
+<span class="sd">-fcn RBFP_name \</span>
+<span class="sd">-v</span>
+
+<span class="sd"># Rename</span>
+<span class="sd">C:\Python27_ArcGIS10.3\ArcGIS10.3\python.exe rename-fhms.py \</span>
+<span class="sd">-fc fhm_coverage_20170511.shp \</span>
+<span class="sd">-s Q:\DAD\FLOOD_HAZARD\Flood_Hazard_Shapefiles\QCed_FHMs\ \</span>
+<span class="sd">-d Q:\DAD\FLOOD_HAZARD\Flood_Hazard_Shapefiles\rename_test\ \</span>
+<span class="sd">-fco RBFP_shp \</span>
+<span class="sd">-fcn RBFP_name \</span>
+<span class="sd">-v -r</span>
+
+<span class="sd">License:</span>
+
+<span class="sd">Copyright (c) 2017, Kenneth Langga (klangga@gmail.com)</span>
+<span class="sd">All rights reserved.</span>
+
+<span class="sd">This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU General Public License as published by</span>
+<span class="sd">the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">any later version.</span>
+
+<span class="sd">This program is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU General Public License</span>
+<span class="sd">along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">arcpy</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="n">LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+<span class="n">CONS_LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+<span class="n">FILE_LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+
+
+<div class="viewcode-block" id="public_fn_with_sphinxy_docstring"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.public_fn_with_sphinxy_docstring">[docs]</a><span class="k">def</span> <span class="nf">public_fn_with_sphinxy_docstring</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function does something.</span>
+
+<span class="sd">    :param name: The name to use.</span>
+<span class="sd">    :type name: str.</span>
+<span class="sd">    :param state: Current state to be in.</span>
+<span class="sd">    :type state: bool.</span>
+<span class="sd">    :returns: int -- the return code.</span>
+<span class="sd">    :raises: AttributeError, KeyError</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="parse_arguments"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.parse_arguments">[docs]</a><span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;This function does something.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       name (str):  The name to use.</span>
+
+<span class="sd">    Kwargs:</span>
+<span class="sd">       state (bool): Current state to be in.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       int.  The return code::</span>
+
+<span class="sd">          0 -- Success!</span>
+<span class="sd">          1 -- No good.</span>
+<span class="sd">          2 -- Try again.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">       AttributeError, KeyError</span>
+
+<span class="sd">    A really great idea.  A way you might use me is</span>
+
+<span class="sd">    &gt;&gt;&gt; print public_fn_with_googley_docstring(name=&#39;foo&#39;, state=None)</span>
+<span class="sd">    0</span>
+
+<span class="sd">    BTW, this always returns 0.  **NEVER** use with :class:`MyPublicClass`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Parse arguments</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--rename&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--src&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--dst&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-fc&#39;</span><span class="p">,</span> <span class="s1">&#39;--fhm-coverage&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-fco&#39;</span><span class="p">,</span> <span class="s1">&#39;--fc-old-field&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-fcn&#39;</span><span class="p">,</span> <span class="s1">&#39;--fc-new-field&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+<div class="viewcode-block" id="setup_logging"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.setup_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function does something.</span>
+
+<span class="sd">    :param name: The name to use.</span>
+<span class="sd">    :type name: str.</span>
+<span class="sd">    :param state: Current state to be in.</span>
+<span class="sd">    :type state: bool.</span>
+<span class="sd">    :returns:  int -- the return code.</span>
+<span class="sd">    :raises: AttributeError, KeyError</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Setup logging</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">LOG_LEVEL</span><span class="p">)</span>
+
+    <span class="c1"># Setup console logging</span>
+    <span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">CONS_LOG_LEVEL</span><span class="p">)</span>
+    <span class="n">ch_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+        <span class="s1">&#39;[</span><span class="si">%(asctime)s</span><span class="s1">] (</span><span class="si">%(levelname)s</span><span class="s1">) : </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">ch_formatter</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+    <span class="c1"># Setup file logging</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">FILE_LOG_LEVEL</span><span class="p">)</span>
+    <span class="n">fh_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+        <span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">fh_formatter</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_if_paths_exist"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.check_if_paths_exist">[docs]</a><span class="k">def</span> <span class="nf">check_if_paths_exist</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">src_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">src</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">src_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;src: </span><span class="si">%s</span><span class="s1"> does not exist! Exiting.&#39;</span><span class="p">,</span> <span class="n">src_path</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dst</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dst_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s1">&#39;dst: </span><span class="si">%s</span><span class="s1"> does not exist! Please create it first. Exiting.&#39;</span><span class="p">,</span>
+            <span class="n">dst_path</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fhm_coverage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">fhm_coverage</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fhm_coverage_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;fhm_coverage: </span><span class="si">%s</span><span class="s1"> does not exist! Exiting.&#39;</span><span class="p">)</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">src_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">,</span> <span class="n">fhm_coverage_path</span></div>
+
+
+<div class="viewcode-block" id="get_filename_rbfp_map"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.get_filename_rbfp_map">[docs]</a><span class="k">def</span> <span class="nf">get_filename_rbfp_map</span><span class="p">(</span><span class="n">fhm_coverage</span><span class="p">):</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">MakeFeatureLayer_management</span><span class="p">(</span><span class="n">fhm_coverage</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">],</span> <span class="s1">&#39;fhm_coverage_lyr&#39;</span><span class="p">)</span>
+    <span class="n">filename_rbfp_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">SearchCursor</span><span class="p">(</span><span class="s1">&#39;fhm_coverage_lyr&#39;</span><span class="p">,</span>
+                               <span class="p">[</span><span class="n">fhm_coverage</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">],</span>
+                                <span class="n">fhm_coverage</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]])</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="c1"># logger.debug(&#39;row: %s&#39;, row)</span>
+            <span class="n">filename_rbfp_map</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">arcpy</span><span class="o">.</span><span class="n">Delete_management</span><span class="p">(</span><span class="s1">&#39;fhm_coverage_lyr&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filename_rbfp_map</span></div>
+
+
+<div class="viewcode-block" id="find_fhm_shapefiles"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.find_fhm_shapefiles">[docs]</a><span class="k">def</span> <span class="nf">find_fhm_shapefiles</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">dst_basepath</span><span class="p">,</span> <span class="n">filename_rbfp_map</span><span class="p">,</span>
+                        <span class="n">rename</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># Find shapefiles in the dir and subdirs</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">src_path</span><span class="p">):</span>
+        <span class="c1"># Ignore hidden dirs</span>
+        <span class="n">dirs</span><span class="p">[:]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">])</span>
+        <span class="c1"># List all files that end with .shp</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+            <span class="n">fn_lower</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fn_lower</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.shp&#39;</span><span class="p">):</span>
+                <span class="c1"># Get filename elements</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="n">get_year</span><span class="p">(</span><span class="n">fn_lower</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Skip</span>
+                    <span class="k">continue</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">get_resolution</span><span class="p">(</span><span class="n">fn_lower</span><span class="p">)</span>
+                <span class="n">fn_head</span><span class="p">,</span> <span class="n">fn_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="n">rbfp_name</span> <span class="o">=</span> <span class="n">get_rbfp_name</span><span class="p">(</span><span class="n">fn_head</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span>
+                                          <span class="n">filename_rbfp_map</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">rbfp_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Skip</span>
+                    <span class="k">continue</span>
+                <span class="c1"># Construct new filename head and dest. path</span>
+                <span class="n">new_fn_head</span> <span class="o">=</span> <span class="n">rbfp_name</span> <span class="o">+</span> <span class="s1">&#39;_fh&#39;</span> <span class="o">+</span> <span class="n">year</span> <span class="o">+</span> <span class="s1">&#39;yr_&#39;</span> <span class="o">+</span> <span class="n">res</span>
+                <span class="c1"># logger.debug(&#39;%s %s&#39;, dst_basepath,</span>
+                <span class="c1">#              root.replace(src_path + os.sep, &#39;&#39;))</span>
+                <span class="n">subdir</span> <span class="o">=</span> <span class="p">(</span><span class="n">root</span>
+                          <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">src_path</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                          <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+                          <span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dst_basepath</span><span class="p">,</span> <span class="n">subdir</span><span class="p">)</span>
+                <span class="c1"># Rename shapefile</span>
+                <span class="n">rename_shapefile</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">fn_head</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">,</span> <span class="n">new_fn_head</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span></div>
+                <span class="c1"># logger.debug(&#39;%s,%s,%s,%s,%s,%s,%s&#39;,</span>
+                <span class="c1">#              file_path, year, res, fn_head, rbfp_name,</span>
+                <span class="c1">#              new_fn_head, dst_path)</span>
+                <span class="c1"># exit(1)</span>
+
+
+<div class="viewcode-block" id="get_year"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.get_year">[docs]</a><span class="k">def</span> <span class="nf">get_year</span><span class="p">(</span><span class="n">fn_lower</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+    <span class="c1"># Get year</span>
+    <span class="n">match_year</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(5|25|100)&#39;</span><span class="p">,</span> <span class="n">fn_lower</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_year</span><span class="p">:</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">match_year</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># logger.info(&#39;year: %s&#39;, year)</span>
+        <span class="k">return</span> <span class="n">year</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Year not found: </span><span class="si">%s</span><span class="s1">!&#39;</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span></div>
+        <span class="c1"># exit(1)</span>
+
+
+<div class="viewcode-block" id="get_resolution"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.get_resolution">[docs]</a><span class="k">def</span> <span class="nf">get_resolution</span><span class="p">(</span><span class="n">fn_lower</span><span class="p">):</span>
+    <span class="c1"># Get resolution</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;10m&#39;</span> <span class="ow">in</span> <span class="n">fn_lower</span> <span class="ow">and</span> <span class="s1">&#39;30m&#39;</span> <span class="ow">in</span> <span class="n">fn_lower</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;30m_10m&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;10m&#39;</span> <span class="ow">in</span> <span class="n">fn_lower</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;30m&#39;</span> <span class="ow">in</span> <span class="n">fn_lower</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;30m&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="get_rbfp_name"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.get_rbfp_name">[docs]</a><span class="k">def</span> <span class="nf">get_rbfp_name</span><span class="p">(</span><span class="n">fn_head</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">filename_rbfp_map</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+    <span class="c1"># Get 100yr filename</span>
+    <span class="n">fn_100yr</span> <span class="o">=</span> <span class="n">fn_head</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">)</span>
+    <span class="c1"># logger.debug(&#39;fn_100yr: %s&#39;, fn_100yr)</span>
+    <span class="n">rbfp_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">rbfp_name</span> <span class="o">=</span> <span class="n">filename_rbfp_map</span><span class="p">[</span><span class="n">fn_100yr</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;No rbfp name for: fn_100yr=</span><span class="si">%s</span><span class="s1"> file_path=</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                     <span class="n">fn_100yr</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rbfp_name</span></div>
+
+
+<div class="viewcode-block" id="rename_shapefile"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.rename_shapefile">[docs]</a><span class="k">def</span> <span class="nf">rename_shapefile</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">old_fn_head</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">,</span> <span class="n">new_fn_head</span><span class="p">,</span> <span class="n">rename</span><span class="p">):</span>
+    <span class="c1"># Create dst_path directories</span>
+    <span class="k">if</span> <span class="n">rename</span><span class="p">:</span>
+        <span class="n">mkdir_p</span><span class="p">(</span><span class="n">dst_path</span><span class="p">)</span>
+
+    <span class="c1"># Copy and rename shapefiles</span>
+    <span class="k">for</span> <span class="n">src_file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">old_fn_head</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span><span class="p">):</span>
+        <span class="c1"># logger.debug(&#39;src_file: %s&#39;, src_file)</span>
+        <span class="n">old_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">src_file</span><span class="p">)</span>
+        <span class="c1"># logger.debug(&#39;old_filename: %s&#39;, old_filename)</span>
+        <span class="n">new_filename</span> <span class="o">=</span> <span class="n">old_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">old_fn_head</span><span class="p">,</span> <span class="n">new_fn_head</span><span class="p">)</span>
+        <span class="c1"># logger.debug(&#39;new_filename: %s&#39;, new_filename)</span>
+        <span class="n">dst_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dst_path</span><span class="p">,</span> <span class="n">new_filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rename</span><span class="p">:</span>
+            <span class="c1"># Delete dest. file if it exists</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dst_file</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dst_file</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src_file</span><span class="p">,</span> <span class="n">dst_file</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">,</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">src_file</span><span class="p">,</span> <span class="n">dst_file</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mkdir_p"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.mkdir_p">[docs]</a><span class="k">def</span> <span class="nf">mkdir_p</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># Python &gt;2.5</span>
+        <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="MyPublicClass"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.MyPublicClass">[docs]</a><span class="k">class</span> <span class="nc">MyPublicClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;We use this as a public class example class.</span>
+
+<span class="sd">    You never call this class before calling :func:`public_fn_with_sphinxy_docstring`.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">       An example of intersphinx is this: you **cannot** use :mod:`pickle` on this class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">foo</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="s1">&#39;baz&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A really simple class.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           foo (str): We all know what foo does.</span>
+
+<span class="sd">        Kwargs:</span>
+<span class="sd">           bar (str): Really, same as foo.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_foo</span> <span class="o">=</span> <span class="n">foo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bar</span> <span class="o">=</span> <span class="n">bar</span>
+
+<div class="viewcode-block" id="MyPublicClass.get_foobar"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.MyPublicClass.get_foobar">[docs]</a>    <span class="k">def</span> <span class="nf">get_foobar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">foo</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This gets the foobar</span>
+
+<span class="sd">        This really should have a full function definition, but I am too lazy.</span>
+
+<span class="sd">        &gt;&gt;&gt; print get_foobar(10, 20)</span>
+<span class="sd">        30</span>
+<span class="sd">        &gt;&gt;&gt; print get_foobar(&#39;a&#39;, &#39;b&#39;)</span>
+<span class="sd">        ab</span>
+
+<span class="sd">        Isn&#39;t that what you want?</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">foo</span> <span class="o">+</span> <span class="n">bar</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../rename_fhms.html#rename_fhms.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+    <span class="c1"># Parse arguments</span>
+    <span class="c1"># logger.debug(&#39;parsing arguments...&#39;)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">()</span>
+
+    <span class="c1"># Setup logging</span>
+    <span class="n">setup_logging</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;args: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+    <span class="c1"># Check if paths exist</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;checking if paths exist...&#39;</span><span class="p">)</span>
+    <span class="n">src_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">,</span> <span class="n">fhm_coverage_path</span> <span class="o">=</span> <span class="n">check_if_paths_exist</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;src_path: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">src_path</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;dst_path: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;fhm_coverage_path: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fhm_coverage_path</span><span class="p">)</span>
+
+    <span class="c1"># Get old filename/rbfp name mapping</span>
+    <span class="n">fhm_coverage</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">fhm_coverage_path</span><span class="p">,</span>
+                    <span class="s1">&#39;old&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">fc_old_field</span><span class="p">,</span>
+                    <span class="s1">&#39;new&#39;</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">fc_new_field</span><span class="p">}</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;getting old filename/rbfp name mapping...&#39;</span><span class="p">)</span>
+    <span class="n">filename_rbfp_map</span> <span class="o">=</span> <span class="n">get_filename_rbfp_map</span><span class="p">(</span><span class="n">fhm_coverage</span><span class="p">)</span>
+
+    <span class="c1"># Find FHM shapefiles</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">rename</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;renaming fhm shapefiles...&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">find_fhm_shapefiles</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">dst_path</span><span class="p">,</span> <span class="n">filename_rbfp_map</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">rename</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Rename FHM</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">rename_fhms</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, denise.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

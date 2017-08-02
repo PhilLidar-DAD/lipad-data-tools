@@ -48,7 +48,27 @@ class DataClassification(Field):
 
 
 class Automation_AutomationJob(BaseModel):
+    """Inherit ``BaseModel`` `model`.
 
+    A model interface for geonode.automation.models.AutomationJob.
+
+    Attributes:
+        id (int): Corresponds to `model` ``AutomationJob`` identifier in database.
+        datatype (str): Corresponds to `model` ``AutomationJob`` datatype
+            in database.
+        input_dir (str): Corresponds to `model` ``AutomationJob`` input directory
+            in database.
+        output_dir (str): Corresponds to `model` ``AutomationJob`` output directory
+            in database.
+        processor (str): Corresponds to `model` ``AutomationJob`` processor
+            in database.
+        date_submitted (date): Corresponds to `model` ``AutomationJob`` date_submitted
+            in database.
+        target_os (str): Corresponds to `model` ``AutomationJob`` target_os
+            in database.
+        log (str): Corresponds to `model` ``AutomationJob`` log in database.
+
+    """
     STATUS_CHOICES = [
         ('pending_process'),
         ('done_process'),

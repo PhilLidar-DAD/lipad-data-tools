@@ -1,6 +1,12 @@
 #!/usr/bin/env python2
 
 """
+.. module:: rename_fhms
+   :platform: Unix, Windows
+   :synopsis: A useful module indeed.
+
+.. moduleauthor:: Kenneth Langga <andrew@invalid.com>
+
 Description:
 
 This script renames FHM shapefiles based on their previous filename in the
@@ -45,6 +51,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 
 
@@ -64,7 +71,47 @@ CONS_LOG_LEVEL = logging.ERROR
 FILE_LOG_LEVEL = logging.INFO
 
 
+def public_fn_with_sphinxy_docstring(name, state=None):
+    """This function does something.
+
+    :param name: The name to use.
+    :type name: str.
+    :param state: Current state to be in.
+    :type state: bool.
+    :returns: int -- the return code.
+    :raises: AttributeError, KeyError
+
+    """
+    return 0
+
+
 def parse_arguments():
+    """This function does something.
+
+    Args:
+       name (str):  The name to use.
+
+    Kwargs:
+       state (bool): Current state to be in.
+
+    Returns:
+       int.  The return code::
+
+          0 -- Success!
+          1 -- No good.
+          2 -- Try again.
+
+    Raises:
+       AttributeError, KeyError
+
+    A really great idea.  A way you might use me is
+
+    >>> print public_fn_with_googley_docstring(name='foo', state=None)
+    0
+
+    BTW, this always returns 0.  **NEVER** use with :class:`MyPublicClass`.
+
+    """
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action="store_true")
@@ -79,6 +126,16 @@ def parse_arguments():
 
 
 def setup_logging(args):
+    """This function does something.
+
+    :param name: The name to use.
+    :type name: str.
+    :param state: Current state to be in.
+    :type state: bool.
+    :returns:  int -- the return code.
+    :raises: AttributeError, KeyError
+
+    """
     # Setup logging
     logger.setLevel(LOG_LEVEL)
 
@@ -242,6 +299,46 @@ def mkdir_p(path):
             pass
         else:
             raise
+
+
+class MyPublicClass(object):
+    """We use this as a public class example class.
+
+    You never call this class before calling :func:`public_fn_with_sphinxy_docstring`.
+
+    .. note::
+
+       An example of intersphinx is this: you **cannot** use :mod:`pickle` on this class.
+
+    """
+
+    def __init__(self, foo, bar='baz'):
+        """A really simple class.
+
+        Args:
+           foo (str): We all know what foo does.
+
+        Kwargs:
+           bar (str): Really, same as foo.
+
+        """
+        self._foo = foo
+        self._bar = bar
+
+    def get_foobar(self, foo, bar=True):
+        """This gets the foobar
+
+        This really should have a full function definition, but I am too lazy.
+
+        >>> print get_foobar(10, 20)
+        30
+        >>> print get_foobar('a', 'b')
+        ab
+
+        Isn't that what you want?
+
+        """
+        return foo + bar
 
 
 def main():

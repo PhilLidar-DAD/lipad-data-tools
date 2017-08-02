@@ -1,0 +1,280 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>rename_fhms module &#8212; Rename FHM  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="rename_fhms" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-rename_fhms">
+<span id="rename-fhms-module"></span><h1>rename_fhms module<a class="headerlink" href="#module-rename_fhms" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-rename_fhms"></span><p>Description:</p>
+<p>This script renames FHM shapefiles based on their previous filename in the
+FHM Coverage shapefile.</p>
+<p>Run using ArcGIS Python.</p>
+<p>Usage example:</p>
+<p># Test run
+C:Python27_ArcGIS10.3ArcGIS10.3python.exe rename-fhms.py -fc fhm_coverage_20170511.shp -s Q:DADFLOOD_HAZARDFlood_Hazard_ShapefilesQCed_FHMs-d Q:DADFLOOD_HAZARDFlood_Hazard_Shapefiles
+ename_test-fco RBFP_shp -fcn RBFP_name -v</p>
+<p># Rename
+C:Python27_ArcGIS10.3ArcGIS10.3python.exe rename-fhms.py -fc fhm_coverage_20170511.shp -s Q:DADFLOOD_HAZARDFlood_Hazard_ShapefilesQCed_FHMs-d Q:DADFLOOD_HAZARDFlood_Hazard_Shapefiles
+ename_test-fco RBFP_shp -fcn RBFP_name -v -r</p>
+<p>License:</p>
+<p>Copyright (c) 2017, Kenneth Langga (<a class="reference external" href="mailto:klangga&#37;&#52;&#48;gmail&#46;com">klangga<span>&#64;</span>gmail<span>&#46;</span>com</a>)
+All rights reserved.</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="class">
+<dt id="rename_fhms.MyPublicClass">
+<em class="property">class </em><code class="descclassname">rename_fhms.</code><code class="descname">MyPublicClass</code><span class="sig-paren">(</span><em>foo</em>, <em>bar='baz'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#MyPublicClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.MyPublicClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>We use this as a public class example class.</p>
+<p>You never call this class before calling <a class="reference internal" href="#rename_fhms.public_fn_with_sphinxy_docstring" title="rename_fhms.public_fn_with_sphinxy_docstring"><code class="xref py py-func docutils literal"><span class="pre">public_fn_with_sphinxy_docstring()</span></code></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An example of intersphinx is this: you <strong>cannot</strong> use <a class="reference external" href="https://docs.python.org/2/library/pickle.html#module-pickle" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">pickle</span></code></a> on this class.</p>
+</div>
+<dl class="method">
+<dt id="rename_fhms.MyPublicClass.get_foobar">
+<code class="descname">get_foobar</code><span class="sig-paren">(</span><em>foo</em>, <em>bar=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#MyPublicClass.get_foobar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.MyPublicClass.get_foobar" title="Permalink to this definition">¶</a></dt>
+<dd><p>This gets the foobar</p>
+<p>This really should have a full function definition, but I am too lazy.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">get_foobar</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="go">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">get_foobar</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="go">ab</span>
+</pre></div>
+</div>
+<p>Isn’t that what you want?</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.check_if_paths_exist">
+<code class="descclassname">rename_fhms.</code><code class="descname">check_if_paths_exist</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#check_if_paths_exist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.check_if_paths_exist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.find_fhm_shapefiles">
+<code class="descclassname">rename_fhms.</code><code class="descname">find_fhm_shapefiles</code><span class="sig-paren">(</span><em>src_path</em>, <em>dst_basepath</em>, <em>filename_rbfp_map</em>, <em>rename=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#find_fhm_shapefiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.find_fhm_shapefiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.get_filename_rbfp_map">
+<code class="descclassname">rename_fhms.</code><code class="descname">get_filename_rbfp_map</code><span class="sig-paren">(</span><em>fhm_coverage</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#get_filename_rbfp_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.get_filename_rbfp_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.get_rbfp_name">
+<code class="descclassname">rename_fhms.</code><code class="descname">get_rbfp_name</code><span class="sig-paren">(</span><em>fn_head</em>, <em>year</em>, <em>filename_rbfp_map</em>, <em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#get_rbfp_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.get_rbfp_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.get_resolution">
+<code class="descclassname">rename_fhms.</code><code class="descname">get_resolution</code><span class="sig-paren">(</span><em>fn_lower</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#get_resolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.get_resolution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.get_year">
+<code class="descclassname">rename_fhms.</code><code class="descname">get_year</code><span class="sig-paren">(</span><em>fn_lower</em>, <em>file_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#get_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.get_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.main">
+<code class="descclassname">rename_fhms.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.mkdir_p">
+<code class="descclassname">rename_fhms.</code><code class="descname">mkdir_p</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#mkdir_p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.mkdir_p" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.parse_arguments">
+<code class="descclassname">rename_fhms.</code><code class="descname">parse_arguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function does something.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>name (str):  The name to use.</dd>
+<dt>Kwargs:</dt>
+<dd>state (bool): Current state to be in.</dd>
+<dt>Returns:</dt>
+<dd><p class="first">int.  The return code:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span>0 -- Success!
+1 -- No good.
+2 -- Try again.
+</pre></div>
+</div>
+</dd>
+<dt>Raises:</dt>
+<dd>AttributeError, KeyError</dd>
+</dl>
+<p>A really great idea.  A way you might use me is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">public_fn_with_googley_docstring</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>BTW, this always returns 0.  <strong>NEVER</strong> use with <a class="reference internal" href="#rename_fhms.MyPublicClass" title="rename_fhms.MyPublicClass"><code class="xref py py-class docutils literal"><span class="pre">MyPublicClass</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.public_fn_with_sphinxy_docstring">
+<code class="descclassname">rename_fhms.</code><code class="descname">public_fn_with_sphinxy_docstring</code><span class="sig-paren">(</span><em>name</em>, <em>state=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#public_fn_with_sphinxy_docstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.public_fn_with_sphinxy_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function does something.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str.</em>) – The name to use.</li>
+<li><strong>state</strong> (<em>bool.</em>) – Current state to be in.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">int – the return code.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">AttributeError, KeyError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.rename_shapefile">
+<code class="descclassname">rename_fhms.</code><code class="descname">rename_shapefile</code><span class="sig-paren">(</span><em>src_path</em>, <em>old_fn_head</em>, <em>dst_path</em>, <em>new_fn_head</em>, <em>rename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#rename_shapefile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.rename_shapefile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rename_fhms.setup_logging">
+<code class="descclassname">rename_fhms.</code><code class="descname">setup_logging</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rename_fhms.html#setup_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rename_fhms.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function does something.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str.</em>) – The name to use.</li>
+<li><strong>state</strong> (<em>bool.</em>) – Current state to be in.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">int – the return code.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">AttributeError, KeyError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Rename FHM</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rename_fhms</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rename_fhms module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">rename_fhms</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">rename_fhms</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, denise.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/rename_fhms.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
