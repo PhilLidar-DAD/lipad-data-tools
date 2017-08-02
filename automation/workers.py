@@ -1,5 +1,5 @@
 from models import *
-# from rename_tiles import *
+
 from transfer_metadata import *
 from utils import *
 from exceptions import *
@@ -11,11 +11,11 @@ import time
 import subprocess
 from datetime import datetime
 import json as py_json
+from os.path import dirname, abspath
 
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
-CONS_LOG_LEVEL = logging.DEBUG
 FILE_LOG_LEVEL = logging.DEBUG
 
 
@@ -26,14 +26,10 @@ def setup_logging():
     formatter = logging.Formatter('[%(asctime)s] %(filename)s \
 (%(levelname)s,%(lineno)d)\t: %(message)s')
 
-    # Setup console logging
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(CONS_LOG_LEVEL)
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
-
     # Setup file logging
-    LOG_FILE = os.path.splitext(__file__)[0] + '.log'
+    filename = __file__.split('/')[-1]
+    LOG_FILE_NAME = os.path.splitext(filename)[0] + '.log'
+    LOG_FILE = dirname(abspath(__file__)) + '/logs/' + LOG_FILE_NAME
     fh = logging.FileHandler(LOG_FILE, mode='w')
     fh.setLevel(FILE_LOG_LEVEL)
     fh.setFormatter(formatter)
@@ -59,71 +55,6 @@ def connect_db():
 def close_db():
     if not PSQL_DB.is_closed():
         PSQL_DB.close()
-
-
-def process_job(q):
-    """Process workers fetched by ORM interface from LiPAD database.
-
-    Check corresponding status of a worker. Get the following attributes of
-    ``Automation_AutomationJob`` model object:
-        - `status`
-        - `status_timestamp`
-        - `datatype`
-        - `input_dir`
-        - `output_dir`
-        - `processor`
-    Get correct block name from `input_dir`. Find `block_name` in `model`
-    ``Cephgeo_LidarCoverageBlock``. If found, do:
-        #. Generate `output_dir` with `block_name` as parent directory.
-        #. If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
-        #. Upload data tiles to ``Ceph Object Storage``.
-        #. Update and assign status of ``Automation_AutomationJob`` worker
-        #.
-
-    Args:
-        q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object
-            fetched from database.
-
-    Raises:
-        Exception: If datatype is not in `Automation_AutomationJob.DATATYPE_CHOICES`.
-    """
-    assign_status(q, 1)
-    print 'Status', q.status
-    print 'Status Timestamp', q.status_timestamp
-    print 'Processing Job'
-    datatype = q.datatype
-    input_dir = q.input_dir
-    output_dir = q.output_dir
-    processor = q.processor
-
-    block_name = proper_block_name(input_dir)
-    output_dir = q.output_dir.__add__('/' + block_name)
-
-    print 'BLOCK NAME', block_name
-
-    in_coverage, block_uid = find_in_coverage(block_name)
-
-    # check first if Block Name is in Lidar Coverage
-    if in_coverage:
-        print 'Found in Lidar Coverage model', block_name, block_uid
-        if datatype.lower() == ('laz' or 'ortho'):
-            if not files_renamed(input_dir):
-                rename_tiles(input_dir, output_dir, processor, block_uid)
-        else:
-            raise Exception(
-                'Handler not implemented for type: ' + str(q.datatype))
-
-        assign_status(q, 2)
-        print 'Status', q.status
-        print 'Status Timestamp', q.status_timestamp
-        ceph_uploaded, log_file = ceph_upload(output_dir)
-
-        if ceph_uploaded:
-            assign_status(q, 3)
-            transfer_metadata(log_file, datatype)
-
-    else:
-        print 'ERROR NOT FOUND IN MODEL', block_name, block_uid
 
 
 def parse_dem_input(input_str):
@@ -192,46 +123,136 @@ def handle_dem(q):
         transfer_metadata(log_file)
 
 
+def process_job(q):
+    """Process workers fetched by ORM interface from LiPAD database.
+
+    Check corresponding status of a worker. Get the following attributes of
+    ``Automation_AutomationJob`` model object:
+
+        - `status`
+        - `status_timestamp`
+        - `datatype`
+        - `input_dir`
+        - `output_dir`
+        - `processor`
+
+    Get correct block name from `input_dir`. Find `block_name` in `model`
+    ``Cephgeo_LidarCoverageBlock``. If found, do:
+
+        #. Generate `output_dir` with `block_name` as parent directory.
+        #. If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
+        #. Upload data tiles to ``Ceph Object Storage``.
+        #. Update and assign status of ``Automation_AutomationJob`` worker
+        #.
+
+    Args:
+        q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object
+            fetched from database.
+
+    Raises:
+        Exception: If datatype is not in `Automation_AutomationJob.DATATYPE_CHOICES`.
+
+    @TODO:
+        User can input a directory containing multiple child directories. Each child
+        folder is a `LiDAR coverage block` folder.
+    """
+
+    logger.info('Processing Job')
+
+    datatype = q.datatype
+    input_dir = q.input_dir
+    output_dir = q.output_dir
+    processor = q.processor
+
+    block_name = proper_block_name(input_dir)
+    logger.info('BLOCK NAME %s', block_name)
+
+    in_coverage, block_uid = find_in_coverage(block_name)
+
+    #: Check first if folder or `block_name` is in `Cephgeo_LidarCoverageBlock`
+    #: If not found, `output_dir` is not created and data is not processed
+    if in_coverage:
+        logger.info('Found in Lidar Coverage model %s %s',
+                    block_name, block_uid)
+
+        #: LAZ and Orthophoto are to be renamed automatically, whether datasets
+        #: have been renamed or not
+        if datatype.lower() == ('laz' or 'ortho'):
+            print 'Will rename tiles ... '
+            rename_tiles(input_dir, output_dir, processor,
+                         block_name, block_uid, q)
+            logger.info('Status  %s Status Timestamp  %s',
+                        q.status, q.status_timestamp)
+            print '1 Status', q.status, 'Status Timestamp', q.status_timestamp
+
+    # for DEM
+        else:
+            logger.info('Handler not implemented for type:  %s',
+                        str(q.datatype))
+
+        # assign_status(q, 2)
+        # logger.info('Status  %s Status Timestamp  %s',
+        #             q.status, q.status_timestamp)
+        # print '2 Status', q.status, 'Status Timestamp', q.status_timestamp
+
+        # # Upload to `Ceph` after processing
+        # ceph_uploaded, log_file = ceph_upload(output_dir)
+        # if ceph_uploaded:
+        #     assign_status(q, 3)
+        #     transfer_metadata(log_file, datatype)
+    else:
+        logger.info('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
+
+
 def db_watcher():
     """Watch LiPAD Database AutomationJob for pending jobs.
 
-    Connect the ORM to the database. This loops watching of AutomationJob for
+    Connect ORM to the database. This loops watching of AutomationJob for
     new workers. This also checks the status of each AutomationJob object. This
     passes the worker to its repective workflow depending on its status.
 
     This starts upon startup of processing environment.
+
+    An `AutomationJob` status is checked and updated.
     """
 
     print 'Starting...'
     setup_logging()
     while True:
         connect_db()
-
         for status in Automation_AutomationJob.STATUS_CHOICES:
             try:
                 q = Automation_AutomationJob.get(status=status)
-                print 'Fetched Query'
-                print 'Status:', q.status
+                print 'Fetched Query. Status: .', q.status
                 if q.status.__eq__('pending_process'):
                     if q.target_os.lower() == 'linux':
+                        logger.info('Process in Linux')
+                        print 'Process in Linux'
                         process_job(q)
-                        # elif q.datatype.lower() == 'dtm':
                     else:
-                        print 'PASS TO WINDOWS'
+                        logger.info('Process in Windows')
+                        # @TODO
                         # Windows poller
+
+                elif q.status.__eq__('done_process'):
+                    # assign_status(q, 2)
+                    pass
+
+                elif q.status.__eq__('pending_ceph'):
+                    # assign_status(q, 3)
+                    pass
+
                 elif q.status.__eq__('done_ceph'):
                     # in case upload from ceph to lipad was interrupted
-                    assign_status(q, 3)
+                    # assign_status(q, 3)
                     # transfer_metadata()
-                elif q.status.__eq__('pending_ceph'):
                     pass
-                elif q.status.__eq__('done_ceph'):
-                    pass
+
                 elif q.status.__eq__('done'):
                     pass
 
             except Automation_AutomationJob.DoesNotExist:
-                logger.error('No %s task', status)
+                logger.info('No %s task', status)
 
             except Exception:
                 logger.exception('Database watcher error!')
@@ -241,3 +262,4 @@ def db_watcher():
         delay = get_delay(1, 10)
         logger.info('Worker Sleeping for %ssecs...', delay)
         time.sleep(delay)
+
