@@ -1,6 +1,8 @@
 automation package
 ==================
 
+.. moduleauthor:: Denise Leviste <drleviste@gmail.com>
+
 Submodules
 ----------
 
@@ -84,3 +86,5 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. moduleauthor:: Denise Leviste <drleviste@gmail.com>
