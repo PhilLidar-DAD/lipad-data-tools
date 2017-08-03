@@ -279,8 +279,9 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                     logger.info(' %s', outPath,
                                 'Filename okay. Wont copy data yet')
                     # Copy data
-                    # print outPath, 'Copied success'
-                    # shutil.copy(laz_file_path, outPath)
+                    shutil.copy(laz_file_path, outPath)
+                    print outPath, 'Copied success'
+                    logger.info('Copied success.')
                 else:
                     logger.error("Error reading extents of [{0}]. Trace from \
                         lasbb:\n{1}".format(
