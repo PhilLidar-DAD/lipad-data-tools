@@ -29,7 +29,12 @@ def setup_logging():
     # Setup file logging
     filename = __file__.split('/')[-1]
     LOG_FILE_NAME = os.path.splitext(filename)[0] + '.log'
-    LOG_FILE = dirname(abspath(__file__)) + '/logs/' + LOG_FILE_NAME
+    LOG_FOLDER = dirname(abspath(__file__)) + '/logs/'
+
+    if not os.path.exists(LOG_FOLDER):
+        os.makedirs(LOG_FOLDER)
+
+    LOG_FILE =  LOG_FOLDER + LOG_FILE_NAME
     fh = logging.FileHandler(LOG_FILE, mode='w')
     fh.setLevel(FILE_LOG_LEVEL)
     fh.setFormatter(formatter)
