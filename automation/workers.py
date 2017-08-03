@@ -72,7 +72,7 @@ def parse_dem_input(input_str):
 
 
 def handle_dem(q):
-    assign_status(q, 1)
+    # assign_status(q, 1)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
@@ -113,13 +113,13 @@ def handle_dem(q):
         1) Upload tiles
         2) Pass CephDataObject metadata to LiPAD db
     """
-    assign_status(q, 2)
+    # assign_status(q, 2)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     ceph_uploaded, log_file = ceph_upload(output_dir)
 
     if ceph_uploaded:
-        assign_status(q, 3)
+        # assign_status(q, 3)
         transfer_metadata(log_file)
 
 
@@ -204,6 +204,14 @@ def process_job(q):
         logger.info('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
 
 
+def upload_to_ceph(job):
+    logger.info('Upload data set to Ceph.')
+    is_uploaded, logfile = ceph_upload(q.input_dir)
+
+    if is_uploaded:
+        assign_status(q)
+
+
 def db_watcher():
     """Watch LiPAD Database AutomationJob for pending jobs.
 
@@ -236,7 +244,7 @@ def db_watcher():
 
                 elif q.status.__eq__('done_process'):
                     # assign_status(q, 2)
-                    pass
+                    upload_to_ceph(q)
 
                 elif q.status.__eq__('pending_ceph'):
                     # assign_status(q, 3)
@@ -262,4 +270,3 @@ def db_watcher():
         delay = get_delay(1, 10)
         logger.info('Worker Sleeping for %ssecs...', delay)
         time.sleep(delay)
-

@@ -196,16 +196,16 @@ with open(data_dump_file_path, 'w') as dump_file:
                     logger.info("Uploaded file [{0}]".format(join(path, name)))
 
                     ### TODO ###
-                    dump_file.write("{0},{1},{2},{3},{4},{5}\n".format(obj_dict['name'],
-                                                                       obj_dict[
-                        'last_modified'],
-                        obj_dict[
-                        'bytes'],
-                        obj_dict[
-                        'content_type'],
-                        obj_dict[
-                        'hash'],
-                        obj_dict['grid_ref']))
+                    dump_file.write("{0},{1},{2},{3},{4},{5}\n".
+                                    format(obj_dict['name'],                                                   obj_dict[
+                                        'last_modified'],
+                                        obj_dict[
+                                        'bytes'],
+                                        obj_dict[
+                                        'content_type'],
+                                        obj_dict[
+                                        'hash'],
+                                        obj_dict['grid_ref']))
                 else:
                     logger.debug(
                         "Skipped file [{0}]. Not allowed in file extensions".format(join(path, name)))
@@ -301,5 +301,5 @@ print("Done Uploading!")
 print("wrote metadata to file:")
 print("{0}".format(data_dump_file_path))
 
-# print 'File Path: ', data_dump_file_path
-# return data_dump_file_path
+print 'File Path: ', data_dump_file_path
+return data_dump_file_path

@@ -34,17 +34,33 @@ def setup_logging():
 
 
 def ceph_upload(input_dir_ceph):
-    print 'Upload to Ceph'
+    # @TODO
+    # Separate logging field in Automation Model
+    stream = setup_logging()
+
+    print 'Uploading to Ceph ....'
+    logger.info('Uploading to Ceph ....')
+
     try:
         output = subprocess.check_output(
             ['./bulk_upload_nonthreaded.py', input_dir_ceph])
-        print 'Ceph Output...'
+
+        print '#' * 40
+        print 'Ceph Output ... '
+        logger.info('Ceph Output ... ')
+        print '#' * 40
+
         print output, len(output)
+        logger.info('%s %s', output, len(output))
+
         filename = output.split('\n')[-1]
         print 'Logfile', filename
+        logger.info('Logfile %s', filename)
+
         if 'Done Uploading!' in output:
             print 'Caught Done Uploading!'
         return True, filename
+
     except Exception:
         print 'Error in Ceph upload!'
         return False, None
@@ -104,16 +120,24 @@ def get_delay(min_, max_):
     return float('%.2f' % random.uniform(min_, max_))
 
 
-def assign_status(q, status):
+def assign_status(q, status_):
+    status = q.status
+    print 'Status:', status
+    loggger.info('Status: %s', status)
+
+    for i in [i for i, x in enumerate(Automation_AutomationJob.STATUS_CHOICES)
+              if x == status]:
+        status += 1
+
     if status == 1:
         new_status = 'done_process'
-        logger.info('Processing Job')
+        logger.info('Processed Job')
     elif status == 2:
         new_status = 'pending_ceph'
-        logger.info('Uploading in Ceph')
+        logger.info('Upload to Ceph')
     elif status == 3:
         new_status = 'done_ceph'
-        logger.info('Uploaded in Ceph')
+        logger.info('Upload to LiPAD')
     elif status == 4:
         new_status = 'done'
         logger.info('Metadata uploaded in LiPAD')
@@ -298,11 +322,10 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
     #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
     if not inDir_error:
-        assign_status(q, 1)
+        assign_status(q)
 
     with PSQL_DB.atomic() as txn:
         new_q = (Automation_AutomationJob
                  .update(log=stream.getvalue(), status_timestamp=datetime.now())
                  .where(Automation_AutomationJob.id == q.id))
         new_q.execute()
-

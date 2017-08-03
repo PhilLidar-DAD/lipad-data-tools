@@ -70,14 +70,19 @@ class Automation_AutomationJob(BaseModel):
 
     """
     STATUS_CHOICES = [
-        ('pending_process'),
-        ('done_process'),
-        ('pending_ceph'),
-        ('done_ceph'),
-        ('done'),
+        ('pending_process'),    # Pending Job
+        ('done_process'),       # Processed Job
+        ('pending_ceph'),       # Uploading in Ceph
+        ('done_ceph'),          # Uploaded in Ceph
+        ('done'),               # Uploaded in LiPAD
         # (-1, 'error', _('Error')),
     ]
-
+    # ('pending_process', _('Pending Job')),
+#         # ('done_process', _('Processing Job')),
+#         ('done_process', _('Processed Job')),
+#         ('pending_ceph', _('Uploading in Ceph')),
+#         ('done_ceph', _('Uploaded in Ceph')),
+#         ('done', _('Uploaded in LiPAD')),
     OS_CHOICES = [
         ('linux', ('Process in Linux')),
         ('windows', ('Process in Windows')),
