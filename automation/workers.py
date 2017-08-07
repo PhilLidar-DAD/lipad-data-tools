@@ -13,6 +13,8 @@ from datetime import datetime
 import json as py_json
 from os.path import dirname, abspath
 
+from data_processing import rename_tiles
+
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
