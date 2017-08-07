@@ -1,112 +1,74 @@
-#!/usr/bin/env python
-
-from geonode.settings import GEONODE_APPS
-import geonode.settings as settings
-
-import subprocess
-import ogr
-import os
-import shutil
-import time
-import math
-import argparse
-import sys
-import logging
-
-from workers import *
-
-from geonode.cephgeo.models import CephDataObject, LidarCoverageBlock
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "geonode.settings")
-
-_version = "0.3.2"
-print os.path.basename(__file__) + ": v" + _version
-_logger = logging.getLogger()
-_LOG_LEVEL = logging.DEBUG
-_CONS_LOG_LEVEL = logging.INFO
-_FILE_LOG_LEVEL = logging.DEBUG
-
-driver = ogr.GetDriverByName('ESRI Shapefile')
 
 
-def get_cwd():
-    cur_path = os.path.realpath(__file__)
-    if "?" in cur_path:
-        return cur_path.rpartition("?")[0].rpartition(os.path.sep)[0] + os.path.sep
-    else:
-        return cur_path.rpartition(os.path.sep)[0] + os.path.sep
+from .utils import assign_status, get_cwd, setup_logging
+
+def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
+    """Rename each file/tile based on its grid reference.
+
+    A tile is defined is a 1km by 1km division of `LAZ` or `Orthophoto` data. Each
+    file is a tile. This function uses `lasbb`, a binary file of `LAStools`. The
+    grid reference of a tile is computed using:
+
+        - `minX`: minimum easting coordinate
+        - `minY`: minimum northing coordinate
+        - maxX`: maximum easting coordinate
+        - `maxY`: maximum northing coordinate
+        - `bbox_center_x`
+        - `bbox_center_y`
 
 
-def _setup_logging(args):
-    # Setup logging`
-    formatter = logging.Formatter("[%(asctime)s] %(filename)s \
-(%(levelname)s,%(lineno)d) : %(message)s")
+    Args:
+        inDir (path): Directory containing data tiles to be processed.  This is
+        a `block_name ` in the `Cephgeo_LidarCoverageBlock` model.
+        outDir (path): The directory where renamed tiles are stored.
+        processor (str): Operating System used in processing data.
+        block_uid (int): Corresponding `uid` of the `block_name`. This `uid` is from
+            `Cephgeo_LidarCoverageBlock` model.
 
-    # Check verbosity for console
-    if args.verbose and args.verbose >= 1:
-        global _CONS_LOG_LEVEL
-        _CONS_LOG_LEVEL = logging.DEBUG
+    Attributes:
+        _TILE_SIZE: Tile size in meters, 1000m by 1000m.
 
-    # Setup console logging
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(_CONS_LOG_LEVEL)
-    ch.setFormatter(formatter)
-    _logger.addHandler(ch)
+    Returns:
+        Output directory containing renamed tiles. The final format of a file is:
+        **Easting_Northing_FileType_Processor_BlockUID.FileType**
 
-    # Setup file logging
-    fh = logging.FileHandler(args.logfile)
-    fh.setLevel(_FILE_LOG_LEVEL)
-    fh.setFormatter(formatter)
-    _logger.addHandler(fh)
+    Raises:
+        Warning: A warning is raised if the output directory path already exists.
+        Extents Error: If a tile is problematic or corrupted.
 
 
-def find_in_coverage(block_name):
-    try:
-        # get block_name in LidarCoverageBlock Model
-        block = LidarCoverageBlock.objects.get(block_name=block_name)
-        print 'Block in Lidar Coverage'
-        print 'Block UID:', block.uid
-        return True, block.uid
-    except Exception:
-        print 'Block not in Lidar Coverage', block_name
-        return False, 0
+    """
 
+    #: Time data type: Start timing
+    startTime = datetime.now()
 
-def proper_block_name(block_path):
+    #: Separate logging for renaming tiles
+    stream = setup_logging()
 
-    # input format: ../../Agno_Blk5C_20130418
+    #: logger variable for log field in `Automation_AutomationJob`
+    logger.info('Renaming tiles ...')
 
-    # parses blockname from path
-    block_name = block_path.split(os.sep)[-1]
-    if block_name == '':
-        block_name = block_path.split(os.sep)[-2]
-    # remove date flown
-    block_name = block_name.rsplit('_', 1)[0]
+    outDir = outDir.__add__('/' + block_name)
+    logger.info('Output Directory: %s', outDir)
 
-    print 'BLOCK NAME', block_name
-    return block_name
-
-
-def rename_tiles(inDir, outDir, processor, block_uid):
-    # Start timing
-    startTime = time.time()
-
-    print 'Renaming ...'
-
-    # outDir = outDir.__add__('/' + block_name)
-    print 'OutDir:', outDir
     if not os.path.exists(outDir):
         os.makedirs(outDir)
 
-    # Loop through the input directory
+    inDir_error = False
+    if not os.path.isdir(inDir) and os.listdir(inDir) == []:
+        logger.error('Problematic Input Directory %s', inDir)
+        inDir_error = True
+
+    #: Loop through the input directory
     for path, dirs, files in os.walk(inDir, topdown=False):
+
         for tile in files:
             if tile.endswith(".laz") or tile.endswith(".tif"):
                 typeFile = tile.split(".")[-1].upper()
                 ctr = 0
                 tile_file_path = os.path.join(path, tile)
 
-                # get LAZ bounding box/extents
+                #: Get file bounding box/extents
                 p = subprocess.Popen([os.path.join(get_cwd(), 'lasbb'), '-get_bb',
                                       tile_file_path], stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT)
@@ -133,9 +95,10 @@ def rename_tiles(inDir, outDir, processor, block_uid):
                         tile_x, tile_y, typeFile, processor, block_uid, typeFile.lower())
                     outPath = os.path.join(outDir, outFN)
 
-                    # Check if output filename is already exists
+                    #: Check if output filename is already exists
                     while os.path.exists(outPath):
-                        print '\nWARNING:', outPath, 'already exists!'
+                        logger.warning('\nWARNING:  %s', outPath,
+                                       'already exists!')
                         ctr += 1
                         # outFN =
                         # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
@@ -145,76 +108,39 @@ def rename_tiles(inDir, outDir, processor, block_uid):
                         # print outFN
                         outPath = os.path.join(outDir, outFN)
 
-                    print os.path.join(path, tile), outFN
+                    print 'Path  %s', os.path.join(path, tile), 'Filename: %s', outFN
+                    logger.info('Path %s', os.path.join(
+                        path, tile), 'Filename: %s', outFN)
 
-                    _logger.info(os.path.join(path, tile) +
-                                 ' --------- ' + outFN + '\n')
+                    logger.info('Path + Filename  %s', os.path.join(path, tile) +
+                                ' ---------  %s', outFN + '\n')
 
-                    print outPath, 'Filename okay'
-                    # print outPath, 'copied successfully'
-                    # shutil.copy(laz_file_path, outPath)
+                    logger.info(' %s', outPath,
+                                'Filename okay. Wont copy data yet')
+                    # Copy data
+                    shutil.copy(tile_file_path, outPath)
+                    print outPath, 'Copied success'
+                    logger.info('Copied success.')
                 else:
-                    _logger.error("Error reading extents of [{0}]. Trace from \
+                    logger.error("Error reading extents of [{0}]. Trace from \
                         lasbb:\n{1}".format(
                         tile_file_path, out))
 
-    endTime = time.time()  # End timing
-    print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime, 2))), 'seconds'
+    endTime = datetime.now()  # End timing
+    elapsed_time = endTime - startTime
 
+    logger.info('\nElapsed Time: %s', elapsed_time)
 
-def assign_processor(processor):
-    value = processor.lower()
-    list_ = {'DRM': ['dream', 'drm', 'd'],
-             'PL1': ['phil-lidar', 'pl', 'pl1']}
-    for k, v in list_.items():
-        if value in v:
-            print 'Processor', k
-            return k
-    return None
+    print '#' * 40
+    print 'Stream value', stream.getvalue()
+    print '#' * 40
 
+    #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
+    if not inDir_error:
+        assign_status(q)
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description='Rename LAZ Files')
-    parser.add_argument("-v", "--verbose", action="count")
-    # parser.add_argument('-i', '--input_directory')
-    # parser.add_argument('-o', '--output_directory')
-    # parser.add_argument('-t','--type')
-    # parser.add_argument("-tmp", "--temp-dir", required=True,
-    #                        help="Path to temporary working directory.")
-    # parser.add_argument("-rbid", "--rbid", required=True,
-    #                     help="River basin ID for this DEM.")
-    parser.add_argument("-p", "--processor", required=True,
-                        help="Processor for this LAZ (dream or phil-lidar)")
-    parser.add_argument("-l", "--logfile", required=True,
-                        help="Filename of logfile")
-
-    args = parser.parse_args()
-    return args
-
-
-if __name__ == '__main__':
-    args = parse_arguments()
-    _setup_logging(args)
-    # Start timing
-    startTime = time.time()
-
-    # inDir = args.input_directory
-    # outDir = args.output_directory
-    inDir = os.path.abspath(
-        '/home/geonode/Work/Data/Copied_blocks/Agno/Agno_Blk5C_20130418/')
-    outDir = '/home/geonode/Work/Data/Copied_blocks/Renamed/'
-    # typeFile = args.type.upper()
-    # fileExtn = args.type.lower()
-
-    # if typeFile != "LAS" and typeFile != "LAZ":
-    #   print typeFile, 'is not a supported format'
-    #   sys.exit()
-
-    block_name = proper_block_name(inDir)
-    in_coverage, block_uid = find_in_coverage(block_name)
-    if in_coverage:
-        print 'Found in Lidar Coverage model', block_name, block_uid
-        processor = assign_processor(args.processor)
-        rename_laz(inDir, outDir, processor, block_name, block_uid)
-    else:
-        print 'ERROR NOT FOUND IN MODEL', block_name, block_uid
+    with PSQL_DB.atomic() as txn:
+        new_q = (Automation_AutomationJob
+                 .update(log=stream.getvalue(), status_timestamp=datetime.now())
+                 .where(Automation_AutomationJob.id == q.id))
+        new_q.execute()
