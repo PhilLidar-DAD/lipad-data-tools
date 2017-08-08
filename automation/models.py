@@ -117,7 +117,7 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
     block_name = CharField()
 
 
-class Cephgeo_CephDataObject(BaseModel):
+class Automation_CephDataObjectResourceBase(BaseModel):
     id = IntegerField(primary_key=True)
     size_in_bytes = IntegerField()
     file_hash = CharField(max_length=40)

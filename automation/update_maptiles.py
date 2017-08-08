@@ -95,11 +95,13 @@ def grid_feature_update(gridref_dict_by_data_class, field_value=1):
         Update the grid shapefile feature attribute specified by [feature_attr] on gridrefs in [gridref_list]
     """
     grid_updated = False
-    for feature_attr, grid_ref_list in gridref_dict_by_data_class.iteritems():
-        logger.info("Updating feature attribute [{0}]".format(feature_attr))
-        grid_updated = nested_grid_update(grid_ref_list, feature_attr, field_value)
-        logger.info("Finished task for feature [{0}]".format(feature_attr))
+    # for feature_attr, grid_ref_list in gridref_dict_by_data_class.iteritems():
+    #     logger.info("Updating feature attribute [{0}]".format(feature_attr))
+    #     grid_updated = nested_grid_update(grid_ref_list, feature_attr, field_value)
+    #     logger.info("Finished task for feature [{0}]".format(feature_attr))
 
     if grid_updated:
         return True
+    else:
+        return False
 
