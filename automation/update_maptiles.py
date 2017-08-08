@@ -21,7 +21,8 @@ def get_data_class_from_filename(filename):
 
 def get_uid_from_filename(filename):
     name = filename.split('.')[0]
-    uid = name.split('_')[3].split('U')
+    uid = int((name.split('_')[3].split('U')[-1:]).pop(0))
+    print 'UID', uid
 
     return uid
 
@@ -71,6 +72,8 @@ def ceph_metadata_update(uploaded_objects_list, update_grid=True):
                 Retrieve and check if metadata is present, update instead if there is
             """
             ceph_obj = None
+            # for x in metadata_list:
+            #     print 'Metadata', x
             try:
                 ceph_obj = Cephgeo_CephDataObject.get(name=metadata_list[0])
                 # Commented attributes are not relevant to update
@@ -117,7 +120,6 @@ def ceph_metadata_update(uploaded_objects_list, update_grid=True):
                                  grid_ref=metadata_list[5],
                                  block_uid=get_uid_from_filename(
                                  metadata_list[0])))
-                    new_q.execute()
                 # ceph_obj.save()
 
                 objects_inserted += 1
@@ -152,7 +154,7 @@ def transform_log_to_list(log):
     log = log.strip()
     log_list = log.split('\r\n')
 
-    print 'Log List:', log_list
+    # print 'Log List:', log_list
     logging.info('Cleaned log.')
 
     return log_list
@@ -161,62 +163,3 @@ def transform_log_to_list(log):
 def upload_metadata(job):
     uploaded_objects_list = transform_log_to_list(job.ceph_upload_log)
     ceph_metadata_update(uploaded_objects_list)
-
-
-
-# def parse_ceph_log(file_path, data_class):
-
-#     if not os.path.isfile(os.path.abspath(file_path)):
-#         # if os.path.isfile(file_path):
-#         print '{0} file not found'.format(file_path)
-#     else:
-#         csv_delimeter = ','
-#         gridref_dict_by_data_class = dict()
-
-#         with open(file_path, 'r') as open_file:
-#             of = open_file.read()
-#             first_line = True
-#             for line in of.split('\n'):
-#                 tokens = line.strip().split(csv_delimeter)
-
-#                 if first_line:
-#                     first_line = False
-#                     continue
-#                 if line:
-#                     try:
-#                         if len(tokens) == 6:
-#                             print 'Tokens'
-#                             print tokens[0]
-#                             print tokens[1]
-#                             print tokens[2]
-#                             print tokens[3]
-#                             print data_class
-#                             print tokens[4]
-#                             print tokens[5]
-#                             print 'Creating Ceph Data Object...'
-
-#                             try:
-#                                 # Cephgeo_CephDataObject.create(name=tokens[0],
-#                                 #                               last_modified=tokens[
-#                                 #                                   1],
-#                                 #                               size_in_bytes=tokens[
-#                                 #                                   2],
-#                                 #                               content_type=tokens[
-#                                 #                                   3],
-#                                 #                               data_class=get_data_class_from_filename(
-#                                 #                               tokens[0]),
-#                                 #                               file_hash=tokens[
-#                                 #                                   4],
-#                                 #                               grid_ref=tokens[5])
-#                                 ceph_obj = 'Ceph object'
-#                                 if ceph_obj is not None:
-#                                     create_gridref_dict(
-#                                         ceph_obj, gridref_dict_by_data_class)
-
-#                             except Exception:
-#                                 print 'Could not create ceph data object'
-#                         else:
-#                             print("Skipping invalid metadata list (invalid length): {0}".format(
-#                                 metadata_list))
-#                     except Exception:
-#                         print 'Error in updating grid?'
