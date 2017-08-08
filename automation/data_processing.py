@@ -1,6 +1,16 @@
+import os
+import logging
+from datetime import datetime
+import subprocess
+import math
+import shutil
 
-
+from .models import PSQL_DB, Automation_AutomationJob
 from .utils import assign_status, get_cwd, setup_logging
+
+
+logger = logging.getLogger()
+
 
 def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     """Rename each file/tile based on its grid reference.
@@ -29,8 +39,9 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
         _TILE_SIZE: Tile size in meters, 1000m by 1000m.
 
     Returns:
-        Output directory containing renamed tiles. The final format of a file is:
-        **Easting_Northing_FileType_Processor_BlockUID.FileType**
+        Output directory containing renamed tiles. This functions appends the data
+        version at the end of the nameThe final format of a file is:
+        **Easting_Northing_FileType_Processor_BlockUID_Version.FileType**
 
     Raises:
         Warning: A warning is raised if the output directory path already exists.
@@ -97,8 +108,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
                     #: Check if output filename is already exists
                     while os.path.exists(outPath):
-                        logger.warning('\nWARNING:  %s', outPath,
-                                       'already exists!')
+                        logger.warning('\nWARNING: %s already exists!', outPath)
                         ctr += 1
                         # outFN =
                         # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
@@ -109,14 +119,13 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                         outPath = os.path.join(outDir, outFN)
 
                     print 'Path  %s', os.path.join(path, tile), 'Filename: %s', outFN
-                    logger.info('Path %s', os.path.join(
-                        path, tile), 'Filename: %s', outFN)
+                    logger.info('Path %s Filename: %s', os.path.join(
+                        path, tile), outFN)
 
-                    logger.info('Path + Filename  %s', os.path.join(path, tile) +
-                                ' ---------  %s', outFN + '\n')
+                    logger.info('Path + Filename  %s ---------  %s\n', os.path.
+                                join(path, tile), outFN)
 
-                    logger.info(' %s', outPath,
-                                'Filename okay. Wont copy data yet')
+                    logger.info(' %s Filename okay. Wont copy data yet', outPath)
                     # Copy data
                     shutil.copy(tile_file_path, outPath)
                     print outPath, 'Copied success'

@@ -60,12 +60,14 @@ def setup_dump_and_logs():
 def write_obj_metadata_to_csv(obj_metadata):
     pass
 
-config_parser = SafeConfigParser()
-config_parser.read(get_cwd() + 'config.ini')
+# config_parser = SafeConfigParser()
+# config_parser.read(get_cwd() + 'config.ini')
 
 
 # Default virtualenv path to activate file
-activate_this_file = "~/.virtualenvs/geonode/bin/activate_this.py"
+# activate_this_file = "~/.virtualenvs/geonode/bin/activate_this.py"
+# activate_this_file ="~/.virtualenvs/automation/bin/activate_this.py"
+activate_this_file = CONFIG.get('env', 'activatethis')
 
 # Default log filepath
 log_filepath = get_cwd() + "logs/bulk_upload.log"
@@ -301,5 +303,5 @@ print("Done Uploading!")
 print("wrote metadata to file:")
 print("{0}".format(data_dump_file_path))
 
-print 'File Path: ', data_dump_file_path
-return data_dump_file_path
+# print 'File Path: ', data_dump_file_path
+# return data_dump_file_path
