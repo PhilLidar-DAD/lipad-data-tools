@@ -13,6 +13,7 @@ import json as py_json
 from os.path import dirname, abspath
 
 from data_processing import rename_tiles
+from update_metadata_store import *
 from update_maptiles import *
 
 logger = logging.getLogger()
@@ -223,6 +224,21 @@ def upload_to_ceph(job):
 
     # elif not is_uploaded:
     # retry uploading or stop?
+
+
+def upload_metadata(job):
+    uploaded_objects_list = transform_log_to_list(job.ceph_upload_log)
+
+    gridref_dict_by_data_class = ceph_metadata_update(uploaded_objects_list)
+    logger.info('Created/Updated Ceph Objects in Database.')
+
+    logger.info('Updating Philgrid ...')
+    grid_updated = grid_feature_update(gridref_dict_by_data_class)
+
+
+    if grid_updated:
+        print 'Successfully updated Ceph and Philgrid'
+        assign_status(job)
 
 
 def db_watcher():
