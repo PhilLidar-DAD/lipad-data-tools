@@ -219,6 +219,7 @@ def upload_to_ceph(job):
     print 'Logfile', logfile
 
     if is_uploaded:
+        print 'STATUS', job.status
         assign_status(job)
 
     # elif not is_uploaded:

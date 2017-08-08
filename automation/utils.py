@@ -79,7 +79,7 @@ def ceph_upload(job):
                          .update(ceph_upload_log=output, status_timestamp=datetime.now())
                          .where(Automation_AutomationJob.id == job.id))
                 new_q.execute()
-        return True, ''
+            return True, ''
 
     except Exception:
         print 'Error in Ceph upload!'
@@ -155,10 +155,8 @@ def assign_status(q):
     if status_index == 1:
         logger.info('Processed Job')
     elif status_index == 2:
-        logger.info('Upload to Ceph')
+        logger.info('Uploaded in Ceph')
     elif status_index == 3:
-        logger.info('Upload to LiPAD')
-    elif status_index == 4:
         logger.info('Metadata uploaded in LiPAD')
 
     with PSQL_DB.atomic() as txn:

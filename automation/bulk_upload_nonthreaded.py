@@ -177,7 +177,7 @@ data_dump_file_path = "dump/uploaded_objects_[{0}]_{1}.txt".format(
 
 with open(data_dump_file_path, 'w') as dump_file:
     header_str = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH GRID_REF\n"
-    print('NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH GRID_REF\n')
+    print('NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH GRID_REF')
     dump_file.write(header_str)
 
     # No previous metadata dump file to resume from specified

@@ -72,7 +72,7 @@ class Automation_AutomationJob(BaseModel):
     STATUS_CHOICES = [
         ('pending_process'),    # Pending Job
         ('done_process'),       # Processed Job
-        ('pending_ceph'),       # Uploading in Ceph
+        # ('pending_ceph'),       # Uploading in Ceph
         ('done_ceph'),          # Uploaded in Ceph
         ('done'),               # Uploaded in LiPAD
         # (-1, 'error', _('Error')),
