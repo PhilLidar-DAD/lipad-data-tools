@@ -144,10 +144,10 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     print 'Stream value', stream.getvalue()
     print '#' * 40
 
-    #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
     if not inDir_error:
         assign_status(q)
 
+    #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
     with PSQL_DB.atomic() as txn:
         new_q = (Automation_AutomationJob
                  .update(data_processing_log=stream.getvalue(), status_timestamp=datetime.now())
