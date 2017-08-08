@@ -99,7 +99,9 @@ class Automation_AutomationJob(BaseModel):
     status_timestamp = peewee.DateTimeField(null=True)
     target_os = peewee.CharField(choices=OS_CHOICES)
     # target_os = OSChoice(choices=OS_CHOICES)
-    log = peewee.TextField(null=False)
+    data_processing_log = peewee.TextField(null=False)
+    ceph_upload_log = peewee.TextField(null=False)
+    database_upload_log = peewee.TextField(null=False)
 
     # class Meta:
     #     primary_key = peewee.CompositeKey(
