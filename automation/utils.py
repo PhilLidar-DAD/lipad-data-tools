@@ -1,11 +1,8 @@
 import os
-from models import *
+from models import PSQL_DB, Automation_AutomationJob, Cephgeo_LidarCoverageBlock
 import random
 import subprocess
 from datetime import datetime
-import logging
-import math
-import shutil
 import logging
 
 
@@ -33,7 +30,7 @@ def setup_logging():
     return stream
 
 
-def ceph_upload(input_dir_ceph):
+def ceph_upload(input_dir):
     # @TODO
     # Separate logging field in Automation Model
     stream = setup_logging()
@@ -41,9 +38,16 @@ def ceph_upload(input_dir_ceph):
     print 'Uploading to Ceph ....'
     logger.info('Uploading to Ceph ....')
 
+    # PATH = './bulk_upload_nonthreaded.py'
+
     try:
-        output = subprocess.check_output(
-            ['./bulk_upload_nonthreaded.py', input_dir_ceph])
+        # if not os.path.isfile(PATH):
+        #     print "File does not exist", PATH
+        # if not os.access(PATH, os.R_OK):
+        #     print "File is not readable", PATH
+        # return True, ''
+
+        output = subprocess.check_output(['./bulk_upload_nonthreaded.py', input_dir])
 
         print '#' * 40
         print 'Ceph Output ... '
@@ -59,10 +63,13 @@ def ceph_upload(input_dir_ceph):
 
         if 'Done Uploading!' in output:
             print 'Caught Done Uploading!'
+            logger.info('Done Uploading!')
+            logger.info('Filename %s', filename)
         return True, filename
 
     except Exception:
         print 'Error in Ceph upload!'
+        logger.exception()
         return False, None
 
 
@@ -120,26 +127,24 @@ def get_delay(min_, max_):
     return float('%.2f' % random.uniform(min_, max_))
 
 
-def assign_status(q, status_):
+def assign_status(q):
     status = q.status
     print 'Status:', status
-    loggger.info('Status: %s', status)
+    logger.info('Status: %s', status)
 
-    for i in [i for i, x in enumerate(Automation_AutomationJob.STATUS_CHOICES)
-              if x == status]:
-        status += 1
+    for status_index in [status_index for status_index, x in enumerate(Automation_AutomationJob.STATUS_CHOICES)
+                         if x == status]:
+        status_index += 1
 
-    if status == 1:
-        new_status = 'done_process'
+    new_status = Automation_AutomationJob.STATUS_CHOICES[status_index]
+
+    if status_index == 1:
         logger.info('Processed Job')
-    elif status == 2:
-        new_status = 'pending_ceph'
+    elif status_index == 2:
         logger.info('Upload to Ceph')
-    elif status == 3:
-        new_status = 'done_ceph'
+    elif status_index == 3:
         logger.info('Upload to LiPAD')
-    elif status == 4:
-        new_status = 'done'
+    elif status_index == 4:
         logger.info('Metadata uploaded in LiPAD')
 
     with PSQL_DB.atomic() as txn:
@@ -185,5 +190,3 @@ def get_cwd():
         return cur_path.rpartition("?")[0].rpartition(os.path.sep)[0] + os.path.sep
     else:
         return cur_path.rpartition(os.path.sep)[0] + os.path.sep
-
-
