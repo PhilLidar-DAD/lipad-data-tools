@@ -5,11 +5,11 @@ from settings import *
 from peewee import *
 
 
-PSQL_DB = peewee.PostgresqlDatabase(
+PSQL_DB = PostgresqlDatabase(
     DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
 
-class BaseModel(peewee.Model):
+class BaseModel(Model):
 
     class Meta:
         database = PSQL_DB
@@ -88,23 +88,23 @@ class Automation_AutomationJob(BaseModel):
         ('windows', ('Process in Windows')),
     ]
 
-    id = peewee.IntegerField(primary_key=True)
-    datatype = peewee.CharField(max_length=10)
-    input_dir = peewee.TextField(null=False)
-    output_dir = peewee.TextField(null=False)
-    processor = peewee.CharField(max_length=10)
-    date_submitted = peewee.DateTimeField(null=False)
-    # status = peewee.CharField(max_length=20)
-    status = peewee.CharField(choices=STATUS_CHOICES)
-    status_timestamp = peewee.DateTimeField(null=True)
-    target_os = peewee.CharField(choices=OS_CHOICES)
+    id = IntegerField(primary_key=True)
+    datatype = CharField(max_length=10)
+    input_dir = TextField(null=False)
+    output_dir = TextField(null=False)
+    processor = CharField(max_length=10)
+    date_submitted = DateTimeField(null=False)
+    # status = CharField(max_length=20)
+    status = CharField(choices=STATUS_CHOICES)
+    status_timestamp = DateTimeField(null=True)
+    target_os = CharField(choices=OS_CHOICES)
     # target_os = OSChoice(choices=OS_CHOICES)
-    data_processing_log = peewee.TextField(null=False)
-    ceph_upload_log = peewee.TextField(null=False)
-    database_upload_log = peewee.TextField(null=False)
+    data_processing_log = TextField(null=False)
+    ceph_upload_log = TextField(null=False)
+    database_upload_log = TextField(null=False)
 
     # class Meta:
-    #     primary_key = peewee.CompositeKey(
+    #     primary_key = CompositeKey(
     #         'datatype', 'date_submitted', 'status')
 
 
@@ -113,30 +113,31 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
         From geonode.cephgeo.models LidarCoverageBlock
         Only UID and Block Name needed for renaming tiles
     """
-    uid = peewee.IntegerField(primary_key=True)
-    block_name = peewee.CharField()
+    uid = IntegerField(primary_key=True)
+    block_name = CharField()
 
 
-class CephDataObject(BaseModel):
-    id = peewee.IntegerField(primary_key=True)
-    size_in_bytes = peewee.IntegerField()
-    file_hash = peewee.CharField(max_length=40)
-    name = peewee.CharField(max_length=100)
-    last_modified = peewee.DateTimeField()
-    content_type = peewee.CharField(max_length=20)
-    data_class = peewee.CharField(max_length=20)
-    grid_ref = peewee.CharField(max_length=10)
+class Cephgeo_CephDataObject(BaseModel):
+    id = IntegerField(primary_key=True)
+    size_in_bytes = IntegerField()
+    file_hash = CharField(max_length=40)
+    name = CharField(max_length=100)
+    last_modified = DateTimeField()
+    content_type = CharField(max_length=20)
+    data_class = CharField(max_length=20)
+    grid_ref = CharField(max_length=10)
+    block_uid = ForeignKeyField(Cephgeo_LidarCoverageBlock)
 
 
 class Cephgeo_DemDataStore():
-    demid = peewee.IntegerField(primary_key=True)
-    name = peewee.CharField(max_length=20)
-    suc = peewee.CharField(max_length=5)
-    type = peewee.CharField(max_length=5)
-    shifting_val_x = peewee.FloatField()
-    shifting_val_y = peewee.FloatField()
-    shifting_val_z = peewee.FloatField()
-    height_diff = peewee.FloatField()
-    rmse = peewee.FloatField()
-    dem_file_path = peewee.TextField(null=False)
-    block_name_list = peewee.TextField(null=False)
+    demid = IntegerField(primary_key=True)
+    name = CharField(max_length=20)
+    suc = CharField(max_length=5)
+    type = CharField(max_length=5)
+    shifting_val_x = FloatField()
+    shifting_val_y = FloatField()
+    shifting_val_z = FloatField()
+    height_diff = FloatField()
+    rmse = FloatField()
+    dem_file_path = TextField(null=False)
+    block_name_list = TextField(null=False)

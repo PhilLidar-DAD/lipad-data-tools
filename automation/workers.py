@@ -1,6 +1,5 @@
 from models import *
 
-from transfer_metadata import *
 from utils import *
 from exceptions import *
 import os
@@ -14,7 +13,7 @@ import json as py_json
 from os.path import dirname, abspath
 
 from data_processing import rename_tiles
-
+from update_maptiles import *
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
@@ -246,6 +245,8 @@ def db_watcher():
             try:
                 q = Automation_AutomationJob.get(status=status)
                 print 'Fetched Query. Status: .', q.status
+
+                #: Pending Job
                 if q.status.__eq__('pending_process'):
                     if q.target_os.lower() == 'linux':
                         logger.info('Process in Linux')
@@ -256,20 +257,17 @@ def db_watcher():
                         # @TODO
                         # Windows poller
 
+                #: Processed Job
                 elif q.status.__eq__('done_process'):
                     # assign_status(q, 2)
                     upload_to_ceph(q)
-                    # pass
 
-                elif q.status.__eq__('pending_ceph'):
-                    # assign_status(q, 3)
-                    pass
-
+                #: Uploaded in Ceph
                 elif q.status.__eq__('done_ceph'):
                     # in case upload from ceph to lipad was interrupted
                     # assign_status(q, 3)
                     # transfer_metadata()
-                    pass
+                    upload_metadata(q)
 
                 elif q.status.__eq__('done'):
                     pass
