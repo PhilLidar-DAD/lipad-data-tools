@@ -150,6 +150,6 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
     with PSQL_DB.atomic() as txn:
         new_q = (Automation_AutomationJob
-                 .update(log=stream.getvalue(), status_timestamp=datetime.now())
+                 .update(data_processing_log=stream.getvalue(), status_timestamp=datetime.now())
                  .where(Automation_AutomationJob.id == q.id))
         new_q.execute()

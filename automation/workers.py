@@ -36,7 +36,7 @@ def setup_logging():
     if not os.path.exists(LOG_FOLDER):
         os.makedirs(LOG_FOLDER)
 
-    LOG_FILE =  LOG_FOLDER + LOG_FILE_NAME
+    LOG_FILE = LOG_FOLDER + LOG_FILE_NAME
     fh = logging.FileHandler(LOG_FILE, mode='w')
     fh.setLevel(FILE_LOG_LEVEL)
     fh.setFormatter(formatter)
@@ -213,10 +213,16 @@ def process_job(q):
 
 def upload_to_ceph(job):
     logger.info('Upload data set to Ceph.')
-    is_uploaded, logfile = ceph_upload(q.input_dir)
+
+    is_uploaded, logfile = ceph_upload(job)
+    print 'IS uploaded', is_uploaded
+    print 'Logfile', logfile
 
     if is_uploaded:
-        assign_status(q)
+        assign_status(job)
+
+    # elif not is_uploaded:
+    # retry uploading or stop?
 
 
 def db_watcher():
@@ -252,6 +258,7 @@ def db_watcher():
                 elif q.status.__eq__('done_process'):
                     # assign_status(q, 2)
                     upload_to_ceph(q)
+                    # pass
 
                 elif q.status.__eq__('pending_ceph'):
                     # assign_status(q, 3)

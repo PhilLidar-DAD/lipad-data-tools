@@ -30,10 +30,13 @@ def setup_logging():
     return stream
 
 
-def ceph_upload(input_dir):
+def ceph_upload(job):
     # @TODO
     # Separate logging field in Automation Model
     stream = setup_logging()
+
+    #: `output_dir` contains processed data to be uploaded in ceph
+    input_dir = job.output_dir
 
     print 'Uploading to Ceph ....'
     logger.info('Uploading to Ceph ....')
@@ -54,18 +57,29 @@ def ceph_upload(input_dir):
         logger.info('Ceph Output ... ')
         print '#' * 40
 
-        print output, len(output)
-        logger.info('%s %s', output, len(output))
+        print 'OUTPUT', output, len(output)
+        # logger.info('%s %s', output, len(output))
 
-        filename = output.split('\n')[-1]
-        print 'Logfile', filename
-        logger.info('Logfile %s', filename)
+        # filename = output.split('\n')[-1]
+        # print 'Logfile', filename
+        # logger.info('Logfile %s', filename)
 
         if 'Done Uploading!' in output:
             print 'Caught Done Uploading!'
-            logger.info('Done Uploading!')
-            logger.info('Filename %s', filename)
-        return True, filename
+            logger.info('Caught Done Uploading!')
+            # logger.info('Filename %s', filename)
+
+            # with PSQL_DB.atomic() as txn:
+            #     new_q = (Automation_AutomationJob
+            #              .update(ceph_upload_log=stream.getvalue(), status_timestamp=datetime.now())
+            #              .where(Automation_AutomationJob.id == job.id))
+            #     new_q.execute()
+            with PSQL_DB.atomic() as txn:
+                new_q = (Automation_AutomationJob
+                         .update(ceph_upload_log=output, status_timestamp=datetime.now())
+                         .where(Automation_AutomationJob.id == job.id))
+                new_q.execute()
+        return True, ''
 
     except Exception:
         print 'Error in Ceph upload!'
