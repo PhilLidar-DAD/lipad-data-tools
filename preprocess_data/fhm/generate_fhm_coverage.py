@@ -1,11 +1,12 @@
 # Windows
 # ArcPy
 
-__version__ = "0.2"
+__version__ = "0.3"
 
 import arcpy
 import os
 import time
+import argparse
 from datetime import datetime as dt
 
 arcpy.env.outputZFlag = "Disabled"
@@ -13,9 +14,14 @@ arcpy.env.outputMFlag = "Disabled"
 
 startTime = time.time()
 
-# parameters
-input_directory = r""
-fhm_coverage = r""
+# Parse arguments
+parser = argparse.ArgumentParser(description='Updating FHM Coverage')
+parser.add_argument('-i','--input_directory')
+parser.add_argument('-f','--fhm_coverage')
+args = parser.parse_args()
+
+input_directory = args.input_directory
+fhm_coverage = args.fhm_coverage
 list_err = []
 
 for path, dirs, files in os.walk(input_directory,topdown=False):
