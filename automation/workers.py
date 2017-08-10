@@ -289,4 +289,3 @@ def db_watcher():
         delay = get_delay(1, 10)
         logger.info('Worker Sleeping for %ssecs...', delay)
         time.sleep(delay)
-        break
