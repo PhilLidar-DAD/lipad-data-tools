@@ -233,12 +233,12 @@ def upload_metadata(job):
     logger.info('Created/Updated Ceph Objects in Database.')
 
     logger.info('Updating Philgrid ...')
-    grid_updated = grid_feature_update(gridref_dict_by_data_class)
+    # grid_updated = grid_feature_update(gridref_dict_by_data_class)
 
 
-    if grid_updated:
-        print 'Successfully updated Ceph and Philgrid'
-        assign_status(job)
+    # if grid_updated:
+    #     print 'Successfully updated Ceph and Philgrid'
+    #     assign_status(job)
 
 
 def db_watcher():
@@ -278,16 +278,6 @@ def db_watcher():
                     # assign_status(q, 2)
                     upload_to_ceph(q)
 
-                #: Uploaded in Ceph
-                elif q.status.__eq__('done_ceph'):
-                    # in case upload from ceph to lipad was interrupted
-                    # assign_status(q, 3)
-                    # transfer_metadata()
-                    upload_metadata(q)
-
-                elif q.status.__eq__('done'):
-                    pass
-
             except Automation_AutomationJob.DoesNotExist:
                 logger.info('No %s task', status)
 
@@ -299,3 +289,4 @@ def db_watcher():
         delay = get_delay(1, 10)
         logger.info('Worker Sleeping for %ssecs...', delay)
         time.sleep(delay)
+        break
