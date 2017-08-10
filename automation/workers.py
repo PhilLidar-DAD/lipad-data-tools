@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 from models import *
 
 from utils import *
@@ -13,8 +15,6 @@ import json as py_json
 from os.path import dirname, abspath
 
 from data_processing import rename_tiles
-from update_metadata_store import *
-from update_maptiles import *
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
@@ -289,3 +289,5 @@ def db_watcher():
         delay = get_delay(1, 10)
         logger.info('Worker Sleeping for %ssecs...', delay)
         time.sleep(delay)
+
+db_watcher()

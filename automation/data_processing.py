@@ -5,8 +5,8 @@ import subprocess
 import math
 import shutil
 
-from .models import PSQL_DB, Automation_AutomationJob
-from .utils import assign_status, get_cwd, setup_logging
+from models import PSQL_DB, Automation_AutomationJob
+from utils import assign_status, get_cwd, setup_logging
 
 
 logger = logging.getLogger()
