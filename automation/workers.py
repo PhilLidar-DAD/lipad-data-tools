@@ -17,8 +17,8 @@ from os.path import dirname, abspath
 from data_processing import process_job
 
 logger = logging.getLogger()
-LOG_LEVEL = logging.DEBUG
-FILE_LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
+FILE_LOG_LEVEL = logging.INFO
 
 
 def setup_logging():
