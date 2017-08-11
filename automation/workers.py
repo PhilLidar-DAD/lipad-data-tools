@@ -140,7 +140,9 @@ def upload_to_ceph(job):
 
     if is_uploaded:
         print 'STATUS', job.status
-        assign_status(job, True)
+        assign_status(job, False)
+    elif not is_uploaded:
+        assign_status(job, error=True)
 
     # elif not is_uploaded:
     # retry uploading or stop?

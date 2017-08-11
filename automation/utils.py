@@ -84,6 +84,11 @@ def ceph_upload(job):
     except Exception:
         print 'Error in Ceph upload!'
         logger.exception('Error in Ceph upload!')
+        with PSQL_DB.atomic() as txn:
+            new_q = (Automation_AutomationJob
+                     .update(ceph_upload_log=output, status_timestamp=datetime.now())
+                     .where(Automation_AutomationJob.id == job.id))
+            new_q.execute()
         return False, None
 
 

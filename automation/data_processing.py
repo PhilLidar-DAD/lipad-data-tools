@@ -56,8 +56,6 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     #: Time data type: Start timing
     startTime = datetime.now()
 
-
-
     #: logger variable for log field in `Automation_AutomationJob`
     logger.info('Renaming tiles ...')
 
@@ -67,72 +65,75 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     if not os.path.exists(outDir):
         os.makedirs(outDir)
 
-    inDir_error = False
+    error = False
     if not os.path.isdir(inDir) and os.listdir(inDir) == []:
         logger.error('Problematic Input Directory %s', inDir)
-        inDir_error = True
+        error = True
 
-    #: Loop through the input directory
-    for path, dirs, files in os.walk(inDir, topdown=False):
+    if not error:
+        #: Loop through the input directory
+        for path, dirs, files in os.walk(inDir, topdown=False):
 
-        for tile in files:
-            if tile.endswith(".laz") or tile.endswith(".tif"):
-                typeFile = tile.split(".")[-1].upper()
-                ctr = 0
-                tile_file_path = os.path.join(path, tile)
+            for tile in files:
+                if tile.endswith(".laz") or tile.endswith(".tif"):
+                    typeFile = tile.split(".")[-1].upper()
+                    ctr = 0
+                    tile_file_path = os.path.join(path, tile)
 
-                #: Get file bounding box/extents
-                p = subprocess.Popen([os.path.join(get_cwd(), 'lasbb'), '-get_bb',
-                                      tile_file_path], stdout=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT)
-                out, err = p.communicate()
-                returncode = p.returncode
-                if returncode is 0:
-                    tokens = out.split(" ")
-                    minX = float(tokens[1])
-                    minY = float(tokens[2])
-                    maxX = float(tokens[3])
-                    maxY = float(tokens[4])
+                    #: Get file bounding box/extents
+                    p = subprocess.Popen([os.path.join(get_cwd(), 'lasbb'), '-get_bb',
+                                          tile_file_path], stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT)
+                    out, err = p.communicate()
+                    returncode = p.returncode
+                    if returncode is 0:
+                        tokens = out.split(" ")
+                        minX = float(tokens[1])
+                        minY = float(tokens[2])
+                        maxX = float(tokens[3])
+                        maxY = float(tokens[4])
 
-                    bbox_center_x = (minX + (maxX - minX) / 2)
-                    bbox_center_y = (minY + (maxY - minY) / 2)
+                        bbox_center_x = (minX + (maxX - minX) / 2)
+                        bbox_center_y = (minY + (maxY - minY) / 2)
 
-                    _TILE_SIZE = 1000
-                    tile_x = int(math.floor(bbox_center_x / float(_TILE_SIZE)))
-                    tile_y = int(math.floor(
-                        bbox_center_y / float(_TILE_SIZE))) + 1
+                        _TILE_SIZE = 1000
+                        tile_x = int(math.floor(bbox_center_x / float(_TILE_SIZE)))
+                        tile_y = int(math.floor(
+                            bbox_center_y / float(_TILE_SIZE))) + 1
 
-                    # outFN =
-                    # ''.join(['E',tile_x,'N',tile_y,'_',typeFile,'.',typeFile.lower()])
-                    outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
-                        tile_x, tile_y, typeFile, processor, block_uid, typeFile.lower())
-                    outPath = os.path.join(outDir, outFN)
-
-                    #: Check if output filename is already exists
-                    while os.path.exists(outPath):
-                        logger.warning('\nWARNING: %s already exists!', outPath)
-                        ctr += 1
                         # outFN =
-                        # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
-                        outFN = 'E{0}N{1}_{2}_{3}_U{4}_{5}.{6}'.format(
-                            tile_x, tile_y, typeFile, processor, block_uid,
-                            str(ctr), typeFile.lower())
-                        # print outFN
+                        # ''.join(['E',tile_x,'N',tile_y,'_',typeFile,'.',typeFile.lower()])
+                        outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
+                            tile_x, tile_y, typeFile, processor, block_uid, typeFile.lower())
                         outPath = os.path.join(outDir, outFN)
 
-                    print 'Path  %s', os.path.join(path, tile), 'Filename: %s', outFN
+                        #: Check if output filename is already exists
+                        while os.path.exists(outPath):
+                            logger.warning('\nWARNING: %s already exists!', outPath)
+                            ctr += 1
+                            # outFN =
+                            # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
+                            outFN = 'E{0}N{1}_{2}_{3}_U{4}_{5}.{6}'.format(
+                                tile_x, tile_y, typeFile, processor, block_uid,
+                                str(ctr), typeFile.lower())
+                            # print outFN
+                            outPath = os.path.join(outDir, outFN)
 
-                    logger.info('%s ---------  %s', os.path.
-                                join(path, tile), outFN)
+                        print 'Path  %s', os.path.join(path, tile), 'Filename: %s', outFN
 
-                    # Copy data
-                    shutil.copy(tile_file_path, outPath)
-                    print outPath, 'Copied success'
-                    logger.info('Copied success.')
-                else:
-                    logger.error("Error reading extents of [{0}]. Trace from \
-                        lasbb:\n{1}".format(
-                        tile_file_path, out))
+                        logger.info('%s ---------  %s', os.path.
+                                    join(path, tile), outFN)
+
+                        # Copy data
+                        shutil.copy(tile_file_path, outPath)
+                        print outPath, 'Copied success'
+                        logger.info('Copied success.')
+                    else:
+                        logger.error("Error reading extents of [{0}]. Trace from \
+                            lasbb:\n{1}".format(
+                            tile_file_path, out))
+                        error = True
+                        break
 
     endTime = datetime.now()  # End timing
     elapsed_time = endTime - startTime
@@ -143,11 +144,10 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     print 'Stream value', stream.getvalue()
     print '#' * 40
 
-    if not inDir_error:
+    if not error:
         assign_status(q, False)
     else:
-        assign_status(q, True)
-
+        assign_status(q, error=True)
 
     #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
     with PSQL_DB.atomic() as txn:
@@ -190,7 +190,6 @@ def process_job(q):
         User can input a directory containing multiple child directories. Each child
         folder is a `LiDAR coverage block` folder.
     """
-
 
     logger.info('Processing Job')
 
@@ -235,7 +234,7 @@ def process_job(q):
         #     transfer_metadata(log_file, datatype)
     else:
         logger.error('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
-
+        assign_status(q, error=True)
 
     #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
     with PSQL_DB.atomic() as txn:
@@ -243,4 +242,3 @@ def process_job(q):
                  .update(data_processing_log=stream.getvalue(), status_timestamp=datetime.now())
                  .where(Automation_AutomationJob.id == q.id))
         new_q.execute()
-
