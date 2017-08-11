@@ -144,7 +144,10 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     print '#' * 40
 
     if not inDir_error:
-        assign_status(q)
+        assign_status(q, False)
+    else:
+        assign_status(q, True)
+
 
     #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
     with PSQL_DB.atomic() as txn:
@@ -222,7 +225,6 @@ def process_job(q):
             logger.info('Handler not implemented for type:  %s',
                         str(q.datatype))
 
-        # assign_status(q, 2)
         # logger.info('Status  %s Status Timestamp  %s',
         #             q.status, q.status_timestamp)
         # print '2 Status', q.status, 'Status Timestamp', q.status_timestamp
@@ -230,7 +232,6 @@ def process_job(q):
         # # Upload to `Ceph` after processing
         # ceph_uploaded, log_file = ceph_upload(output_dir)
         # if ceph_uploaded:
-        #     assign_status(q, 3)
         #     transfer_metadata(log_file, datatype)
     else:
         logger.error('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)

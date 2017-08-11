@@ -80,7 +80,6 @@ def parse_dem_input(input_str):
 
 
 def handle_dem(q):
-    # assign_status(q, 1)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     print 'Processing Job'
@@ -121,13 +120,11 @@ def handle_dem(q):
         1) Upload tiles
         2) Pass CephDataObject metadata to LiPAD db
     """
-    # assign_status(q, 2)
     print 'Status', q.status
     print 'Status Timestamp', q.status_timestamp
     ceph_uploaded, log_file = ceph_upload(output_dir)
 
     if ceph_uploaded:
-        # assign_status(q, 3)
         transfer_metadata(log_file)
 
 
@@ -143,7 +140,7 @@ def upload_to_ceph(job):
 
     if is_uploaded:
         print 'STATUS', job.status
-        assign_status(job)
+        assign_status(job, True)
 
     # elif not is_uploaded:
     # retry uploading or stop?
@@ -191,7 +188,6 @@ def db_watcher():
 
                 #: Processed Job
                 elif q.status.__eq__('done_process'):
-                    # assign_status(q, 2)
                     upload_to_ceph(q)
 
             except Automation_AutomationJob.DoesNotExist:

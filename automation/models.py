@@ -75,7 +75,7 @@ class Automation_AutomationJob(BaseModel):
         # ('pending_ceph'),       # Uploading in Ceph
         ('done_ceph'),          # Uploaded in Ceph
         # ('done'),               # Uploaded in LiPAD
-        # (-1, 'error', _('Error')),
+        ('error'),
     ]
     # ('pending_process', _('Pending Job')),
 #         # ('done_process', _('Processing Job')),

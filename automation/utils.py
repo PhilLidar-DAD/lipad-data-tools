@@ -141,29 +141,34 @@ def get_delay(min_, max_):
     return float('%.2f' % random.uniform(min_, max_))
 
 
-def assign_status(q):
+def assign_status(q, error):
     status = q.status
     print 'Status:', status
     logger.info('Status: %s', status)
 
-    for status_index in [status_index for status_index, x in enumerate(Automation_AutomationJob.STATUS_CHOICES)
-                         if x == status]:
-        status_index += 1
+    if not error:
+        for status_index in [status_index for status_index, x in enumerate(Automation_AutomationJob.STATUS_CHOICES)
+                             if x == status]:
+            status_index += 1
 
-    new_status = Automation_AutomationJob.STATUS_CHOICES[status_index]
+        new_status = Automation_AutomationJob.STATUS_CHOICES[status_index]
 
-    if status_index == 1:
-        logger.info('Processed Job')
-    elif status_index == 2:
-        logger.info('Uploaded in Ceph')
-    elif status_index == 3:
-        logger.info('Metadata uploaded in LiPAD')
+        if status_index == 1:
+            logger.info('Processed Job')
+        elif status_index == 2:
+            logger.info('Uploaded in Ceph')
 
-    with PSQL_DB.atomic() as txn:
-        new_q = (Automation_AutomationJob
-                 .update(status=new_status, status_timestamp=datetime.now())
-                 .where(Automation_AutomationJob.id == q.id))
-        new_q.execute()
+        with PSQL_DB.atomic() as txn:
+            new_q = (Automation_AutomationJob
+                     .update(status=new_status, status_timestamp=datetime.now())
+                     .where(Automation_AutomationJob.id == q.id))
+            new_q.execute()
+    else:
+        with PSQL_DB.atomic() as txn:
+            new_q = (Automation_AutomationJob
+                     .update(status=Automation_AutomationJob.STATUS_CHOICES.error, status_timestamp=datetime.now())
+                     .where(Automation_AutomationJob.id == q.id))
+            new_q.execute()
 
 
 def proper_block_name(block_path):
