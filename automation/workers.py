@@ -14,7 +14,7 @@ from datetime import datetime
 import json as py_json
 from os.path import dirname, abspath
 
-from data_processing import rename_tiles
+from data_processing import process_job
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.DEBUG
@@ -49,6 +49,7 @@ def connect_db():
         try:
             PSQL_DB.connect()
             print 'Connected to DB...'
+            logger.info('Connected to DB...')
             retry = False
             print 'Retry', retry
         except Exception:
@@ -130,89 +131,11 @@ def handle_dem(q):
         transfer_metadata(log_file)
 
 
-def process_job(q):
-    """Process workers fetched by ORM interface from LiPAD database.
 
-    Check corresponding status of a worker. Get the following attributes of
-    ``Automation_AutomationJob`` model object:
-
-        - `status`
-        - `status_timestamp`
-        - `datatype`
-        - `input_dir`
-        - `output_dir`
-        - `processor`
-
-    Get correct block name from `input_dir`. Find `block_name` in `model`
-    ``Cephgeo_LidarCoverageBlock``. If found, do:
-
-        #. Generate `output_dir` with `block_name` as parent directory.
-        #. If datatype is LAZ or Orthophoto, rename data tiles if not yet renamed.
-        #. Upload data tiles to ``Ceph Object Storage``.
-        #. Update and assign status of ``Automation_AutomationJob`` worker
-        #.
-
-    Args:
-        q (:obj: `Automation_AutomationJob`): A ``Automation_AutomationJob`` object
-            fetched from database.
-
-    Raises:
-        Exception: If datatype is not in `Automation_AutomationJob.DATATYPE_CHOICES`.
-
-    @TODO:
-        User can input a directory containing multiple child directories. Each child
-        folder is a `LiDAR coverage block` folder.
-    """
-
-    logger.info('Processing Job')
-
-    datatype = q.datatype
-    input_dir = q.input_dir
-    output_dir = q.output_dir
-    processor = q.processor
-
-    block_name = proper_block_name(input_dir)
-    logger.info('BLOCK NAME %s', block_name)
-
-    in_coverage, block_uid = find_in_coverage(block_name)
-
-    #: Check first if folder or `block_name` is in `Cephgeo_LidarCoverageBlock`
-    #: If not found, `output_dir` is not created and data is not processed
-    if in_coverage:
-        logger.info('Found in Lidar Coverage model %s %s',
-                    block_name, block_uid)
-
-        #: LAZ and Orthophoto are to be renamed automatically, whether datasets
-        #: have been renamed or not
-        if datatype.lower() == ('laz' or 'ortho'):
-            print 'Will rename tiles ... '
-            rename_tiles(input_dir, output_dir, processor,
-                         block_name, block_uid, q)
-            logger.info('Status  %s Status Timestamp  %s',
-                        q.status, q.status_timestamp)
-            print '1 Status', q.status, 'Status Timestamp', q.status_timestamp
-
-    # for DEM
-        else:
-            logger.info('Handler not implemented for type:  %s',
-                        str(q.datatype))
-
-        # assign_status(q, 2)
-        # logger.info('Status  %s Status Timestamp  %s',
-        #             q.status, q.status_timestamp)
-        # print '2 Status', q.status, 'Status Timestamp', q.status_timestamp
-
-        # # Upload to `Ceph` after processing
-        # ceph_uploaded, log_file = ceph_upload(output_dir)
-        # if ceph_uploaded:
-        #     assign_status(q, 3)
-        #     transfer_metadata(log_file, datatype)
-    else:
-        logger.info('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
 
 
 def upload_to_ceph(job):
-    logger.info('Upload data set to Ceph.')
+    logger.info('Upload data set to Ceph...')
 
     is_uploaded, logfile = ceph_upload(job)
     print 'IS uploaded', is_uploaded
@@ -232,13 +155,6 @@ def upload_metadata(job):
     gridref_dict_by_data_class = ceph_metadata_update(uploaded_objects_list)
     logger.info('Created/Updated Ceph Objects in Database.')
 
-    logger.info('Updating Philgrid ...')
-    # grid_updated = grid_feature_update(gridref_dict_by_data_class)
-
-
-    # if grid_updated:
-    #     print 'Successfully updated Ceph and Philgrid'
-    #     assign_status(job)
 
 
 def db_watcher():

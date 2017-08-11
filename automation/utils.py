@@ -83,7 +83,7 @@ def ceph_upload(job):
 
     except Exception:
         print 'Error in Ceph upload!'
-        logger.exception()
+        logger.exception('Error in Ceph upload!')
         return False, None
 
 
@@ -190,9 +190,11 @@ def find_in_coverage(block_name):
         uid = block.uid
         print 'Block in Lidar Coverage'
         print 'Block UID:', uid
+        logger.info('Block UID:%s', uid)
         return True, uid
     except Exception:
         print 'Block not in Lidar Coverage', block_name
+        logger.exception('Block not in Lidar Coverage %s', block_name)
         return False, 0
 
 
