@@ -171,7 +171,7 @@ def assign_status(q, error):
     else:
         with PSQL_DB.atomic() as txn:
             new_q = (Automation_AutomationJob
-                     .update(status=Automation_AutomationJob.STATUS_CHOICES.error, status_timestamp=datetime.now())
+                     .update(status=Automation_AutomationJob.STATUS_CHOICES[-1], status_timestamp=datetime.now())
                      .where(Automation_AutomationJob.id == q.id))
             new_q.execute()
 
