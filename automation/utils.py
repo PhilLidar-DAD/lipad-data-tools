@@ -4,7 +4,7 @@ import random
 import subprocess
 from datetime import datetime
 import logging
-
+import json
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.INFO
@@ -214,3 +214,42 @@ def get_cwd():
         return cur_path.rpartition("?")[0].rpartition(os.path.sep)[0] + os.path.sep
     else:
         return cur_path.rpartition(os.path.sep)[0] + os.path.sep
+
+
+def get_checksums(file_path, skip_checksum=False):
+
+    dir_path, filename = os.path.split(file_path)
+
+    # Check if SHA1SUMS file already exists
+    checksum = None
+    sha1sum_filepath = os.path.join(dir_path, 'SHA1SUMS')
+    if os.path.isfile(sha1sum_filepath):
+        # Read files from SHA1SUM file that already have checksums
+        with open(sha1sum_filepath, 'r') as open_file:
+            for line in open_file:
+                tokens = line.strip().split()
+                # Strip wildcard from filename if it exists
+                fn = tokens[1]
+                if fn.startswith('?'):
+                    fn = fn[1:]
+                if fn == filename:
+                    checksum = tokens[0]
+    if not checksum and not skip_checksum:
+        # Compute checksum
+        shasum = subprocess.check_output(['sha1sum', file_path])
+        tokens = shasum.strip().split()
+        checksum = tokens[0][1:]
+
+    # Check if LAST_MODIFIED file already exists
+    last_modified = None
+    last_modified_filepath = os.path.join(dir_path, 'LAST_MODIFIED')
+    if os.path.isfile(last_modified_filepath):
+
+        last_modified_all = json.load(open(last_modified_filepath, 'r'))
+        if filename in last_modified_all:
+            last_modified = last_modified_all[filename]
+    if not last_modified:
+        # Get last modified time
+        last_modified = os.stat(file_path).st_mtime
+
+    return checksum, int(last_modified)

@@ -6,7 +6,9 @@ import math
 import shutil
 
 from models import PSQL_DB, Automation_AutomationJob
-from utils import assign_status, get_cwd, setup_logging, proper_block_name, find_in_coverage
+from utils import assign_status, get_cwd, setup_logging, proper_block_name, \
+    find_in_coverage, get_checksums
+from verify_workers import verify_las
 
 
 logger = logging.getLogger()
@@ -211,27 +213,28 @@ def process_job(q):
 
         #: LAZ and Orthophoto are to be renamed automatically, whether datasets
         #: have been renamed or not
-        if datatype.lower() == ('laz' or 'ortho'):
-            print 'Will rename tiles ... '
-            rename_tiles(input_dir, output_dir, processor,
-                         block_name, block_uid, q)
-            logger.info('Status  %s Status Timestamp  %s',
-                        q.status, q.status_timestamp)
-            print '1 Status', q.status, 'Status Timestamp', q.status_timestamp
+        if datatype.lower() == 'laz':
 
-    # for DEM
+            logger.info('Getting checksum...')
+            checksum = get_checksums(input_dir)
+
+            logger.info('Verifying las tiles...')
+            has_error = verify_las(input_dir, checksum)
+
+            if has_error:
+                assign_status(q, error=True)
+            else:
+                logger.info('Renaming tiles...')
+                rename_tiles(input_dir, output_dir, processor,
+                             block_name, block_uid, q)
+                logger.info('Status  %s Status Timestamp  %s',
+                            q.status, q.status_timestamp)
+
+        # for DEM
         else:
             logger.info('Handler not implemented for type:  %s',
                         str(q.datatype))
 
-        # logger.info('Status  %s Status Timestamp  %s',
-        #             q.status, q.status_timestamp)
-        # print '2 Status', q.status, 'Status Timestamp', q.status_timestamp
-
-        # # Upload to `Ceph` after processing
-        # ceph_uploaded, log_file = ceph_upload(output_dir)
-        # if ceph_uploaded:
-        #     transfer_metadata(log_file, datatype)
     else:
         logger.error('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
         assign_status(q, error=True)
