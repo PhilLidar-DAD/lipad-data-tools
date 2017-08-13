@@ -1,4 +1,4 @@
-__version__ = "0.1"
+__version__ = "0.1.1"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Shifting Values"
@@ -62,9 +62,11 @@ for nrow in range(1, sheet.nrows):
 		rmse = sheet.row(nrow)[5].value
 		pl1_suc = sheet.row(nrow)[6].value
 
+		logger.info("Checking if %s exists in LiDAR Coverage" % block_name)
 		cursor = arcpy.da.UpdateCursor(lidar_coverage,lidar_fields)
 		for row in cursor:
 			if row[0] == block_name:
+				logger.info("%s exists in LiDAR Coverage" % block_name)
 				copied = True
 				row[1] = x_shift
 				row[2] = y_shift
@@ -72,6 +74,7 @@ for nrow in range(1, sheet.nrows):
 				row[4] = height_difference
 				row[5] = rmse
 				row[6] = pl1_suc
+			logger.info("Successfully updated the shifting values of %s" % block_name)
 			cursor.updateRow(row)
 	except Exception, e:
 		spamwriter.writerow([str(nrow), block_name, "Error"])
