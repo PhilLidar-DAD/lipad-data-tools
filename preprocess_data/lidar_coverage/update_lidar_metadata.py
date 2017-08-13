@@ -1,4 +1,4 @@
-__version__ = "0.2"
+__version__ = "0.2.1"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Metadata"
@@ -6,12 +6,14 @@ __description__ = "Script for updating LiDAR Coverage Metadata"
 import arcpy
 import xlrd
 import os
-import sys
 import datetime
 import logging
 import csv
 import argparse
+import time
 from xlrd import open_workbook
+
+startTime = time.time()
 
 parser = argparse.ArgumentParser(description='Script for updating LiDAR Coverage Metadata')
 parser.add_argument('-l','--lidar_coverage')
@@ -21,10 +23,10 @@ args = parser.parse_args()
 lidar_coverage = args.lidar_coverage
 metadata_spreadsheet = args.metadata_spreadsheet
 
-lidar_fields = ["Block_Name", "Sensor", "Base_Used", "Flight_Number", "Mission_Name", "Date_Flown"]
+lidar_fields = ["BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_REMOVED"]
 
 book = open_workbook(metadata_spreadsheet,on_demand=True)
-sheet = book.sheet_by_name("DRAFT DAD-FORMAT")
+sheet = book.sheet_by_name("Metadata")
 
 LOG_FILENAME = "update_lidar_metadata.log"
 logging.basicConfig(filename=LOG_FILENAME,level=logging.ERROR, format='%(asctime)s: %(levelname)s: %(message)s')
@@ -61,11 +63,13 @@ if __name__ == "__main__":
 		try:
 			copied = False
 			block_name = sheet.row(nrow)[3].value
-			sensor = checkNull(sheet.row(nrow)[0].value)
-			base_used = checkNull(sheet.row(nrow)[4].value)
-			flight_number = checkNull(sheet.row(nrow)[8].value)
-			mission_name = checkNull(sheet.row(nrow)[9].value)
-			date_flown_dec = checkNull(sheet.row(nrow)[10].value)
+			processor = sheet.row(nrow)[4].value
+			sensor = checkNull(sheet.row(nrow)[5].value)
+			base_used = checkNull(sheet.row(nrow)[6].value)
+			flight_number = checkNull(sheet.row(nrow)[7].value)
+			mission_name = checkNull(sheet.row(nrow)[8].value)
+			date_flown_dec = checkNull(sheet.row(nrow)[9].value)
+			is_removed = checkNull(sheet.row(nrow)[12].value)
 
 			logger.info("Checking if %s exists in LiDAR Coverage" % block_name)
 
@@ -80,20 +84,25 @@ if __name__ == "__main__":
 					copied = True
 					logger.info("%s exists in LiDAR Coverage" % block_name)
 					logger.info("Checking if metadata exists")
-					if row[1]:
+					if row[4]:
+						# ["BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_REMOVED"]
 						logger.info("Metadata already exists. Appending the values")
-						row[1] = "{0} | {1}".format(row[1], sensor)
-						row[2] = "{0} | {1}".format(row[2], base_used)
-						row[3] = "{0} | {1}".format(row[3], flight_number)
-						row[4] = "{0} | {1}".format(row[4], mission_name)
-						row[5] = "{0} | {1}".format(row[5], date_flown)
+						row[1] = "{0} | {1}".format(row[1], processor)
+						row[2] = "{0} | {1}".format(row[2], sensor)
+						row[3] = "{0} | {1}".format(row[3], base_used)
+						row[4] = "{0} | {1}".format(row[4], flight_number)
+						row[5] = "{0} | {1}".format(row[5], mission_name)
+						row[6] = "{0} | {1}".format(row[6], date_flown)
+						row[7] = "{0} | {1}".format(row[7], is_removed)
 					else:
 						logger.info("Metadata doesn't exists. Updating the values")
-						row[1] = sensor
-						row[2] = base_used
-						row[3] = flight_number
-						row[4] = mission_name
-						row[5] = date_flown
+						row[1] = processor
+						row[2] = sensor
+						row[3] = base_used
+						row[4] = flight_number
+						row[5] = mission_name
+						row[6] = date_flown
+						row[7] = is_removed
 				cursor.updateRow(row)
 		except Exception, e:
 			spamwriter.writerow([str(nrow), block_name, "Error"])
@@ -102,3 +111,5 @@ if __name__ == "__main__":
 			logger.info("%s doesn't exists in LiDAR Coverage" % block_name)
 			spamwriter.writerow([str(nrow), block_name, "Inconsistent name"])
 csv_file.close()
+endTime = time.time()  # End timing
+print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime,2))), 'seconds'
