@@ -1,4 +1,4 @@
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Metadata"
@@ -23,7 +23,7 @@ args = parser.parse_args()
 lidar_coverage = args.lidar_coverage
 metadata_spreadsheet = args.metadata_spreadsheet
 
-lidar_fields = ["BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_REMOVED"]
+lidar_fields = ["AREA", "BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_REMOVED"]
 
 book = open_workbook(metadata_spreadsheet,on_demand=True)
 sheet = book.sheet_by_name("Metadata")
@@ -55,7 +55,7 @@ def checkNull(field):
 
 if __name__ == "__main__":
 	for f in lidar_fields:
-		if f != "Block_Name":
+		if f != "BLOCK_NAME":
 			arcpy.CalculateField_management(lidar_coverage, f, "None", "PYTHON_9.3")
 
 	# loop thru the rows
@@ -63,7 +63,8 @@ if __name__ == "__main__":
 		try:
 			copied = False
 			block_name = sheet.row(nrow)[3].value
-			processor = sheet.row(nrow)[4].value
+			area = checkNull(sheet.row(nrow)[1].value)
+			processor = checkNull(sheet.row(nrow)[4].value)
 			sensor = checkNull(sheet.row(nrow)[5].value)
 			base_used = checkNull(sheet.row(nrow)[6].value)
 			flight_number = checkNull(sheet.row(nrow)[7].value)
@@ -80,29 +81,30 @@ if __name__ == "__main__":
 
 			cursor = arcpy.da.UpdateCursor(lidar_coverage,lidar_fields)
 			for row in cursor:
-				if row[0] == block_name:
+				if row[1] == block_name:
 					copied = True
 					logger.info("%s exists in LiDAR Coverage" % block_name)
 					logger.info("Checking if metadata exists")
-					if row[4]:
-						# ["BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_REMOVED"]
+					if row[5]:
 						logger.info("Metadata already exists. Appending the values")
-						row[1] = "{0} | {1}".format(row[1], processor)
-						row[2] = "{0} | {1}".format(row[2], sensor)
-						row[3] = "{0} | {1}".format(row[3], base_used)
-						row[4] = "{0} | {1}".format(row[4], flight_number)
-						row[5] = "{0} | {1}".format(row[5], mission_name)
-						row[6] = "{0} | {1}".format(row[6], date_flown)
-						row[7] = "{0} | {1}".format(row[7], is_removed)
+						row[0] = "{0} | {1}".format(row[0], area)
+						row[2] = "{0} | {1}".format(row[2], processor)
+						row[3] = "{0} | {1}".format(row[3], sensor)
+						row[4] = "{0} | {1}".format(row[4], base_used)
+						row[5] = "{0} | {1}".format(row[5], flight_number)
+						row[6] = "{0} | {1}".format(row[6], mission_name)
+						row[7] = "{0} | {1}".format(row[7], date_flown)
+						row[8] = "{0} | {1}".format(row[8], is_removed)
 					else:
 						logger.info("Metadata doesn't exists. Updating the values")
-						row[1] = processor
-						row[2] = sensor
-						row[3] = base_used
-						row[4] = flight_number
-						row[5] = mission_name
-						row[6] = date_flown
-						row[7] = is_removed
+						row[0] = area
+						row[2] = processor
+						row[3] = sensor
+						row[4] = base_used
+						row[5] = flight_number
+						row[6] = mission_name
+						row[7] = date_flown
+						row[8] = is_removed
 				cursor.updateRow(row)
 		except Exception, e:
 			spamwriter.writerow([str(nrow), block_name, "Error"])
