@@ -1,4 +1,4 @@
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Shifting Values"
@@ -42,7 +42,10 @@ metadata_spreadsheet = args.shifting_spreadsheet
 
 lidar_fields = ["BLOCK_NAME", "X_SHIFT", "Y_SHIFT", "Z_SHIFT", "HEIGHT_DIFFERENCE", "RMSE_VAL", "PL1_SUC"]
 
-csv_file = open("shifting_not_updated_.csv", 'wb')
+book = open_workbook(metadata_spreadsheet,on_demand=True)
+sheet = book.sheet_by_name("Sheet1")
+
+csv_file = open("shifting_not_updated.csv", 'wb')
 spamwriter = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 spamwriter.writerow(['ID', 'Block', 'Remarks'])
 
@@ -74,8 +77,8 @@ for nrow in range(1, sheet.nrows):
 				row[4] = height_difference
 				row[5] = rmse
 				row[6] = pl1_suc
-			logger.info("Successfully updated the shifting values of %s" % block_name)
 			cursor.updateRow(row)
+		logger.info("Successfully updated the shifting values of %s" % block_name)
 	except Exception, e:
 		spamwriter.writerow([str(nrow), block_name, "Error"])
 		logger.exception("Error in updating metadata of %s" % block_name)
