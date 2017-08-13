@@ -1,14 +1,13 @@
-# Windows
-# ArcPy
-
-__version__ = "0.1"
+__version__ = "0.1.1"
+__author__ = "Jok Laurente"
+__email__ = "jmelaurente@gmail.com"
+__description__ = "Script for updating LiDAR Coverage Geometry"
 
 import arcpy
 import os
 import time
 import logging
 import argparse
-from datetime import datetime as dt
 
 startTime = time.time()
 
@@ -16,7 +15,7 @@ startTime = time.time()
 LOG_FILENAME = "update_lidar_coverage.log"
 logging.basicConfig(filename=LOG_FILENAME,level=logging.ERROR, format='%(asctime)s: %(levelname)s: %(message)s')
 
-logger = logging.getLogger("clip_fhm.log")
+logger = logging.getLogger("update_lidar_coverage.log")
 logger.setLevel(logging.DEBUG)
 # create console handler and set level to debug
 ch = logging.StreamHandler()
