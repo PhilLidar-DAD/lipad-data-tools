@@ -1,4 +1,4 @@
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Metadata"
@@ -31,7 +31,7 @@ sheet = book.sheet_by_name("Metadata")
 LOG_FILENAME = "update_lidar_metadata.log"
 logging.basicConfig(filename=LOG_FILENAME,level=logging.ERROR, format='%(asctime)s: %(levelname)s: %(message)s')
 
-csv_file = open("blocks_not_updated.csv", 'wb')
+csv_file = open("metadata_not_updated.csv", 'wb')
 spamwriter = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 spamwriter.writerow(['ID', 'Block', 'Remarks'])
 
@@ -74,10 +74,10 @@ if __name__ == "__main__":
 
 			logger.info("Checking if %s exists in LiDAR Coverage" % block_name)
 
-			if date_flown_dec == "NULL":
-				date_flown = "NULL"
-			else:
+			try:
 				date_flown = str(datetime.datetime(*xlrd.xldate_as_tuple(date_flown_dec, book.datemode)).strftime("%m-%d-%Y"))
+			except Exception, e:
+				date_flown = "NULL"
 
 			cursor = arcpy.da.UpdateCursor(lidar_coverage,lidar_fields)
 			for row in cursor:
@@ -87,8 +87,8 @@ if __name__ == "__main__":
 					logger.info("Checking if metadata exists")
 					if row[5]:
 						logger.info("Metadata already exists. Appending the values")
-						row[0] = "{0} | {1}".format(row[0], area)
-						row[2] = "{0} | {1}".format(row[2], processor)
+						row[0] = area
+						row[2] = processor
 						row[3] = "{0} | {1}".format(row[3], sensor)
 						row[4] = "{0} | {1}".format(row[4], base_used)
 						row[5] = "{0} | {1}".format(row[5], flight_number)
