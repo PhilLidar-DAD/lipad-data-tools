@@ -1,4 +1,4 @@
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Shifting Values"
@@ -43,7 +43,7 @@ metadata_spreadsheet = args.shifting_spreadsheet
 lidar_fields = ["BLOCK_NAME", "X_SHIFT", "Y_SHIFT", "Z_SHIFT", "HEIGHT_DIFFERENCE", "RMSE_VAL", "PL1_SUC"]
 
 book = open_workbook(metadata_spreadsheet,on_demand=True)
-sheet = book.sheet_by_name("Sheet1")
+sheet = book.sheet_by_name("Shifting Values")
 
 csv_file = open("shifting_not_updated.csv", 'wb')
 spamwriter = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
