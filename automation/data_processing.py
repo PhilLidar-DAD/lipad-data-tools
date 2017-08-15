@@ -8,13 +8,13 @@ import shutil
 from models import PSQL_DB, Automation_AutomationJob
 from utils import assign_status, get_cwd, setup_logging, proper_block_name, \
     find_in_coverage, get_checksums
-from verify_workers import verify_las
+from verify_workers import verify_las, verify_dir
 
 
 logger = logging.getLogger()
 
 #: Separate logging for renaming tiles
-stream = setup_logging()
+log_msg = []
 
 
 def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
@@ -60,9 +60,11 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
     #: logger variable for log field in `Automation_AutomationJob`
     logger.info('Renaming tiles ...')
+    log_msg.append('Renaming tiles ...\n')
 
     outDir = outDir.__add__('/' + block_name)
     logger.info('Output Directory: %s', outDir)
+    log_msg.append('Output Directory: %s\n', outDir)
 
     if not os.path.exists(outDir):
         os.makedirs(outDir)
@@ -70,6 +72,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     error = False
     if not os.path.isdir(inDir) and os.listdir(inDir) == []:
         logger.error('Problematic Input Directory %s', inDir)
+        log_msg.append('Problematic Input Directory %s\n', inDir)
         error = True
 
     if not error:
@@ -112,6 +115,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                         #: Check if output filename is already exists
                         while os.path.exists(outPath):
                             logger.warning('\nWARNING: %s already exists!', outPath)
+                            log_msg.append('\nWARNING: %s already exists!\n', outPath)
                             ctr += 1
                             # outFN =
                             # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
@@ -125,14 +129,21 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
                         logger.info('%s ---------  %s', os.path.
                                     join(path, tile), outFN)
+                        log_msg.append('%s ---------  %s\n', os.path.
+                                       join(path, tile), outFN)
 
                         # Copy data
                         shutil.copy(tile_file_path, outPath)
                         print outPath, 'Copied success'
                         logger.info('Copied success.')
+                        log_msg.append('Copied success.\n')
+
                     else:
                         logger.error("Error reading extents of [{0}]. Trace from \
                             lasbb:\n{1}".format(
+                            tile_file_path, out))
+                        log_msg.append("Error reading extents of [{0}]. Trace from \
+                            lasbb:\n{1}\n".format(
                             tile_file_path, out))
                         error = True
                         break
@@ -141,20 +152,21 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     elapsed_time = endTime - startTime
 
     logger.info('\nElapsed Time: %s', elapsed_time)
-
-    print '#' * 40
-    print 'Stream value', stream.getvalue()
-    print '#' * 40
+    log_msg.append('Elapsed Time: %s\n', elapsed_time)
 
     if not error:
         assign_status(q, False)
     else:
         assign_status(q, error=True)
 
-    #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
+    paragraph = ''
+    for par in log_msg:
+        paragraph = paragraph + par
+
+    #: Save log message from renaming tiles to `Automation_AutomationJob.log`
     with PSQL_DB.atomic() as txn:
         new_q = (Automation_AutomationJob
-                 .update(data_processing_log=stream.getvalue(), status_timestamp=datetime.now())
+                 .update(data_processing_log=paragraph, status_timestamp=datetime.now())
                  .where(Automation_AutomationJob.id == q.id))
         new_q.execute()
 
@@ -200,48 +212,58 @@ def process_job(q):
     output_dir = q.output_dir
     processor = q.processor
 
-    block_name = proper_block_name(input_dir)
-    logger.info('BLOCK NAME %s', block_name)
+    if datatype.lower() == 'laz':
+        logger.info('Verifying las tiles in directory...')
+        log_msg.append('Verifying las tiles in directory...\n')
+        has_error = verify_dir(input_dir)
 
-    in_coverage, block_uid = find_in_coverage(block_name)
+        if has_error:
+            assign_status(q, error=True)
+            log_msg.append('Error in verify_las!\n')
+        else:
+            logger.info('Renaming tiles...')
 
-    #: Check first if folder or `block_name` is in `Cephgeo_LidarCoverageBlock`
-    #: If not found, `output_dir` is not created and data is not processed
-    if in_coverage:
-        logger.info('Found in Lidar Coverage model %s %s',
-                    block_name, block_uid)
+            block_name = proper_block_name(input_dir)
+            logger.info('BLOCK NAME %s', block_name)
+            log_msg.append('BLOCK NAME %s\n', block_name)
 
-        #: LAZ and Orthophoto are to be renamed automatically, whether datasets
-        #: have been renamed or not
-        if datatype.lower() == 'laz':
+            in_coverage, block_uid = find_in_coverage(block_name)
 
-            logger.info('Getting checksum...')
-            checksum = get_checksums(input_dir)
+            #: Check first if folder or `block_name` is in `Cephgeo_LidarCoverageBlock`
+            #: If not found, `output_dir` is not created and data is not processed
+            if in_coverage:
+                logger.info('Found in Lidar Coverage model %s %s',
+                            block_name, block_uid)
+                log_msg.append('Found in Lidar Coverage model %s %s\n',
+                            block_name, block_uid)
 
-            logger.info('Verifying las tiles...')
-            has_error = verify_las(input_dir, checksum)
-
-            if has_error:
-                assign_status(q, error=True)
-            else:
-                logger.info('Renaming tiles...')
                 rename_tiles(input_dir, output_dir, processor,
                              block_name, block_uid, q)
                 logger.info('Status  %s Status Timestamp  %s',
                             q.status, q.status_timestamp)
+                log_msg.append('Status  %s Status Timestamp  %s\n',
+                               q.status, q.status_timestamp)
 
-        # for DEM
-        else:
-            logger.info('Handler not implemented for type:  %s',
-                        str(q.datatype))
-
+            else:
+                has_error = True
+                logger.error('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
+                log_msg.append('ERROR NOT FOUND IN MODEL %s %s\n', block_name, block_uid)
+                assign_status(q, error=True)
+    # for DEM
     else:
-        logger.error('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
+        logger.info('Handler not implemented for type:  %s',
+                    str(q.datatype))
+        log_msg.append('Handler not implemented for type:  %s\n',
+                       str(q.datatype))
         assign_status(q, error=True)
 
-    #: Save log stream from renaming tiles to `Automation_AutomationJob.log`
+    paragraph = ''
+    for par in log_msg:
+        paragraph = paragraph + par
+
+    #: Save log messages from renaming tiles to `Automation_AutomationJob.log`
     with PSQL_DB.atomic() as txn:
         new_q = (Automation_AutomationJob
-                 .update(data_processing_log=stream.getvalue(), status_timestamp=datetime.now())
+                 .update(data_processing_log=paragraph, status_timestamp=datetime.now())
                  .where(Automation_AutomationJob.id == q.id))
         new_q.execute()
