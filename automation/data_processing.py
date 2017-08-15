@@ -113,17 +113,17 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                         outPath = os.path.join(outDir, outFN)
 
                         #: Check if output filename is already exists
-                        while os.path.exists(outPath):
-                            logger.warning('\nWARNING: %s already exists!', outPath)
-                            log_msg.append('\nWARNING: %s already exists!\n', outPath)
-                            ctr += 1
-                            # outFN =
-                            # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
-                            outFN = 'E{0}N{1}_{2}_{3}_U{4}_{5}.{6}'.format(
-                                tile_x, tile_y, typeFile, processor, block_uid,
-                                str(ctr), typeFile.lower())
-                            # print outFN
-                            outPath = os.path.join(outDir, outFN)
+                        # while os.path.exists(outPath):
+                        #     logger.warning('\nWARNING: %s already exists!', outPath)
+                        #     log_msg.append('\nWARNING: %s already exists!\n', outPath)
+                        #     ctr += 1
+                        #     # outFN =
+                        #     # ''.join(['E',minX,'N',maxY,'_',typeFile,'_',str(ctr),'.',typeFile.lower()])
+                        #     # outFN = 'E{0}N{1}_{2}_{3}_U{4}_{5}.{6}'.format(
+                        #     #     tile_x, tile_y, typeFile, processor, block_uid,
+                        #     #     str(ctr), typeFile.lower())
+                        #     # print outFN
+                        #     outPath = os.path.join(outDir, outFN)
 
                         print 'Path  %s', os.path.join(path, tile), 'Filename: %s', outFN
 
