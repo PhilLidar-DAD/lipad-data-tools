@@ -7,7 +7,7 @@ import shutil
 
 from models import PSQL_DB, Automation_AutomationJob
 from utils import assign_status, get_cwd, setup_logging, proper_block_name, \
-    find_in_coverage, get_checksums
+    find_in_coverage
 from verify_workers import verify_las, verify_dir
 
 
