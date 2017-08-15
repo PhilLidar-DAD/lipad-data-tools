@@ -1,11 +1,10 @@
-__version__ = "0.4"
+__version__ = "0.4.1"
 
 import arcpy
 import os
 import time
 import argparse
 import logging
-from datetime import datetime as dt
 
 arcpy.env.outputZFlag = "Disabled"
 arcpy.env.outputMFlag = "Disabled"
@@ -49,12 +48,16 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				arcpy.Dissolve_management(fhm, r"in_memory\temp_dissolve")
 
 				logger.info("Adding fields to dissolved fhm")
-				arcpy.AddField_management(r"in_memory\temp_dissolve", "RBFP_shp", "TEXT")
-				arcpy.AddField_management(r"in_memory\temp_dissolve", "RBFP_name", "TEXT")
-				arcpy.AddField_management(r"in_memory\temp_dissolve", "Processor", "TEXT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "UID", "SHORT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "FHM_SHP", "TEXT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "RBFP", "TEXT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "RBFP_COUNT", "SHORT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "RESOLUTION", "TEXT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "SUC", "TEXT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "PROCESSOR", "TEXT")
 
 				logger.info("Calculating field of dissolved fhm")
-				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "RBFP_shp",'"' + rbfp_name + '"', "PYTHON_9.3")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "FHM_SHP",'"' + rbfp_name + '"', "PYTHON_9.3")
 
 				logger.info("Appending dissolved fhm to fhm coverage")
 				arcpy.Append_management(r"in_memory\temp_dissolve", fhm_coverage, "TEST")
