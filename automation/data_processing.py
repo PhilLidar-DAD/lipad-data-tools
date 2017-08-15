@@ -64,7 +64,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
     outDir = outDir.__add__('/' + block_name)
     logger.info('Output Directory: %s', outDir)
-    log_msg.append('Output Directory: %s\n', outDir)
+    log_msg.append('Output Directory: {0}\n'.format(outDir))
 
     if not os.path.exists(outDir):
         os.makedirs(outDir)
@@ -72,7 +72,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     error = False
     if not os.path.isdir(inDir) and os.listdir(inDir) == []:
         logger.error('Problematic Input Directory %s', inDir)
-        log_msg.append('Problematic Input Directory %s\n', inDir)
+        log_msg.append('Problematic Input Directory {0}\n'.format(inDir))
         error = True
 
     if not error:
@@ -129,8 +129,8 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
                         logger.info('%s ---------  %s', os.path.
                                     join(path, tile), outFN)
-                        log_msg.append('%s ---------  %s\n', os.path.
-                                       join(path, tile), outFN)
+                        log_msg.append('{0} ---------  {1}\n'.format(os.path.
+                                                                     join(path, tile), outFN))
 
                         # Copy data
                         shutil.copy(tile_file_path, outPath)
@@ -152,7 +152,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
     elapsed_time = endTime - startTime
 
     logger.info('\nElapsed Time: %s', elapsed_time)
-    log_msg.append('Elapsed Time: %s\n', elapsed_time)
+    log_msg.append('Elapsed Time: {0}\n'.format(elapsed_time))
 
     if not error:
         assign_status(q, False)
@@ -225,7 +225,7 @@ def process_job(q):
 
             block_name = proper_block_name(input_dir)
             logger.info('BLOCK NAME %s', block_name)
-            log_msg.append('BLOCK NAME %s\n', block_name)
+            log_msg.append('BLOCK NAME {0}\n'.format(block_name))
 
             in_coverage, block_uid = find_in_coverage(block_name)
 
@@ -234,27 +234,27 @@ def process_job(q):
             if in_coverage:
                 logger.info('Found in Lidar Coverage model %s %s',
                             block_name, block_uid)
-                log_msg.append('Found in Lidar Coverage model %s %s\n',
-                            block_name, block_uid)
+                log_msg.append('Found in Lidar Coverage model {0} {1}\n'.format(
+                               block_name, block_uid))
 
                 rename_tiles(input_dir, output_dir, processor,
                              block_name, block_uid, q)
                 logger.info('Status  %s Status Timestamp  %s',
                             q.status, q.status_timestamp)
-                log_msg.append('Status  %s Status Timestamp  %s\n',
-                               q.status, q.status_timestamp)
+                log_msg.append('Status  {0} Status Timestamp  {1}\n'.format(
+                               q.status, q.status_timestamp))
 
             else:
                 has_error = True
                 logger.error('ERROR NOT FOUND IN MODEL %s %s', block_name, block_uid)
-                log_msg.append('ERROR NOT FOUND IN MODEL %s %s\n', block_name, block_uid)
+                log_msg.append('ERROR NOT FOUND IN MODEL {0} {1}\n'.format(block_name, block_uid))
                 assign_status(q, error=True)
     # for DEM
     else:
         logger.info('Handler not implemented for type:  %s',
                     str(q.datatype))
-        log_msg.append('Handler not implemented for type:  %s\n',
-                       str(q.datatype))
+        log_msg.append('Handler not implemented for type:  {0}\n'.format(
+                       str(q.datatype)))
         assign_status(q, error=True)
 
     paragraph = ''
