@@ -1,6 +1,6 @@
-__version__ = "0.2"
+__version__ = "0.2.1"
 __authors__ = "Jok Laurente"
-__email__ = ["jalaurente@dream.upd.edu.ph", "jmelaurente@gmail.com"]
+__email__ = ["jmelaurente@gmail.com"]
 __description__ = 'Updating of FHM Municipal Index'
 
 import arcpy
@@ -11,7 +11,7 @@ import time
 startTime = time.time()
 
 # parameters
-arcpy.env.workspace = r"D:\update_muni_index\FHM_Monitoring.gdb"
+arcpy.env.workspace = r"E:\FLOOD_HAZARD_MAPS\FHM_SHAPEFILES_FINAL\FHM_Monitoring.gdb"
 muni_boundary = "PSA_Muni_Boundary"
 fhm_coverage = "fhm_coverage"
 builtup = "builtup_all"
@@ -152,7 +152,7 @@ arcpy.SelectLayerByLocation_management("muni_index_layer", "INTERSECT", "fhm_cov
 arcpy.CalculateField_management("muni_index_layer", "Projected_Resolution", "checkResolution(\"30m_10m\",!Projected_Resolution!)", "PYTHON_9.3", codeblock_resolution)
 
 drop_fields = ["Area_Hazard_1", "Percentage_hazard_1", "FID_builtup_all", "RBFP_1", "Processor_1", "SUC_1"]
-arcpy.DeleteField_management(muni_index, drop_fields) 
+arcpy.DeleteField_management(muni_index, drop_fields)
 
 # delete intermediate data
 arcpy.Delete_management("in_memory")
