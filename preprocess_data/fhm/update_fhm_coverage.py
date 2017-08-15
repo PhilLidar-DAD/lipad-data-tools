@@ -1,12 +1,10 @@
-# Windows
-# ArcPy
-
-__version__ = "0.3"
+__version__ = "0.4"
 
 import arcpy
 import os
 import time
 import argparse
+import logging
 from datetime import datetime as dt
 
 arcpy.env.outputZFlag = "Disabled"
@@ -15,51 +13,55 @@ arcpy.env.outputMFlag = "Disabled"
 startTime = time.time()
 
 # Parse arguments
-parser = argparse.ArgumentParser(description='Updating FHM Coverage')
+parser = argparse.ArgumentParser(description='Updating of FHM Coverage')
 parser.add_argument('-i','--input_directory')
 parser.add_argument('-f','--fhm_coverage')
 args = parser.parse_args()
 
+LOG_FILENAME = "update_fhm_coverage.log"
+logging.basicConfig(filename=LOG_FILENAME,level=logging.ERROR, format='%(asctime)s: %(levelname)s: %(message)s')
+
+logger = logging.getLogger("update_fhm_coverage.log")
+logger.setLevel(logging.DEBUG)
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter("%(asctime)s: %(levelname)s: %(message)s")
+# add formatter to ch
+ch.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(ch)
+
 input_directory = args.input_directory
 fhm_coverage = args.fhm_coverage
-list_err = []
 
 for path, dirs, files in os.walk(input_directory,topdown=False):
 	for f in sorted(files):
 		if f.endswith("shp") and f.__contains__("100"):
 			fhm = os.path.join(path,f)
 			rbfp_name = f.replace(".shp","")
-			print "#" * 80
-			print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-			"FHM:", fhm
-			print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-			"RBFP Name:", rbfp_name
+			logger.info("Searching for fhm in input directory")
 
 			try:
 				# dissolve
-				print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-				"Dissolving fhm"
+				logger.info("Dissolving %s" rbfp_name)
 				arcpy.Dissolve_management(fhm, r"in_memory\temp_dissolve")
 
-				print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-				"Adding fields to dissolved fhm"
+				logger.info("Adding fields to dissolved fhm")
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "RBFP_shp", "TEXT")
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "RBFP_name", "TEXT")
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "Processor", "TEXT")
 
-				print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-				"Calculating field of dissolved fhm "
+				logger.info("Calculating field of dissolved fhm")
 				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "RBFP_shp",'"' + rbfp_name + '"', "PYTHON_9.3")
 
-				print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", \
-				"Appending dissolved fhm to fhm coverage"
+				logger.info("Appending dissolved fhm to fhm coverage")
 				arcpy.Append_management(r"in_memory\temp_dissolve", fhm_coverage, "TEST")
 				arcpy.Delete_management("in_memory")
 
 			except Exception, e:
-				print "[" + dt.now().strftime('%Y-%m-%d %H:%M:%S') + "]:", e
-				list_err.append(fhm + "\n")
+				logger.exception("Error in updating fhm coverage")
 
-print list_err
 endTime = time.time()  # End timing
 print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime,2))), 'seconds'
