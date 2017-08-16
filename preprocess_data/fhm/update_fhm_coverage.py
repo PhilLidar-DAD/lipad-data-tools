@@ -1,4 +1,4 @@
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 import arcpy
 import os
@@ -44,7 +44,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 
 			try:
 				# dissolve
-				logger.info("Dissolving %s" rbfp_name)
+				logger.info("Dissolving %s", rbfp_name)
 				arcpy.Dissolve_management(fhm, r"in_memory\temp_dissolve")
 
 				logger.info("Adding fields to dissolved fhm")
@@ -55,6 +55,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "RESOLUTION", "TEXT")
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "SUC", "TEXT")
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "PROCESSOR", "TEXT")
+				arcpy.AddField_management(r"in_memory\temp_dissolve", "AREA_SQKM", "DOUBLE")
 
 				logger.info("Calculating field of dissolved fhm")
 				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "FHM_SHP",'"' + rbfp_name + '"', "PYTHON_9.3")
