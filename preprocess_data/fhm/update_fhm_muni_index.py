@@ -1,4 +1,4 @@
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __authors__ = "Jok Laurente"
 __email__ = ["jmelaurente@gmail.com"]
 __description__ = 'Updating of FHM Municipal Index'
@@ -72,17 +72,23 @@ arcpy.JoinField_management(muni_index, "MUN_CODE", fhm_muni_dissolve, "MUN_CODE"
 logger.info("Joining fields of fhm-muni-builtup to muni index")
 arcpy.JoinField_management(muni_index, "MUN_CODE", fhm_muni_builtup, "MUN_CODE", "FID_builtup_all")
 
+codeblock_builtup = """def checkBuiltup(num):
+	if num == 1:
+		return "Y"
+	else:
+		return "N""""
+
 logger.info("Calculating fields of muni index")
 arcpy.CalculateField_management(muni_index, "HAZ_AREA", '!HAZ_AREA_1!', "PYTHON_9.3")
 arcpy.CalculateField_management(muni_index, "HAZ_PERCENTAGE", '!HAZ_PERCENTAGE_1!', "PYTHON_9.3")
-arcpy.CalculateField_management(muni_index, "IS_BUILTUP_COVERED", '!FID_builtup_all!', "PYTHON_9.3")
+arcpy.CalculateField_management(muni_index, "IS_BUILTUP_COVERED", "checkBuiltup(!FID_builtup_all!)", "PYTHON_9.3", codeblock_builtup)
 
 # compute boolean values
 codeblock_percentage = """def checkPercentage(num):
 	if num >= 80:
-		return 1
+		return "Y"
 	else:
-		return 0"""
+		return "N""""
 
 logger.info("Checking if fhm coverage is >= 80%")
 arcpy.CalculateField_management(muni_index, "IS_FHM_COVERED", "checkPercentage(!HAZ_PERCENTAGE!)", "PYTHON_9.3", codeblock_percentage)
