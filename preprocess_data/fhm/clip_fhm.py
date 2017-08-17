@@ -1,4 +1,4 @@
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 __authors__ = "Jok Laurente"
 __email__ = ["jmelaurente@gmail.com"]
 __description__ = 'Clipping of Flood Hazard Maps per Municipality'
@@ -108,7 +108,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 
 				logger.info("Performing analysis on selected municipalities")
 				arcpy.Statistics_analysis(muni_layer, table, [["IS_FHM_COVERED", "MAX"], ["IS_BUILTUP_COVERED", "MAX"]])
-				table_fields = ["IS_FHM_COVERED", "IS_BUILTUP_COVERED"]
+				table_fields = ["MAX_IS_FHM_COVERED", "MAX_IS_BUILTUP_COVERED"]
 				cursor1 = arcpy.da.SearchCursor(table, table_fields)
 				for row1 in cursor1:
 					if row1[0] == "Y":
