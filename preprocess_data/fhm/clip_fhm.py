@@ -1,4 +1,4 @@
-__version__ = "0.7.3"
+__version__ = "0.7.4"
 __authors__ = "Jok Laurente"
 __email__ = ["jmelaurente@gmail.com"]
 __description__ = 'Clipping of Flood Hazard Maps per Municipality'
@@ -107,16 +107,13 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				 "", "NEW_SELECTION")
 
 				logger.info("Performing analysis on selected municipalities")
-				arcpy.Statistics_analysis(muni_layer, table, [["IS_FHM_COVERED", "SUM"], ["IS_BUILTUP_COVERED", "SUM"]])
-				table_fields = ["SUM_IS_FHM_COVERED", "SUM_IS_BUILTUP_COVERED"]
+				arcpy.Statistics_analysis(muni_layer, table, [["IS_FHM_COVERED", "MAX"], ["IS_BUILTUP_COVERED", "MAX"]])
+				table_fields = ["IS_FHM_COVERED", "IS_BUILTUP_COVERED"]
 				cursor1 = arcpy.da.SearchCursor(table, table_fields)
 				for row1 in cursor1:
-					logger.info("Number of city/muni with 80% FHM coverage: {0}".format(str(row1[0])))
-					logger.info("Number of city/muni with built-up areas: {0}".format(str(row1[1])))
-
-					if row1[0] > 0:
+					if row1[0] == "Y":
 						for_checking_value = False
-					if row1[1] > 0:
+					if row1[1] == "Y":
 						for_checking_value = False
 					logger.info("FHM for checking: {0}".format(for_checking_value))
 
@@ -134,9 +131,9 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					coverage_80 = False
 					builtup = False
 
-					if row[8] == 1:
+					if row[8] == "Y":
 						coverage_80 = True
-					if row[9] == 1:
+					if row[9] == "Y":
 						builtup = True
 
 					print "\n" + "-" * 70 + "\n"
