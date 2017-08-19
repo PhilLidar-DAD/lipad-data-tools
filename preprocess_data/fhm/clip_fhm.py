@@ -1,4 +1,4 @@
-__version__ = "0.7.5"
+__version__ = "0.7.6"
 __authors__ = "Jok Laurente"
 __email__ = ["jmelaurente@gmail.com"]
 __description__ = 'Clipping of Flood Hazard Maps per Municipality'
