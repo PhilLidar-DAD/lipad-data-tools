@@ -32,11 +32,6 @@ parser = argparse.ArgumentParser(description='Clipping of Flood Hazard Maps per 
 parser.add_argument('-i','--input_directory')
 args = parser.parse_args()
 
-print "Python version:", sys.version
-print "Script version:", __version__
-
-print "Modules were successfully imported \n"
-
 startTime = time.time()
 
 arcpy.env.outputZFlag = "Disabled"
