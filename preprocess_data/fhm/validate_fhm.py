@@ -1,4 +1,4 @@
-__version__ = "0.2"
+__version__ = "0.2.1"
 __authors__ = "Jok Laurente"
 __email__ = ["jmelaurente@gmail.com"]
 __description__ = 'Validation of Flood Hazard Maps'
@@ -31,29 +31,33 @@ args = parser.parse_args()
 input_directory = args.input_directory
 csv_file = open("validate_fhm.csv", 'wb')
 spamwriter = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-spamwriter.writerow(['Filename', 'Path', 'SRID', 'Schema'])
+spamwriter.writerow(['Filename', 'Path', 'SRID', 'Schema', 'Remarks'])
 
 for path, dirs, files in os.walk(input_directory, topdown=False):
 	for f in files:
 		if f.endswith(".shp"):
-			var_field = False
-			fhm = os.path.join(path,f)
+			try:
+				var_field = False
+				fhm = os.path.join(path,f)
+				# check spatial reference
+				logger.info("%s: Checking spatial reference", f)
+				srid = arcpy.Describe(fhm).spatialReference.PCSCode
+				logger.info("{0}: SRID: {1}".format(f,srid))
 
-			# check spatial reference
-			logger.info("%s: Checking spatial reference", f)
-			srid = arcpy.Describe(fhm).spatialReference.PCSCode
-			logger.info("{0}: SRID: {1}".format(f,srid))
+				# check schema
+				logger.info("%s: Checking if Var field exists", f)
+				fields = arcpy.ListFields(fhm)
+				for field in fields:
+					if field.name == 'Var':
+						var_field = True
+						break
+				if var_field:
+					logger.info("%s: Var field exists", f)
+				else:
+					logger.info("%s: Var field doesn't exists", f)
+				spamwriter.writerow([f, path, srid, var_field])
+			except Exception:
+				logger.info("%s: Cannot read shapefile", f)
+				spamwriter.writerow([f, path, "N/A", "N/A", "Cannot read shapefile"])
 
-			# check schema
-			logger.info("%s: Checking if Var field exists", f)
-			fields = arcpy.ListFields(fhm)
-			for field in fields:
-				if field.name == 'Var':
-					var_field = True
-					break
-			if var_field:
-				logger.info("%s: Var field exists", f)
-			else:
-				logger.info("%s: Var field doesn't exists", f)
-			spamwriter.writerow([f, path, srid, var_field])
 csv_file.close()
