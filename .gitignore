@@ -12,3 +12,4 @@ automation/dump
 automation/logs
 automation/settings.py
 automation/tests/
+automation-tests
