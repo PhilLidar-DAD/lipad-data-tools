@@ -1,4 +1,4 @@
-__version__ = "0.4.2"
+__version__ = "0.5"
 
 import arcpy
 import os
@@ -39,12 +39,15 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 	for f in sorted(files):
 		if f.endswith("shp") and f.__contains__("100"):
 			fhm = os.path.join(path,f)
-			rbfp_name = f.replace(".shp","")
+			rbfp = f.split("_fh")[0]
+			fh100_yr = f.replace(".shp","")
 			logger.info("Searching for fhm in input directory")
 
 			try:
 				# dissolve
-				logger.info("Dissolving %s", rbfp_name)
+				count = arcpy.GetCount_management(fhm_coverage)
+				UID = int(count.getOutput(0)) + 1
+				logger.info("Dissolving %s", fh100_yr)
 				arcpy.Dissolve_management(fhm, r"in_memory\temp_dissolve")
 
 				logger.info("Adding fields to dissolved fhm")
@@ -57,8 +60,13 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "PROCESSOR", "TEXT")
 				arcpy.AddField_management(r"in_memory\temp_dissolve", "AREA_SQKM", "DOUBLE")
 
-				logger.info("Calculating field of dissolved fhm")
-				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "FHM_SHP",'"' + rbfp_name + '"', "PYTHON_9.3")
+				logger.info("Calculating fields of dissolved fhm")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "UID", UID, "PYTHON_9.3")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "FHM_SHP",'"' + fh100_yr + '"', "PYTHON_9.3")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "RBFP",'"' + rbfp.title() + '"', "PYTHON_9.3")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "RBFP_COUNT", "!RBFP!.count(',') + 1", "PYTHON_9.3")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "RESOLUTION",'"10m"', "PYTHON_9.3")
+				arcpy.CalculateField_management(r"in_memory\temp_dissolve", "AREA_SQKM", "!shape.area@squarekilometers!", "PYTHON_9.3")
 
 				logger.info("Appending dissolved fhm to fhm coverage")
 				arcpy.Append_management(r"in_memory\temp_dissolve", fhm_coverage, "TEST")
