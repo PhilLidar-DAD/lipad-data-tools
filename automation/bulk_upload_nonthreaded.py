@@ -60,12 +60,14 @@ def setup_dump_and_logs():
 def write_obj_metadata_to_csv(obj_metadata):
     pass
 
-config_parser = SafeConfigParser()
-config_parser.read(get_cwd() + 'config.ini')
+# config_parser = SafeConfigParser()
+# config_parser.read(get_cwd() + 'config.ini')
 
 
 # Default virtualenv path to activate file
-activate_this_file = "~/.virtualenvs/geonode/bin/activate_this.py"
+# activate_this_file = "~/.virtualenvs/geonode/bin/activate_this.py"
+# activate_this_file ="~/.virtualenvs/automation/bin/activate_this.py"
+activate_this_file = CONFIG.get('env', 'activatethis')
 
 # Default log filepath
 log_filepath = get_cwd() + "logs/bulk_upload.log"
@@ -86,7 +88,7 @@ parser.add_argument("-r", "--resume", dest="resume",
                     help="Resume from a interrupted upload using the CSV dump")
 
 args = parser.parse_args()
-pprint(args)
+# pprint(args)
 
 # Check if --logfile is set
 if args.logfile is not None:
@@ -139,7 +141,7 @@ logger.addHandler(stream)
 grid_files_dir = None
 if isdir(args.dir):
     grid_files_dir = args.dir
-    print("Uploading files from [{0}].".format(args.dir))
+    # print("Uploading files from [{0}].".format(args.dir))
     logger.info("Uploading files from [{0}].".format(args.dir))
 else:
     raise Exception("ERROR: [{0}] is not a valid directory.".format(args.dir))
@@ -175,6 +177,7 @@ data_dump_file_path = "dump/uploaded_objects_[{0}]_{1}.txt".format(
 
 with open(data_dump_file_path, 'w') as dump_file:
     header_str = "NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH GRID_REF\n"
+    print('NAME,LAST_MODIFIED,SIZE_IN_BYTES,CONTENT_TYPE,FILE_HASH GRID_REF')
     dump_file.write(header_str)
 
     # No previous metadata dump file to resume from specified
@@ -196,16 +199,28 @@ with open(data_dump_file_path, 'w') as dump_file:
                     logger.info("Uploaded file [{0}]".format(join(path, name)))
 
                     ### TODO ###
-                    dump_file.write("{0},{1},{2},{3},{4},{5}\n".format(obj_dict['name'],
-                                                                       obj_dict[
-                        'last_modified'],
-                        obj_dict[
-                        'bytes'],
-                        obj_dict[
-                        'content_type'],
-                        obj_dict[
-                        'hash'],
-                        obj_dict['grid_ref']))
+                    dump_file.write("{0},{1},{2},{3},{4},{5}\n".
+                                    format(obj_dict['name'],                                                   obj_dict[
+                                        'last_modified'],
+                                        obj_dict[
+                                        'bytes'],
+                                        obj_dict[
+                                        'content_type'],
+                                        obj_dict[
+                                        'hash'],
+                                        obj_dict['grid_ref']))
+
+                    print("{0},{1},{2},{3},{4},{5}".
+                          format(obj_dict['name'],                                                   obj_dict[
+                              'last_modified'],
+                              obj_dict[
+                              'bytes'],
+                              obj_dict[
+                              'content_type'],
+                              obj_dict[
+                              'hash'],
+                              obj_dict['grid_ref']))
+
                 else:
                     logger.debug(
                         "Skipped file [{0}]. Not allowed in file extensions".format(join(path, name)))
@@ -283,6 +298,8 @@ with open(data_dump_file_path, 'w') as dump_file:
                         # Skip if previously uploaded
                         dump_file.write(metadata_csv)
 
+                        print(metadata_csv)
+
                     else:
                         logger.debug(
                             "Skipped unallowed file [{0}]".format(join(path, name)))
@@ -295,11 +312,10 @@ with open(data_dump_file_path, 'w') as dump_file:
 # Close Ceph Connection
 ceph_client.close_connection()
 
-print("====================")
 print("Done Uploading!")
 # pprint(uploaded_objects)
-print("wrote metadata to file:")
-print("{0}".format(data_dump_file_path))
+# print("wrote metadata to file:")
+# print("{0}".format(data_dump_file_path))
 
 # print 'File Path: ', data_dump_file_path
 # return data_dump_file_path

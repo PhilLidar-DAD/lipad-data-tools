@@ -11,3 +11,5 @@ preprocess_data/remote/upload/dump/
 automation/dump
 automation/logs
 automation/settings.py
+automation/tests/
+automation-tests

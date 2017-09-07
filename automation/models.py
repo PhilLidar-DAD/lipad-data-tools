@@ -5,7 +5,7 @@ from settings import *
 from peewee import *
 
 
-PSQL_DB = peewee.PostgresqlDatabase(
+PSQL_DB = PostgresqlDatabase(
     DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
 
 
@@ -15,7 +15,7 @@ class BaseModel(peewee.Model):
         database = PSQL_DB
 
 
-class DataClassification(Field):
+class DataClassification(peewee.Field):
     UNKNOWN = 0
     LAZ = 1
 #    DEM = 2
@@ -48,16 +48,41 @@ class DataClassification(Field):
 
 
 class Automation_AutomationJob(BaseModel):
+    """Inherit ``BaseModel`` `model`.
 
+    A model interface for geonode.automation.models.AutomationJob.
+
+    Attributes:
+        id (int): Corresponds to `model` ``AutomationJob`` identifier in database.
+        datatype (str): Corresponds to `model` ``AutomationJob`` datatype
+            in database.
+        input_dir (str): Corresponds to `model` ``AutomationJob`` input directory
+            in database.
+        output_dir (str): Corresponds to `model` ``AutomationJob`` output directory
+            in database.
+        processor (str): Corresponds to `model` ``AutomationJob`` processor
+            in database.
+        date_submitted (date): Corresponds to `model` ``AutomationJob`` date_submitted
+            in database.
+        target_os (str): Corresponds to `model` ``AutomationJob`` target_os
+            in database.
+        log (str): Corresponds to `model` ``AutomationJob`` log in database.
+
+    """
     STATUS_CHOICES = [
-        ('pending_process'),
-        ('done_process'),
-        ('pending_ceph'),
-        ('done_ceph'),
-        ('done'),
-        # (-1, 'error', _('Error')),
+        ('pending_process'),    # Pending Job
+        ('done_process'),       # Processed Job
+        # ('pending_ceph'),       # Uploading in Ceph
+        ('done_ceph'),          # Uploaded in Ceph
+        # ('done'),               # Uploaded in LiPAD
+        ('error'),
     ]
-
+    # ('pending_process', _('Pending Job')),
+#         # ('done_process', _('Processing Job')),
+#         ('done_process', _('Processed Job')),
+#         ('pending_ceph', _('Uploading in Ceph')),
+#         ('done_ceph', _('Uploaded in Ceph')),
+#         ('done', _('Uploaded in LiPAD')),
     OS_CHOICES = [
         ('linux', ('Process in Linux')),
         ('windows', ('Process in Windows')),
@@ -74,10 +99,12 @@ class Automation_AutomationJob(BaseModel):
     status_timestamp = peewee.DateTimeField(null=True)
     target_os = peewee.CharField(choices=OS_CHOICES)
     # target_os = OSChoice(choices=OS_CHOICES)
-    log = peewee.TextField(null=False)
+    data_processing_log = peewee.TextField(null=False)
+    ceph_upload_log = peewee.TextField(null=False)
+    database_upload_log = peewee.TextField(null=False)
 
     # class Meta:
-    #     primary_key = peewee.CompositeKey(
+    #     primary_key = CompositeKey(
     #         'datatype', 'date_submitted', 'status')
 
 
@@ -90,8 +117,7 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
     block_name = peewee.CharField()
 
 
-class CephDataObject(BaseModel):
-    id = peewee.IntegerField(primary_key=True)
+class Automation_CephDataObjectResourceBase(BaseModel):
     size_in_bytes = peewee.IntegerField()
     file_hash = peewee.CharField(max_length=40)
     name = peewee.CharField(max_length=100)
@@ -99,6 +125,7 @@ class CephDataObject(BaseModel):
     content_type = peewee.CharField(max_length=20)
     data_class = peewee.CharField(max_length=20)
     grid_ref = peewee.CharField(max_length=10)
+    block_uid = peewee.ForeignKeyField(Cephgeo_LidarCoverageBlock)
 
 
 class Cephgeo_DemDataStore():

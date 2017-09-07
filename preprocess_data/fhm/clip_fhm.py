@@ -1,7 +1,7 @@
-# Windows
-# ArcPy
-
-__version__ = "0.7.2"
+__version__ = "0.7.6"
+__authors__ = "Jok Laurente"
+__email__ = ["jmelaurente@gmail.com"]
+__description__ = 'Clipping of Flood Hazard Maps per Municipality'
 
 import arcpy
 import os
@@ -28,14 +28,9 @@ ch.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(ch)
 
-parser = argparse.ArgumentParser(description='Clip flood hazard maps per municipality')
+parser = argparse.ArgumentParser(description='Clipping of Flood Hazard Maps per Municipality')
 parser.add_argument('-i','--input_directory')
 args = parser.parse_args()
-
-print "Python version:", sys.version
-print "Script version:", __version__
-
-print "Modules were successfully imported \n"
 
 startTime = time.time()
 
@@ -53,13 +48,13 @@ else:
 # define variables
 # replace output directory
 input_directory = args.input_directory
-output_directory = r"\\pmsat-nas.prd.dream.upd.edu.ph\geostorage\DAD\FLOOD_HAZARD\Clipped_FHMs"
-muni_boundary = r"\\pmsat-nas.prd.dream.upd.edu.ph\geostorage\DAD\FLOOD_HAZARD\FHM_Monitoring.gdb\PSA_Muni_Boundary"
-muni_index= r"\\pmsat-nas.prd.dream.upd.edu.ph\geostorage\DAD\FLOOD_HAZARD\FHM_Monitoring.gdb\PSA_Muni_Index"
+output_directory = r"E:\FLOOD_HAZARD_MAPS\FHM_SHAPEFILES_FINAL\Clipped_FHMs"
+muni_boundary = r"E:\FLOOD_HAZARD_MAPS\FHM_SHAPEFILES_FINAL\FHM_Monitoring.gdb\psa_muni_boundary"
+muni_index= r"E:\FLOOD_HAZARD_MAPS\FHM_SHAPEFILES_FINAL\FHM_Monitoring.gdb\fhm_muni_index"
 
 # muni boundary fields
-muni_fields = ['REG_NAME', 'PRO_NAME', 'MUN_NAME', 'MUN_CODE', 'RB_FP', 'Return_Period', \
-'Last_Clipped', 'Resolution', 'FHM_80_coverage', 'Builtup_coverage', 'Status', 'Projected_Resolution', 'SHAPE@']
+muni_fields = ['REG_NAME', 'PRO_NAME', 'MUN_NAME', 'MUN_CODE', 'RBFP_CLIPPED', 'RETURN_PERIOD', \
+'LAST_CLIPPED', 'RESOLUTION', 'IS_FHM_COVERED', 'IS_BUILTUP_COVERED', 'STATUS', 'PROJ_RESOLUTION', 'SHAPE@']
 
 # temporary shapefiles
 erase = r"in_memory\temp_erase"
@@ -78,12 +73,12 @@ fhm_list_err = []
 
 logger.info("Creating a layer for Muni Index")
 arcpy.MakeFeatureLayer_management(muni_index, muni_layer, "", "", \
-				"OBJECTID_1 OBJECTID_1 VISIBLE NONE;Shape Shape VISIBLE NONE;REG_CODE REG_CODE \
+				"OBJECTID OBJECTID VISIBLE NONE;Shape Shape VISIBLE NONE;REG_CODE REG_CODE \
 				VISIBLE NONE;REG_NAME REG_NAME VISIBLE NONE;PRO_CODE PRO_CODE VISIBLE NONE;PRO_NAME \
 				PRO_NAME VISIBLE NONE;MUN_CODE MUN_CODE VISIBLE NONE;MUN_NAME MUN_NAME VISIBLE \
-				NONE;ISCITY ISCITY VISIBLE NONE;FHM_80_coverage FHM_80_coverage VISIBLE NONE;\
-				Builtup_coverage Builtup_coverage VISIBLE NONE;Status Status VISIBLE NONE;\
-				Projected_Resolution Projected_Resolution VISIBLE NONE\
+				NONE;IS_CITY IS_CITY VISIBLE NONE;IS_FHM_COVERED IS_FHM_COVERED VISIBLE NONE;\
+				IS_BUILTUP_COVERED IS_BUILTUP_COVERED VISIBLE NONE;STATUS STATUS VISIBLE NONE;\
+				PROJ_RESOLUTION PROJ_RESOLUTION VISIBLE NONE\
 				Shape_Length Shape_Length VISIBLE NONE;Shape_Area Shape_Area VISIBLE NONE")
 
 # loop through the flood hazard shapefiles
@@ -105,18 +100,15 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				logger.info("Selecting municipalities intersected with fhm")
 				arcpy.SelectLayerByLocation_management(muni_layer, "INTERSECT", fhm_path,\
 				 "", "NEW_SELECTION")
-				
+
 				logger.info("Performing analysis on selected municipalities")
-				arcpy.Statistics_analysis(muni_layer, table, [["FHM_80_coverage", "SUM"], ["Builtup_coverage", "SUM"]])
-				table_fields = ["SUM_FHM_80_coverage", "SUM_Builtup_coverage"]
+				arcpy.Statistics_analysis(muni_layer, table, [["IS_FHM_COVERED", "MAX"], ["IS_BUILTUP_COVERED", "MAX"]])
+				table_fields = ["MAX_IS_FHM_COVERED", "MAX_IS_BUILTUP_COVERED"]
 				cursor1 = arcpy.da.SearchCursor(table, table_fields)
 				for row1 in cursor1:
-					logger.info("Number of city/muni with 80% FHM coverage: {0}".format(str(row1[0])))
-					logger.info("Number of city/muni with built-up areas: {0}".format(str(row1[1])))
-
-					if row1[0] > 0:
+					if row1[0] == "Y":
 						for_checking_value = False
-					if row1[1] > 0:
+					if row1[1] == "Y":
 						for_checking_value = False
 					logger.info("FHM for checking: {0}".format(for_checking_value))
 
@@ -134,9 +126,9 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 					coverage_80 = False
 					builtup = False
 
-					if row[8] == 1:
+					if row[8] == "Y":
 						coverage_80 = True
-					if row[9] == 1:
+					if row[9] == "Y":
 						builtup = True
 
 					print "\n" + "-" * 70 + "\n"
@@ -168,7 +160,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 
 					if not fhm_exists:
 						# clip flood hazard shapefile using muni index as extent
-						logger.info("Clipping flood hazard shapefile")					
+						logger.info("Clipping flood hazard shapefile")
 						arcpy.Clip_analysis(fhm_path, geom, temp_fhm, "")
 
 						# erase the muni index extent using fhm to generate "area not assessed"
@@ -179,7 +171,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 						logger.info("Adding Var field to temporary 'area not assessed' shapefile")
 						arcpy.AddField_management(erase, "Var", "SHORT")
 
-						# calculate value of the temporary "area not assessed" shapefile 
+						# calculate value of the temporary "area not assessed" shapefile
 						logger.info("Calculating erase's Var field")
 						arcpy.CalculateField_management(erase, "Var", "-1","PYTHON_9.3")
 
@@ -196,7 +188,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 						logger.info("Adding Var field to temporary municipal outline shapefile")
 						arcpy.AddField_management(select, "Var", "SHORT")
 
-						# calculate value of the temporary municipal outline shapefile 
+						# calculate value of the temporary municipal outline shapefile
 						logger.info("Calculating select's Var field")
 						arcpy.CalculateField_management(select, "Var", "-2","PYTHON_9.3")
 
@@ -240,7 +232,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 						logger.info("Adding Var field to temporary municipal outline shapefile")
 						arcpy.AddField_management(select, "Var", "SHORT")
 
-						# calculate value of the temporary municipal outline shapefile 
+						# calculate value of the temporary municipal outline shapefile
 						logger.info("Calculating select's Var field")
 						arcpy.CalculateField_management(select, "Var", "-2","PYTHON_9.3")
 
@@ -271,7 +263,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 							os.makedirs(output_path_upload)
 						else:
 							logger.info("Output directory already exists")
-						
+
 						if os.path.exists(output_fhm_upload):
 							logger.info("Deleting the old fhm")
 							arcpy.Delete_management(output_fhm_upload)
@@ -329,7 +321,7 @@ for path, dirs, files in os.walk(input_directory,topdown=False):
 				logger.info("Deleting in_memory workspace")
 				arcpy.Delete_management("in_memory")
 
-arcpy.Delete_management("in_memory")			
+arcpy.Delete_management("in_memory")
 csvfile.close()
 endTime = time.time()  # End timing
 print '\nElapsed Time:', str("{0:.2f}".format(round(endTime - startTime,2))), 'seconds'
