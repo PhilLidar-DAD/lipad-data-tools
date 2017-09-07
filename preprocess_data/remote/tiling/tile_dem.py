@@ -83,7 +83,7 @@ projection is the same.")
                         help="Path to output directory.")
     parser.add_argument("-tmp", "--temp-dir", required=True,
                         help="Path to temporary working directory.")
-    parser.add_argument("-rbid", "--rbid", required=True,
+    parser.add_argument("-dem_id", "--dem_id", required=True,
                         help="River basin ID for this DEM.")
     parser.add_argument("-l", "--logfile", required=True,
                         help="Filename of logfile")
@@ -107,7 +107,7 @@ def _ceil(x):
     <log_file>  - log file output
     <_logger>   - python logger instance
 """
-def tile_dem(src_dem,out_dir,dem_type,rbid,prj_file,temp_dir,log_file,_logger=_logger):
+def tile_dem(src_dem,out_dir,dem_type,dem_id,prj_file,temp_dir,log_file,_logger=_logger):
     _setup_logging_2(log_file)
     # Open DEM raster
     try:
@@ -201,7 +201,7 @@ def tile_dem(src_dem,out_dir,dem_type,rbid,prj_file,temp_dir,log_file,_logger=_l
                 filename = "E%sN%s_%s_%s.tif" % (tile_x / _TILE_SIZE,
                                                  tile_y / _TILE_SIZE,
                                                  dem_type.upper(),
-                                                 rbid.upper())
+                                                 dem_id.upper())
                 tile_path = os.path.join(out_dir, filename)
 
                 # Check if output filename is already exists
@@ -330,7 +330,7 @@ if __name__ == '__main__':
                 filename = "E%sN%s_%s_%s.tif" % (tile_x / _TILE_SIZE,
                                                  tile_y / _TILE_SIZE,
                                                  args.type.upper(),
-                                                 args.rbid.upper())
+                                                 args.dem_id.upper())
                 tile_path = os.path.join(output_dir, filename)
 
                 # Check if output filename is already exists
