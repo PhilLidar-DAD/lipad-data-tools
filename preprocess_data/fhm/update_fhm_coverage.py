@@ -1,4 +1,4 @@
-__version__ = "0.6"
+__version__ = "0.7"
 
 import arcpy
 import os
@@ -36,8 +36,10 @@ input_directory = args.input_directory
 fhm_coverage = args.fhm_coverage
 temp_dissolve = r"in_memory\temp_dissolve"
 temp_union = r"in_memory\temp_union"
-fhm_directory = r"D:\JOK_WORKING\GITHUB\phil-lidar1-dad\lipad-data-tools\preprocess_data\fhm\FHM_RENAMED"
+temp_union2 = r"in_memory\temp_union2"
+fhm_directory = r""
 union_directory = os.path.join(input_directory, "UNION")
+union_directory2 = os.path.join(input_directory, "UNION2")
 fhm_coverage_layer = "fhm_coverage_layer"
 
 def unionFHM(fname, fhm1, fhm2):
@@ -47,14 +49,25 @@ def unionFHM(fname, fhm1, fhm2):
 		uvar = var2
 	return uvar
 	"""
-	fhm_union = os.path.join(union_directory, f)
-	in_features = [fhm1, fhm2]
-	logger.info("Performing union of fhm")
-	arcpy.Union_analysis(in_features, temp_union)
-	logger.info("Calculating the dominant value")
+	# Calculate dominant value of input fhm
+	logger.info("%s: Performing union of fhm", fname)
+	arcpy.Identity_analysis(fhm1, fhm2, temp_union)
+	logger.info("%s: Calculating the dominant value", fname)
 	arcpy.CalculateField_management(temp_union, "Var", "getDominantValue(!Var!, !Var_1!)", "PYTHON_9.3", code_block)
-	logger.info("Dissolving the feature")
-	arcpy.Dissolve_management(temp_union, fhm_union, "Var")
+
+	# Calculate dominant value of intersected fhm
+	arcpy.Identity_analysis(fhm2, fhm1, temp_union2)
+	logger.info("%s: Calculating the dominant value", fname)
+	arcpy.CalculateField_management(temp_union2, "Var", "getDominantValue(!Var!, !Var_1!)", "PYTHON_9.3", code_block)
+
+	logger.info("%s: Deleting old copy of fhm", fname)
+	arcpy.Delete_management(fhm1)
+	arcpy.Delete_management(fhm2)
+
+	logger.info("%s: Dissolving the feature", fname)
+	arcpy.Dissolve_management(temp_union, fhm1, "Var")
+	arcpy.Dissolve_management(temp_union2, fhm2, "Var")
+
 	arcpy.Delete_management("in_memory")
 
 if __name__ == "__main__":
@@ -63,11 +76,11 @@ if __name__ == "__main__":
 		for f in sorted(files):
 			try:
 				if f.endswith("shp") and "UNION" not in path:
+					fhm = os.path.join(path,f)
 					if "fh100" in f:
-						fhm = os.path.join(path,f)
 						rbfp = f.split("_fh")[0]
 						fh100_yr = f.replace(".shp","")
-						logger.info("Searching for fhm in input directory")
+
 						# dissolve
 						count = arcpy.GetCount_management(fhm_coverage)
 						UID = int(count.getOutput(0)) + 1
@@ -95,8 +108,12 @@ if __name__ == "__main__":
 						# check if new fhm overlaps with existing coverage
 						logger.info("%s: Checking if dissolved fhm intersects with existing coverage", rbfp)
 						arcpy.MakeFeatureLayer_management(fhm_coverage, fhm_coverage_layer)
+						# check if intersects ###################
 						arcpy.SelectLayerByLocation_management(fhm_coverage_layer, "INTERSECT", temp_dissolve)
 						cursor = arcpy.da.SearchCursor(fhm_coverage_layer, "RBFP")
+
+						logger.info("%s: Appending dissolved fhm to fhm coverage", rbfp)
+						arcpy.Append_management(temp_dissolve, fhm_coverage, "TEST")
 
 						# loop through the features of intersected layer
 						for row in cursor:
@@ -104,28 +121,23 @@ if __name__ == "__main__":
 							logger.info("{0}: Dissolved fhm intersects with {1}".format(rbfp, rbfp_value))
 
 							# loop through the fhm shapefiles
-							for path, dirs, files in os.walk(fhm_directory, topdown=False):
-								for i in files:
+							for path2, dirs2, files2 in os.walk(fhm_directory, topdown=False):
+								for i in files2:
 									if rbfp_value in i and i.endswith(".shp"):
-										fhm_intersect = os.path.join(path, i)
+										fhm_intersect = os.path.join(path2, i)
 										fhm_list.append(fhm_intersect)
 						for item in fhm_list:
 							if "fh100" in item:
-								print f, item
 								unionFHM(f, fhm, item)
 					elif "fh25" in f:
 						for item in fhm_list:
 							if "fh25" in item:
-								print f, item
 								unionFHM(f, fhm, item)
 					elif "fh5" in f:
 						for item in fhm_list:
 							if "fh5" in item:
-								print f, item
 								unionFHM(f, fhm, item)
 
-						# logger.info("%s: Appending dissolved fhm to fhm coverage", rbfp)
-						# arcpy.Append_management(temp_dissolve, fhm_coverage, "TEST")
 						arcpy.Delete_management("in_memory")
 						arcpy.Delete_management("fhm_coverage_layer")
 
