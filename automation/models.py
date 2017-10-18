@@ -117,7 +117,7 @@ class Cephgeo_LidarCoverageBlock(BaseModel):
     block_name = peewee.CharField()
 
 
-class Automation_CephDataObjectResourceBase(BaseModel):
+class Cephgeo_CephDataObject(BaseModel):
     size_in_bytes = peewee.IntegerField()
     file_hash = peewee.CharField(max_length=40)
     name = peewee.CharField(max_length=100)
