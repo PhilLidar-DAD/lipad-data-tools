@@ -1,10 +1,14 @@
-__version__ = "0.7"
+__version__ = "0.8"
 
 import arcpy
 import os
 import time
 import argparse
 import logging
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 arcpy.env.outputZFlag = "Disabled"
 arcpy.env.outputMFlag = "Disabled"
@@ -37,12 +41,27 @@ fhm_coverage = args.fhm_coverage
 temp_dissolve = r"in_memory\temp_dissolve"
 temp_union = r"in_memory\temp_union"
 temp_union2 = r"in_memory\temp_union2"
-fhm_directory = r""
+# specify static fhm directory
+fhm_directory = ""
 union_directory = os.path.join(input_directory, "UNION")
 union_directory2 = os.path.join(input_directory, "UNION2")
 fhm_coverage_layer = "fhm_coverage_layer"
 
-def unionFHM(fname, fhm1, fhm2):
+def renameInput(fhm_input):
+	fhm_bname = os.path.basename(fhm_input)
+	fhm_dname = os.path.dirname(fhm_input)
+
+	fhm_bname = fhm_bname.replace("(","___")
+	fhm_bname = fhm_bname.replace(")","___")
+	fhm_bname = fhm_bname.replace(", ","__")
+	fhm_bname = fhm_bname.replace("-","_")
+
+	fhm_input = os.path.join(fhm_dname, fhm_bname)
+	return fhm_input
+
+def unionFHM(fhm1, fhm2):
+	bfhm1 = os.path.basename(fhm1)
+	bfhm2 = os.path.basename(fhm2)
 	code_block = """def getDominantValue(var1, var2):
 	uvar = var1
 	if var1 < var2:
@@ -50,25 +69,32 @@ def unionFHM(fname, fhm1, fhm2):
 	return uvar
 	"""
 	# Calculate dominant value of input fhm
-	logger.info("%s: Performing union of fhm", fname)
+	logger.info("%s: Performing union of fhm", bfhm1)
 	arcpy.Identity_analysis(fhm1, fhm2, temp_union)
-	logger.info("%s: Calculating the dominant value", fname)
+	logger.info("%s: Calculating the dominant value", bfhm1)
 	arcpy.CalculateField_management(temp_union, "Var", "getDominantValue(!Var!, !Var_1!)", "PYTHON_9.3", code_block)
 
 	# Calculate dominant value of intersected fhm
 	arcpy.Identity_analysis(fhm2, fhm1, temp_union2)
-	logger.info("%s: Calculating the dominant value", fname)
+	logger.info("%s: Calculating the dominant value", bfhm2)
 	arcpy.CalculateField_management(temp_union2, "Var", "getDominantValue(!Var!, !Var_1!)", "PYTHON_9.3", code_block)
 
-	logger.info("%s: Deleting old copy of fhm", fname)
+	logger.info("%s: Deleting old copy of fhm", bfhm1)
+	logger.info("%s: Deleting old copy of fhm", bfhm2)
 	arcpy.Delete_management(fhm1)
 	arcpy.Delete_management(fhm2)
 
-	logger.info("%s: Dissolving the feature", fname)
-	arcpy.Dissolve_management(temp_union, fhm1, "Var")
-	arcpy.Dissolve_management(temp_union2, fhm2, "Var")
+	logger.info("%s: Dissolving the feature", bfhm1)
+	arcpy.Dissolve_management(temp_union, renameInput(fhm1), "Var")
+	if renameInput(fhm1) != fhm1:
+		logger.info("%s: Renaming the output file", bfhm1)
+		arcpy.Rename_management(renameInput(fhm1),fhm1)
 
-	arcpy.Delete_management("in_memory")
+	logger.info("%s: Dissolving the feature", bfhm2)
+	arcpy.Dissolve_management(temp_union2, renameInput(fhm2), "Var")
+	if renameInput(fhm2) != fhm2:
+		logger.info("%s: Renaming the output file", bfhm2)
+		arcpy.Rename_management(renameInput(fhm2),fhm2)
 
 if __name__ == "__main__":
 	for path, dirs, files in os.walk(input_directory,topdown=False):
@@ -108,7 +134,7 @@ if __name__ == "__main__":
 						# check if new fhm overlaps with existing coverage
 						logger.info("%s: Checking if dissolved fhm intersects with existing coverage", rbfp)
 						arcpy.MakeFeatureLayer_management(fhm_coverage, fhm_coverage_layer)
-						# check if intersects ###################
+						# check if intersects
 						arcpy.SelectLayerByLocation_management(fhm_coverage_layer, "INTERSECT", temp_dissolve)
 						cursor = arcpy.da.SearchCursor(fhm_coverage_layer, "RBFP")
 
@@ -128,18 +154,19 @@ if __name__ == "__main__":
 										fhm_list.append(fhm_intersect)
 						for item in fhm_list:
 							if "fh100" in item:
-								unionFHM(f, fhm, item)
+								unionFHM(fhm, item)
 					elif "fh25" in f:
 						for item in fhm_list:
 							if "fh25" in item:
-								unionFHM(f, fhm, item)
+								unionFHM(fhm, item)
 					elif "fh5" in f:
 						for item in fhm_list:
 							if "fh5" in item:
-								unionFHM(f, fhm, item)
+								unionFHM(fhm, item)
 
-						arcpy.Delete_management("in_memory")
-						arcpy.Delete_management("fhm_coverage_layer")
+					logger.info("%s: Deleting intermediate files", rbfp)
+					arcpy.Delete_management("in_memory")
+					arcpy.Delete_management("fhm_coverage_layer")
 
 			except Exception, e:
 				logger.exception("Error in updating fhm coverage")
