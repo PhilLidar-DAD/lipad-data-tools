@@ -1,4 +1,4 @@
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 __author__ = "Jok Laurente"
 __email__ = "jmelaurente@gmail.com"
 __description__ = "Script for updating LiDAR Coverage Metadata"
@@ -23,7 +23,7 @@ args = parser.parse_args()
 lidar_coverage = args.lidar_coverage
 metadata_spreadsheet = args.metadata_spreadsheet
 
-lidar_fields = ["AREA", "BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_REMOVED"]
+lidar_fields = ["AREA", "BLOCK_NAME", "PROCESSOR", "SENSOR", "BASE_USED", "FLIGHT_NUMBER", "MISSION_NAME", "DATE_FLOWN", "IS_PROBLEMATIC"]
 
 book = open_workbook(metadata_spreadsheet,on_demand=True)
 sheet = book.sheet_by_name("Metadata")
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 			flight_number = checkNull(sheet.row(nrow)[7].value)
 			mission_name = checkNull(sheet.row(nrow)[8].value)
 			date_flown_dec = checkNull(sheet.row(nrow)[9].value)
-			is_removed = checkNull(sheet.row(nrow)[12].value)
+			is_problematic = checkNull(sheet.row(nrow)[12].value)
 
 			logger.info("Checking if %s exists in LiDAR Coverage" % block_name)
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 						row[5] = "{0} | {1}".format(row[5], flight_number)
 						row[6] = "{0} | {1}".format(row[6], mission_name)
 						row[7] = "{0} | {1}".format(row[7], date_flown)
-						row[8] = "{0} | {1}".format(row[8], is_removed)
+						row[8] = "{0} | {1}".format(row[8], is_problematic)
 					else:
 						logger.info("Metadata doesn't exists. Updating the values")
 						row[0] = area
@@ -104,7 +104,7 @@ if __name__ == "__main__":
 						row[5] = flight_number
 						row[6] = mission_name
 						row[7] = date_flown
-						row[8] = is_removed
+						row[8] = is_problematic
 				cursor.updateRow(row)
 		except Exception, e:
 			spamwriter.writerow([str(nrow), block_name, "Error"])
