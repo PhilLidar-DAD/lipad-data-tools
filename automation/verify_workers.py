@@ -31,7 +31,7 @@ def verify_las(file_path, checksum):
                 output['checksum'] != checksum)):
         # Process file and redirect output to json file
         proc = subprocess.Popen(
-            ['lasbb', file_path], stdout=subprocess.PIPE,
+            ['lasinfo', file_path], stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT)
 
         out, err = proc.communicate()
