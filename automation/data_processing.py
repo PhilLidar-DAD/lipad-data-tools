@@ -212,7 +212,7 @@ def process_job(q):
     output_dir = q.output_dir
     processor = q.processor
 
-    if datatype.lower() == 'laz':
+    if datatype.lower() == 'laz' or datatype.lower() == 'ortho':
         logger.info('Verifying las tiles in directory...')
         log_msg.append('Verifying las tiles in directory...\n')
         has_error = verify_dir(input_dir)
