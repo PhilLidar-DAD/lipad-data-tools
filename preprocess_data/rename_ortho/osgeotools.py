@@ -13,7 +13,7 @@ try:
 except:
     sys.exit('ERROR: cannot find GDAL/OGR modules')
 
-_version = "0.1.57"
+_version = "0.1.58"
 print os.path.basename(__file__) + ": v" + _version
 _logger = logging.getLogger()
 _BUFFER = 50  # meters
@@ -96,7 +96,7 @@ def open_raster(path, prj_file):
     _logger.debug('raster["cols"] = %s raster["rows"] = %s',
                   raster["cols"], raster["rows"])
     # Also check prjection
-    _check_projection(prj_file, raster["dataset"])
+    # _check_projection(prj_file, raster["dataset"])
     # Compute extents
     # Upper left corner
     min_x, max_y = pixel2world(raster["geotransform"], 0, 0)
@@ -109,7 +109,10 @@ def open_raster(path, prj_file):
                "min_y": min_y,
                "max_y": max_y}
     raster["extents"] = extents
-    return raster
+    if _check_projection(prj_file, raster["dataset"]):
+        return raster
+    else:
+        return -1
 
 
 def open_raster_band(raster, bandno, open_band_array=False):
@@ -134,12 +137,11 @@ def _check_projection(prj_file, raster_dataset):
     prj_raster_srs = osr.SpatialReference(wkt=prj_raster)
     # Check if they are the same
     if not prj_srs.IsSame(prj_raster_srs):
-        _logger.error("Projection from %s does not match raster dataset! \
-Exiting.",
-                      prj_file)
-        exit(5)
-    _logger.info("Projection from %s matches raster dataset.", prj_file)
-    return prj
+        print("Projection from %s does not match raster dataset! Exiting.", prj_file)
+        return False
+    else:
+        # _logger.info("Projection from %s matches raster dataset.", prj_file)
+        return True
 
 
 def get_band_array_tile(raster, raster_band, xoff, yoff, size):
