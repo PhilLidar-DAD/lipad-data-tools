@@ -204,7 +204,7 @@ def process_job(q):
         User can input a directory containing multiple child directories. Each child
         folder is a `LiDAR coverage block` folder.
     """
-
+    log_msg = []
     logger.info('Processing Job')
 
     datatype = q.datatype
@@ -219,7 +219,7 @@ def process_job(q):
 
         if has_error:
             assign_status(q, error=True)
-            log_msg.append('Error in verify_las!\n')
+            log_msg.append('Error in verify_las/verify_raster!\n')
         else:
             logger.info('Renaming tiles...')
 
