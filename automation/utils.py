@@ -36,7 +36,7 @@ def ceph_upload(job):
     stream = setup_logging()
 
     #: `output_dir` contains processed data to be uploaded in ceph
-    input_dir = job.output_dir
+    upload_dir = os.path.join(job.output_dir,proper_block_name(job.input_dir))
 
     print 'Uploading to Ceph ....'
     logger.info('Uploading to Ceph ....')
@@ -50,7 +50,7 @@ def ceph_upload(job):
         #     print "File is not readable", PATH
         # return True, ''
 
-        output = subprocess.check_output(['./bulk_upload_nonthreaded.py', input_dir])
+        output = subprocess.check_output(['./bulk_upload_nonthreaded.py', upload_dir])
 
         print '#' * 40
         print 'Ceph Output ... '
