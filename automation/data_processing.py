@@ -207,7 +207,7 @@ def process_job(q):
     for each_log in log_msg:
         del each_log
 
-    logger.info('Processing Job')
+    logger.info('Processing Job %s', q.id)
 
     datatype = q.datatype
     input_dir = q.input_dir

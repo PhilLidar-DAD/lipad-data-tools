@@ -182,6 +182,7 @@ def db_watcher():
                     if q.target_os.lower() == 'linux':
                         logger.info('Process in Linux')
                         print 'Process in Linux'
+                        print q.id
                         process_job(q)
                     else:
                         logger.info('Process in Windows')
