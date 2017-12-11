@@ -204,7 +204,9 @@ def process_job(q):
         User can input a directory containing multiple child directories. Each child
         folder is a `LiDAR coverage block` folder.
     """
-    log_msg = []
+    for each_log in log_msg:
+        del each_log
+
     logger.info('Processing Job')
 
     datatype = q.datatype
