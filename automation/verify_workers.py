@@ -212,8 +212,8 @@ def verify_raster(file_path, checksum):
     remarks = '\n'.join(remarks_buf)
 
     return has_error, remarks
-    
-def verify_file(file_path):
+
+def verify_file(file_path, data_type):
     # Check file extension
     file_ext = os.path.splitext(file_path)[1].lower()
 
@@ -224,25 +224,30 @@ def verify_file(file_path):
     is_processed = True
     has_error = None
     remarks = ''
-
-    if file_ext in RASTERS:
-        file_type = 'RASTER'
-        has_error, remarks = verify_raster(file_path, checksum)
-    elif file_ext in VECTORS:
-        file_type = 'VECTOR'
-        has_error, remarks = verify_vector(file_path, checksum)
-    elif file_ext in LAS:
-        file_type = 'LAS/LAZ'
-        has_error, remarks = verify_las(file_path, checksum)
-    elif file_ext in ARCHIVES:
-        file_type = 'ARCHIVE'
-        has_error, remarks = verify_archive(file_path, checksum)
+    if data_type.lower() == 'laz' or data_type.lower() == 'ortho':
+        if file_ext in RASTERS:
+            file_type = 'RASTER'
+            has_error, remarks = verify_raster(file_path, checksum)
+        elif file_ext in LAS:
+            file_type = 'LAS/LAZ'
+            has_error, remarks = verify_las(file_path, checksum)
+        else:
+            is_processed = False
     else:
-        is_processed = False
+        has_error = True
+        '''if file_ext in VECTORS:
+            file_type = 'VECTOR'
+            has_error, remarks = verify_vector(file_path, checksum)
+        elif file_ext in ARCHIVES:
+            file_type = 'ARCHIVE'
+            has_error, remarks = verify_archive(file_path, checksum)
+        else:
+            is_processed = False
+            '''
 
     return has_error, remarks
 
-def verify_dir(dir_path):
+def verify_dir(dir_path, data_type):
     # Check if folder exists
     if not os.path.isdir(dir_path):
         logger.debug('%s not a directory\n'%dir_path)
@@ -261,7 +266,7 @@ def verify_dir(dir_path):
     # Verify files
     for fp in file_list.viewkeys():
         # file_list[fp] = verify_file(fp)
-        has_error, remarks = verify_file(fp)
+        has_error, remarks = verify_file(fp, data_type)
 
         if has_error:
             return True
