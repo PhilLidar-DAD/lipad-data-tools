@@ -269,6 +269,6 @@ def verify_dir(dir_path, data_type):
         has_error, remarks = verify_file(fp, data_type)
 
         if has_error:
-            return True
+            return True, remarks
 
-    return False
+    return False, remarks

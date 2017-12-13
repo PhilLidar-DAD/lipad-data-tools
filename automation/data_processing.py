@@ -6,7 +6,7 @@ import math
 import shutil
 
 from models import PSQL_DB, Automation_AutomationJob
-from utils import assign_status, get_cwd, setup_logging, proper_block_name, \
+from utils import assign_status, get_cwd, setup_logging, proper_block_name, proper_block_name_ortho, \
     find_in_coverage
 from verify_workers import verify_las, verify_dir
 
@@ -213,15 +213,18 @@ def process_job(q):
     input_dir = q.input_dir
     output_dir = q.output_dir
     processor = q.processor
-
+    if datatype.lower() == 'laz':
+        block_name = proper_block_name(input_dir)
+    elif datatype.lower() == 'ortho':
+        block_name = proper_block_name_ortho(input_dir)
     if datatype.lower() == 'laz' or datatype.lower() == 'ortho':
         logger.info('Verifying las tiles in directory...')
         log_msg.append('Verifying las tiles in directory...\n')
-        has_error = verify_dir(input_dir, datatype.lower())
+        has_error, remarks = verify_dir(input_dir, datatype.lower())
 
         if has_error:
             assign_status(q, error=True)
-            log_msg.append('Error in verify_las/verify_raster!\n')
+            log_msg.append('Error in verify_las/verify_raster!\n {0} \n'.format(remarks))
         else:
             logger.info('Renaming tiles...')
 

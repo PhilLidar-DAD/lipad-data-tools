@@ -189,6 +189,19 @@ def proper_block_name(block_path):
 
     return block_name
 
+def proper_block_name_ortho(block_path):
+
+    # input format: ../../Agno_Blk5C_20130418
+
+    # parses blockname from path
+    block_name = block_path.split(os.sep)[-1]
+    if block_name == '':
+        block_name = block_path.split(os.sep)[-2]
+    # remove date flown
+    #block_name = block_name.rsplit('_', 1)[0]
+
+    return block_name
+
 
 def find_in_coverage(block_name):
     """
