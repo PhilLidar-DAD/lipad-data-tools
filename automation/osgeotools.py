@@ -109,10 +109,11 @@ def open_raster(path, prj_file):
                "min_y": min_y,
                "max_y": max_y}
     raster["extents"] = extents
-    if _check_projection(prj_file, raster["dataset"]):
-        return raster
+    chck_prj, remarks = _check_projection(prj_file, raster["dataset"])
+    if chck_prj:
+        return raster, remarks
     else:
-        return -1
+        return False, remarks
 
 
 def open_raster_band(raster, bandno, open_band_array=False):
@@ -136,12 +137,14 @@ def _check_projection(prj_file, raster_dataset):
     prj_raster = raster_dataset.GetProjection()
     prj_raster_srs = osr.SpatialReference(wkt=prj_raster)
     # Check if they are the same
+    remarks = ''
     if not prj_srs.IsSame(prj_raster_srs):
-        print("Projection from %s does not match raster dataset! Exiting.", prj_file)
-        return False
+        print "Projection from %s does not match raster dataset! Exiting.", prj_file
+        remarks = "Projection from {0} does not match raster dataset! Exiting.".format(prj_file)
+        return False, remarks
     else:
         # _logger.info("Projection from %s matches raster dataset.", prj_file)
-        return True
+        return True, remarks
 
 
 def get_band_array_tile(raster, raster_band, xoff, yoff, size):

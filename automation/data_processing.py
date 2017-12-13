@@ -148,32 +148,39 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                         error = True
                         break
                 elif tile.endswith(".tif"):
-                    proj_file = os.path.dirname('/mnt/pmsat-nas_geostorage/DAD/Working/WGS_84_UTM_zone_51N.prj')
+                    proj_file = os.path.abspath('/mnt/pmsat-nas_geostorage/DAD/Working/WGS_84_UTM_zone_51N.prj')
                     typeFile = tile.split(".")[-1].upper()
                     tile_file_path = os.path.join(path, tile)
                     try:
-                        orthophoto = osgeotools.open_raster(tile_file_path, proj_file)
-                        ul_x = orthophoto["extents"]["min_x"]
-                        ul_y = orthophoto["extents"]["max_y"]
-                        outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
-                            int(ul_x / float(_TILE_SIZE)), int(ul_y / float(_TILE_SIZE)), typeFile, processor, block_uid, typeFile.lower())
-                        outPath = os.path.join(outDir, outFN)
+                        orthophoto, remarks = osgeotools.open_raster(tile_file_path, proj_file)
+                        if orthophoto:
+                            ul_x = orthophoto["extents"]["min_x"]
+                            ul_y = orthophoto["extents"]["max_y"]
+                            outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
+                                int(ul_x / float(_TILE_SIZE)), int(ul_y / float(_TILE_SIZE)), typeFile, processor, block_uid, typeFile.lower())
+                            outPath = os.path.join(outDir, outFN)
 
-                        logger.info('%s ---------  %s', os.path.
-                                    join(path, tile), outFN)
-                        log_msg.append('{0} ---------  {1}\n'.format(os.path.
-                                                                     join(path, tile), outFN))
+                            logger.info('%s ---------  %s', os.path.
+                                        join(path, tile), outFN)
+                            log_msg.append('{0} ---------  {1}\n'.format(os.path.
+                                                                         join(path, tile), outFN))
 
-                        shutil.copy(tile_file_path, outPath)
-                        print outPath, 'Copied success'
-                        logger.info('Copied success.')
-                        log_msg.append('Copied success.\n')
+                            shutil.copy(tile_file_path, outPath)
+                            print outPath, 'Copied success'
+                            logger.info('Copied success.')
+                            log_msg.append('Copied success.\n')
+                        else:
+                            logger.error("Error for ORTHO [{0}].\n{1}\n".format(
+                                tile_file_path,remarks))
+                            log_msg.append("Error for ORTHO [{0}].\n{1}\n".format(
+                                tile_file_path,remarks))
+                            error = True
 
-                    except:
-                        logger.error("Error for ORTHO [{0}].".format(
-                            tile_file_path))
-                        log_msg.append("Error for ORTHO [{0}].".format(
-                            tile_file_path))
+                    except Exception as e:
+                        logger.error("Error for ORTHO [{0}].\n{1}\n".format(
+                            tile_file_path,e))
+                        log_msg.append("Error for ORTHO [{0}].\n{1}\n".format(
+                            tile_file_path,e))
                         error = True
                         break
 
