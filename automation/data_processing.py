@@ -4,6 +4,7 @@ from datetime import datetime
 import subprocess
 import math
 import shutil
+import osgeotools
 
 from models import PSQL_DB, Automation_AutomationJob
 from utils import assign_status, get_cwd, setup_logging, proper_block_name, proper_block_name_ortho, \
@@ -54,7 +55,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
 
     """
-
+    _TILE_SIZE = 1000
     #: Time data type: Start timing
     startTime = datetime.now()
 
@@ -80,7 +81,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
         for path, dirs, files in os.walk(inDir, topdown=False):
 
             for tile in files:
-                if tile.endswith(".laz") or tile.endswith(".tif"):
+                if tile.endswith(".laz"):
                     typeFile = tile.split(".")[-1].upper()
                     ctr = 0
                     tile_file_path = os.path.join(path, tile)
@@ -101,7 +102,6 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                         bbox_center_x = (minX + (maxX - minX) / 2)
                         bbox_center_y = (minY + (maxY - minY) / 2)
 
-                        _TILE_SIZE = 1000
                         tile_x = int(math.floor(bbox_center_x / float(_TILE_SIZE)))
                         tile_y = int(math.floor(
                             bbox_center_y / float(_TILE_SIZE))) + 1
@@ -147,6 +147,36 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                             tile_file_path, out))
                         error = True
                         break
+                elif tile.endswith(".tif"):
+                    proj_file = os.path.dirname('/mnt/pmsat-nas_geostorage/DAD/Working/WGS_84_UTM_zone_51N.prj')
+                    typeFile = tile.split(".")[-1].upper()
+                    tile_file_path = os.path.join(path, tile)
+                    try:
+                        orthophoto = osgeotools.open_raster(tile_file_path, proj_file)
+                        ul_x = orthophoto["extents"]["min_x"]
+                        ul_y = orthophoto["extents"]["max_y"]
+                        outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
+                            int(ul_x / float(_TILE_SIZE)), int(ul_y / float(_TILE_SIZE)), typeFile, processor, block_uid, typeFile.lower())
+                        outPath = os.path.join(outDir, outFN)
+
+                        logger.info('%s ---------  %s', os.path.
+                                    join(path, tile), outFN)
+                        log_msg.append('{0} ---------  {1}\n'.format(os.path.
+                                                                     join(path, tile), outFN))
+
+                        shutil.copy(tile_file_path, outPath)
+                        print outPath, 'Copied success'
+                        logger.info('Copied success.')
+                        log_msg.append('Copied success.\n')
+
+                    except:
+                        logger.error("Error for ORTHO [{0}].".format(
+                            tile_file_path))
+                        log_msg.append("Error for ORTHO [{0}].".format(
+                            tile_file_path))
+                        error = True
+                        break
+
 
     endTime = datetime.now()  # End timing
     elapsed_time = endTime - startTime
