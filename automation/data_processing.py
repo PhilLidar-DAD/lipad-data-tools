@@ -228,7 +228,6 @@ def process_job(q):
         else:
             logger.info('Renaming tiles...')
 
-            block_name = proper_block_name(input_dir)
             logger.info('BLOCK NAME %s', block_name)
             log_msg.append('BLOCK NAME {0}\n'.format(block_name))
 
