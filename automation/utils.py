@@ -36,7 +36,11 @@ def ceph_upload(job):
     stream = setup_logging()
 
     #: `output_dir` contains processed data to be uploaded in ceph
-    upload_dir = os.path.join(job.output_dir,proper_block_name(job.input_dir))
+    if job.datatype.lower() == 'laz':
+        properblockname = proper_block_name(job.input_dir)
+    elif job.datatype.lower() == 'ortho':
+        properblockname = proper_block_name_ortho(job.input_dir)
+    upload_dir = os.path.join(job.output_dir,properblockname)
 
     print 'Uploading to Ceph ....'
     logger.info('Uploading to Ceph ....')
