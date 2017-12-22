@@ -147,16 +147,16 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                             tile_file_path, out))
                         error = True
                         break
-                elif tile.endswith(".tif"):
+                elif tile.endswith(".tif") and 'ortho' in path.lower():
                     proj_file = os.path.abspath('/mnt/pmsat-nas_geostorage/DAD/Working/WGS_84_UTM_zone_51N.prj')
-                    typeFile = tile.split(".")[-1].upper()
+                    typeFile = "ORTHO" #tile.split(".")[-1].upper()
                     tile_file_path = os.path.join(path, tile)
                     try:
                         orthophoto, remarks = osgeotools.open_raster(tile_file_path, proj_file)
                         if orthophoto:
                             ul_x = orthophoto["extents"]["min_x"]
                             ul_y = orthophoto["extents"]["max_y"]
-                            outFN = 'E{0}N{1}_{2}_{3}_U{4}_ORTHO.{5}'.format(
+                            outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
                                 int(ul_x / float(_TILE_SIZE)), int(ul_y / float(_TILE_SIZE)), typeFile, processor, block_uid, typeFile.lower())
                             outPath = os.path.join(outDir, outFN)
 
