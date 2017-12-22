@@ -156,7 +156,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                         if orthophoto:
                             ul_x = orthophoto["extents"]["min_x"]
                             ul_y = orthophoto["extents"]["max_y"]
-                            outFN = 'E{0}N{1}_{2}_{3}_U{4}.{5}'.format(
+                            outFN = 'E{0}N{1}_{2}_{3}_U{4}_ORTHO.{5}'.format(
                                 int(ul_x / float(_TILE_SIZE)), int(ul_y / float(_TILE_SIZE)), typeFile, processor, block_uid, typeFile.lower())
                             outPath = os.path.join(outDir, outFN)
 
