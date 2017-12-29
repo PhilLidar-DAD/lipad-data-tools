@@ -251,7 +251,7 @@ def verify_dir(dir_path, data_type):
     # Check if folder exists
     if not os.path.isdir(dir_path):
         logger.debug('%s not a directory\n'%dir_path)
-        return True #has_error
+        return True, '%s not a directory'%dir_path #has_error
     # Get file list
     file_list = {}
     for f in sorted(os.listdir(dir_path)):
@@ -271,4 +271,4 @@ def verify_dir(dir_path, data_type):
         if has_error:
             return True, remarks
 
-    return False, remarks
+    return False, ''
