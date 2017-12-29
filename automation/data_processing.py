@@ -78,7 +78,7 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
 
     if not error:
         #: Loop through the input directory
-        for path, dirs, files in os.walk(inDir, topdown=False):
+        for path, dirs, files in os.walk(inDir, topdown=True):
 
             for tile in files:
                 if tile.endswith(".laz"):
