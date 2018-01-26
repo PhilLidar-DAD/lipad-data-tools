@@ -94,11 +94,20 @@ def rename_tiles(inDir, outDir, processor, block_name, block_uid, q):
                     returncode = p.returncode
                     if returncode is 0:
                         tokens = out.split(" ")
-                        minX = float(tokens[1])
-                        minY = float(tokens[2])
-                        maxX = float(tokens[3])
-                        maxY = float(tokens[4])
-
+                        try:
+                            minX = float(tokens[1])
+                            minY = float(tokens[2])
+                            maxX = float(tokens[3])
+                            maxY = float(tokens[4])
+                        except:
+                            logger.error("Error reading extents of [{0}]. Trace from \
+                                lasbb:\n{1}".format(
+                                tile_file_path, out))
+                            log_msg.append("Error reading extents of [{0}]. Trace from \
+                                lasbb:\n{1}\n".format(
+                                tile_file_path, out))
+                            error = True
+                            break
                         bbox_center_x = (minX + (maxX - minX) / 2)
                         bbox_center_y = (minY + (maxY - minY) / 2)
 
