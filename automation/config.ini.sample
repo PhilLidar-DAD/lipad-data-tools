@@ -1,0 +1,9 @@
+[ceph]
+USER = <ceph_rgw_geonode_user:swift>
+KEY  = <swift_user_api_key>
+URL  = <ceph_rgw_host>
+CONTAINER = <container>
+[env]
+activatethis = ~/.virtualenvs/automation/bin/activate_this.py
+[tmp_folder]
+path='/tmp/tmp_ceph_objects/'

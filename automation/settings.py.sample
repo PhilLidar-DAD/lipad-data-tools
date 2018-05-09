@@ -1,0 +1,7 @@
+# lipad.tst geonode database settings
+DB_NAME = '<db_name>'
+DB_USER = '<db_user>'
+DB_PASS = '<db_password>'
+DB_HOST = '<db_host.example.net>'
+DB_PORT = '5432'
+
