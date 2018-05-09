@@ -10,6 +10,7 @@ import logging
 import random
 import time
 import subprocess
+import platform
 from datetime import datetime
 import json as py_json
 from os.path import dirname, abspath
@@ -19,13 +20,14 @@ from data_processing import process_job
 logger = logging.getLogger()
 LOG_LEVEL = logging.INFO
 FILE_LOG_LEVEL = logging.INFO
+hostname = platform.uname()[1]
 
 
 def setup_logging():
 
     # Setup logging
     logger.setLevel(LOG_LEVEL)
-    formatter = logging.Formatter('[%(asctime)s] %(filename)s \
+    formatter = logging.Formatter('[%(hostname)s] [%(asctime)s] %(filename)s \
 (%(levelname)s,%(lineno)d)\t: %(message)s')
 
     # Setup file logging
@@ -126,8 +128,6 @@ def handle_dem(q):
 
     if ceph_uploaded:
         transfer_metadata(log_file)
-
-
 
 
 
