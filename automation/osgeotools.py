@@ -140,7 +140,12 @@ def _check_projection(prj_file, raster_dataset):
     remarks = ''
     if not prj_srs.IsSame(prj_raster_srs):
         print "Projection from %s does not match raster dataset! Exiting.", prj_file
-        remarks = "Projection from {0} does not match raster dataset! Exiting.".format(prj_file)
+        if prj_raster_srs.IsProjected():
+            print "Raster Dataset Projection: {0}, {1}".format(prj_raster_srs.GetAttrValue('projcs'), prj_raster_srs.GetAttrValue('geogcs'))
+            remarks = "Projection from {0} does not match raster dataset: {1} {2} {3}! Exiting.".format(prj_file, prj_raster_srs, prj_raster_srs.GetAttrValue('projcs'), prj_raster_srs.GetAttrValue('geogcs'))
+        else:
+            print "Raster Dataset Projection: {0}".format(prj_raster_srs.GetAttrValue('geogcs'))
+            remarks = "Projection from {0} does not match raster dataset: {1} {2}! Exiting.".format(prj_file, prj_raster_srs, prj_raster_srs.GetAttrValue('geogcs'))
         return False, remarks
     else:
         # _logger.info("Projection from %s matches raster dataset.", prj_file)
