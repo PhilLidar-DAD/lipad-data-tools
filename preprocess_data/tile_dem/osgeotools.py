@@ -25,11 +25,14 @@ def pixel2world(gt, col_id, row_id):
 
 
 def world2pixel(gt, x, y):
-    inv_gt = gdal.InvGeoTransform(gt)[1]
+    # try-except block to handle different output of InvGeoTransform with gdal versions
+    try:
+        inv_gt_success, inv_gt = gdal.InvGeoTransform(gt)
+    except:
+        inv_gt = gdal.InvGeoTransform(gt)
     pixel_loc = gdal.ApplyGeoTransform(inv_gt, x, y)
     col_id, row_id = tuple([int(round(i, 0)) for i in pixel_loc])
     return col_id, row_id
-
 
 def _image2array(i):
     a = gdalnumeric.fromstring(i.tostring(), 'b')
